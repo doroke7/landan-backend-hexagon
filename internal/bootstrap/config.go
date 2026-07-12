@@ -23,6 +23,9 @@ type Config struct {
 	FACADE struct {
 		PORT string `mapstructure:"port"`
 	} `mapstructure:"facade"`
+	RESOURCE struct {
+		PORT string `mapstructure:"port"`
+	} `mapstructure:"resource"`
 	SERVICES struct {
 		FACADE struct {
 			HOST string `mapstructure:"host"`

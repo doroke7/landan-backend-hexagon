@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.35.0
-// source: facade/table/scanner.proto
+// source: facade/register/authenticator.proto
 
-package pb_facade_table
+package pb_facade_register
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -30,7 +30,7 @@ type OneRequest struct {
 
 func (x *OneRequest) Reset() {
 	*x = OneRequest{}
-	mi := &file_facade_table_scanner_proto_msgTypes[0]
+	mi := &file_facade_register_authenticator_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *OneRequest) String() string {
 func (*OneRequest) ProtoMessage() {}
 
 func (x *OneRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_facade_table_scanner_proto_msgTypes[0]
+	mi := &file_facade_register_authenticator_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *OneRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OneRequest.ProtoReflect.Descriptor instead.
 func (*OneRequest) Descriptor() ([]byte, []int) {
-	return file_facade_table_scanner_proto_rawDescGZIP(), []int{0}
+	return file_facade_register_authenticator_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *OneRequest) GetName() string {
@@ -74,7 +74,7 @@ type OneResponse struct {
 
 func (x *OneResponse) Reset() {
 	*x = OneResponse{}
-	mi := &file_facade_table_scanner_proto_msgTypes[1]
+	mi := &file_facade_register_authenticator_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +86,7 @@ func (x *OneResponse) String() string {
 func (*OneResponse) ProtoMessage() {}
 
 func (x *OneResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_facade_table_scanner_proto_msgTypes[1]
+	mi := &file_facade_register_authenticator_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,7 +99,7 @@ func (x *OneResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OneResponse.ProtoReflect.Descriptor instead.
 func (*OneResponse) Descriptor() ([]byte, []int) {
-	return file_facade_table_scanner_proto_rawDescGZIP(), []int{1}
+	return file_facade_register_authenticator_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *OneResponse) GetName() string {
@@ -109,39 +109,39 @@ func (x *OneResponse) GetName() string {
 	return ""
 }
 
-var File_facade_table_scanner_proto protoreflect.FileDescriptor
+var File_facade_register_authenticator_proto protoreflect.FileDescriptor
 
-const file_facade_table_scanner_proto_rawDesc = "" +
+const file_facade_register_authenticator_proto_rawDesc = "" +
 	"\n" +
-	"\x1afacade/table/scanner.proto\x12\x0fpb.facade.table\" \n" +
+	"#facade/register/authenticator.proto\x12\x12pb.facade.register\" \n" +
 	"\n" +
 	"OneRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"!\n" +
 	"\vOneResponse\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name2Q\n" +
-	"\aScanner\x12F\n" +
-	"\tReportOne\x12\x1b.pb.facade.table.OneRequest\x1a\x1c.pb.facade.table.OneResponseB\x13Z\x11./pb_facade_tableb\x06proto3"
+	"\x04name\x18\x01 \x01(\tR\x04name2Z\n" +
+	"\rAuthenticator\x12I\n" +
+	"\x06SignIn\x12\x1e.pb.facade.register.OneRequest\x1a\x1f.pb.facade.register.OneResponseB\x16Z\x14./pb_facade_registerb\x06proto3"
 
 var (
-	file_facade_table_scanner_proto_rawDescOnce sync.Once
-	file_facade_table_scanner_proto_rawDescData []byte
+	file_facade_register_authenticator_proto_rawDescOnce sync.Once
+	file_facade_register_authenticator_proto_rawDescData []byte
 )
 
-func file_facade_table_scanner_proto_rawDescGZIP() []byte {
-	file_facade_table_scanner_proto_rawDescOnce.Do(func() {
-		file_facade_table_scanner_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_facade_table_scanner_proto_rawDesc), len(file_facade_table_scanner_proto_rawDesc)))
+func file_facade_register_authenticator_proto_rawDescGZIP() []byte {
+	file_facade_register_authenticator_proto_rawDescOnce.Do(func() {
+		file_facade_register_authenticator_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_facade_register_authenticator_proto_rawDesc), len(file_facade_register_authenticator_proto_rawDesc)))
 	})
-	return file_facade_table_scanner_proto_rawDescData
+	return file_facade_register_authenticator_proto_rawDescData
 }
 
-var file_facade_table_scanner_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_facade_table_scanner_proto_goTypes = []any{
-	(*OneRequest)(nil),  // 0: pb.facade.table.OneRequest
-	(*OneResponse)(nil), // 1: pb.facade.table.OneResponse
+var file_facade_register_authenticator_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_facade_register_authenticator_proto_goTypes = []any{
+	(*OneRequest)(nil),  // 0: pb.facade.register.OneRequest
+	(*OneResponse)(nil), // 1: pb.facade.register.OneResponse
 }
-var file_facade_table_scanner_proto_depIdxs = []int32{
-	0, // 0: pb.facade.table.Scanner.ReportOne:input_type -> pb.facade.table.OneRequest
-	1, // 1: pb.facade.table.Scanner.ReportOne:output_type -> pb.facade.table.OneResponse
+var file_facade_register_authenticator_proto_depIdxs = []int32{
+	0, // 0: pb.facade.register.Authenticator.SignIn:input_type -> pb.facade.register.OneRequest
+	1, // 1: pb.facade.register.Authenticator.SignIn:output_type -> pb.facade.register.OneResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -149,26 +149,26 @@ var file_facade_table_scanner_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_facade_table_scanner_proto_init() }
-func file_facade_table_scanner_proto_init() {
-	if File_facade_table_scanner_proto != nil {
+func init() { file_facade_register_authenticator_proto_init() }
+func file_facade_register_authenticator_proto_init() {
+	if File_facade_register_authenticator_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_facade_table_scanner_proto_rawDesc), len(file_facade_table_scanner_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_facade_register_authenticator_proto_rawDesc), len(file_facade_register_authenticator_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_facade_table_scanner_proto_goTypes,
-		DependencyIndexes: file_facade_table_scanner_proto_depIdxs,
-		MessageInfos:      file_facade_table_scanner_proto_msgTypes,
+		GoTypes:           file_facade_register_authenticator_proto_goTypes,
+		DependencyIndexes: file_facade_register_authenticator_proto_depIdxs,
+		MessageInfos:      file_facade_register_authenticator_proto_msgTypes,
 	}.Build()
-	File_facade_table_scanner_proto = out.File
-	file_facade_table_scanner_proto_goTypes = nil
-	file_facade_table_scanner_proto_depIdxs = nil
+	File_facade_register_authenticator_proto = out.File
+	file_facade_register_authenticator_proto_goTypes = nil
+	file_facade_register_authenticator_proto_depIdxs = nil
 }

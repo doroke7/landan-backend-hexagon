@@ -14,7 +14,7 @@ var oFacadeCommand = &cobra.Command{
 	Use:   "facade",
 	Short: "啟動 Facade 服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		oContainer, err := container.InitContainer()
+		oContainer, err := container.InitFacadeContainer()
 		oFacadeServer := register.FacadeInit(oContainer)
 
 		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.FACADE.PORT)

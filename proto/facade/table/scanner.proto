@@ -5,7 +5,7 @@ package pb.facade.table;
 option go_package = "./pb_facade_table";
 
 service Scanner {
-  rpc PostOne(OneRequest) returns (OneResponse);
+  rpc ReportOne(OneRequest) returns (OneResponse);
 }
 
 message OneRequest {

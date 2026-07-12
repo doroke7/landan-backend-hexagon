@@ -6,16 +6,14 @@ import (
 	container "example/internal/container"
 
 	pbFacadeGame "example/pb/facade/game"
-	pbFacadeRegister "example/pb/facade/register"
 	pbFacadeTable "example/pb/facade/table"
 )
 
-func FacadeInit(oContainer *container.FacadeContainer) *grpc.Server {
+func ResourceInit(oContainer *container.ResourceContainer) *grpc.Server {
 	oGrpcServer := grpc.NewServer()
 
-	pbFacadeTable.RegisterScannerServer(oGrpcServer, oContainer.FacadeTableScanner)
+	pbFacadeTable.RegisterScannerServer(oGrpcServer, oContainer.FacadeTableScannerUser)
 	pbFacadeGame.RegisterUserServiceServer(oGrpcServer, oContainer.FacadeGameUser)
-	pbFacadeRegister.RegisterAuthenticatorServer(oGrpcServer, oContainer.FacadeTableAuthenticator)
 
 	return oGrpcServer
 }

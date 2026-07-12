@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Scanner_PostOne_FullMethodName = "/pb.facade.table.Scanner/PostOne"
+	Scanner_ReportOne_FullMethodName = "/pb.facade.table.Scanner/ReportOne"
 )
 
 // ScannerClient is the client API for Scanner service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ScannerClient interface {
-	PostOne(ctx context.Context, in *OneRequest, opts ...grpc.CallOption) (*OneResponse, error)
+	ReportOne(ctx context.Context, in *OneRequest, opts ...grpc.CallOption) (*OneResponse, error)
 }
 
 type scannerClient struct {
@@ -37,10 +37,10 @@ func NewScannerClient(cc grpc.ClientConnInterface) ScannerClient {
 	return &scannerClient{cc}
 }
 
-func (c *scannerClient) PostOne(ctx context.Context, in *OneRequest, opts ...grpc.CallOption) (*OneResponse, error) {
+func (c *scannerClient) ReportOne(ctx context.Context, in *OneRequest, opts ...grpc.CallOption) (*OneResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(OneResponse)
-	err := c.cc.Invoke(ctx, Scanner_PostOne_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, Scanner_ReportOne_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *scannerClient) PostOne(ctx context.Context, in *OneRequest, opts ...grp
 // All implementations must embed UnimplementedScannerServer
 // for forward compatibility.
 type ScannerServer interface {
-	PostOne(context.Context, *OneRequest) (*OneResponse, error)
+	ReportOne(context.Context, *OneRequest) (*OneResponse, error)
 	mustEmbedUnimplementedScannerServer()
 }
 
@@ -62,8 +62,8 @@ type ScannerServer interface {
 // pointer dereference when methods are called.
 type UnimplementedScannerServer struct{}
 
-func (UnimplementedScannerServer) PostOne(context.Context, *OneRequest) (*OneResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method PostOne not implemented")
+func (UnimplementedScannerServer) ReportOne(context.Context, *OneRequest) (*OneResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReportOne not implemented")
 }
 func (UnimplementedScannerServer) mustEmbedUnimplementedScannerServer() {}
 func (UnimplementedScannerServer) testEmbeddedByValue()                 {}
@@ -86,20 +86,20 @@ func RegisterScannerServer(s grpc.ServiceRegistrar, srv ScannerServer) {
 	s.RegisterService(&Scanner_ServiceDesc, srv)
 }
 
-func _Scanner_PostOne_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Scanner_ReportOne_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OneRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ScannerServer).PostOne(ctx, in)
+		return srv.(ScannerServer).ReportOne(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Scanner_PostOne_FullMethodName,
+		FullMethod: Scanner_ReportOne_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ScannerServer).PostOne(ctx, req.(*OneRequest))
+		return srv.(ScannerServer).ReportOne(ctx, req.(*OneRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var Scanner_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ScannerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PostOne",
-			Handler:    _Scanner_PostOne_Handler,
+			MethodName: "ReportOne",
+			Handler:    _Scanner_ReportOne_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
