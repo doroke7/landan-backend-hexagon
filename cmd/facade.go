@@ -1,0 +1,32 @@
+package cmd
+
+import (
+	"example/internal/bootstrap"
+	"example/internal/container"
+	"example/internal/register"
+	"log"
+	"net"
+
+	"github.com/spf13/cobra"
+)
+
+var oFacadeCommand = &cobra.Command{
+	Use:   "facade",
+	Short: "啟動 Facade 服務",
+	Run: func(cmd *cobra.Command, args []string) {
+		oContainer, err := container.InitContainer()
+		oFacadeServer := register.FacadeInit(oContainer)
+
+		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.FACADE.PORT)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Fatal(oFacadeServer.Serve(oListener))
+	},
+}
+
+func init() {
+	// 將 server 指令加入到 root 中
+	oRootCommand.AddCommand(oFacadeCommand)
+}

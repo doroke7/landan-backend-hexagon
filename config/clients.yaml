@@ -1,0 +1,13 @@
+facade:        # 面門 服務
+  hosts: ["127.0.0.1"]
+  ports: ["3001"]
+
+domain:        # 數據服務
+  hosts: ["127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"]
+  ports: ["4001", "4001", "4001", "4001"]
+  username: 'domain'
+  password: '!Scg]4"?VYY`mzFOV(Nu247ou6O5E@jB'
+
+
+# services 是服務端要配置什麼密碼
+# clients 是客戶端連線時候要配置什麼密碼
