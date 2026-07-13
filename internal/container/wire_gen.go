@@ -80,11 +80,11 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		return nil, err
 	}
 	userRepository := mysql.NewUserRepository(db)
-	redisClient, err := bootstrap.NewRedis()
+	client, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
@@ -96,13 +96,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	clientConn, err := bootstrap.NewClient()
-	if err != nil {
-		return nil, err
-	}
-	clientClient := client.NewClient(clientConn)
-	clientAbstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
-	userHandler := client2.NewUserHandler(userUsecase, clientAbstractHandler)
 	serviceAbstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
 	resourceContainer := &ResourceContainer{
@@ -113,7 +106,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		AbstractUsecase:        abstractUsecase,
 		UserUsecase:            userUsecase,
 		ConsumerUser:           userConsumer,
-		ClientUser:             userHandler,
 		ResourceAbstract:       serviceAbstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
 	}
@@ -241,9 +233,6 @@ type ResourceContainer struct {
 
 	// MQ 消費者
 	ConsumerUser *consumer.UserConsumer
-
-	// gRPC client stream 訂閱
-	ClientUser *client2.UserHandler
 
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
