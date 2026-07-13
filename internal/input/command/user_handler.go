@@ -7,8 +7,10 @@ import (
 	"log"
 )
 
-func NewUserHandler() *UserHandler {
-	return &UserHandler{}
+func NewUserHandler(oUserUsecase port.UserUsecase) *UserHandler {
+	return &UserHandler{
+		userUsecase: oUserUsecase,
+	}
 }
 
 type UserHandler struct {

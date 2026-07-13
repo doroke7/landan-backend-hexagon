@@ -17,31 +17,30 @@ import (
 
 	bootstrap "example/internal/bootstrap"
 	internalClient "example/internal/client"
+
 	helper "example/internal/helper"
+
 	client "example/internal/input/client"
 	command "example/internal/input/command"
 	consumer "example/internal/input/consumer"
 	cron "example/internal/input/cron"
-
 	Facade "example/internal/input/facade"
 	FacadeGame "example/internal/input/facade/game"
 	FacadeRegister "example/internal/input/facade/register"
 	FacadeTable "example/internal/input/facade/table"
-
-	Resource "example/internal/input/resource"
-	ResourceModel "example/internal/input/resource/model"
-
-	MiddlewareAdmin "example/internal/middleware/admin"
-
 	HttpAdmin "example/internal/input/http/admin"
 	HttpAdminResource "example/internal/input/http/admin/resource"
+	Resource "example/internal/input/resource"
+	ResourceModel "example/internal/input/resource/model"
+	websocket "example/internal/input/websocket"
+
+	MiddlewareAdmin "example/internal/middleware/admin"
 
 	usecase "example/internal/usecase"
 	usecaseResource "example/internal/usecase/resource"
 
-	"example/internal/input/websocket"
-	"example/internal/output/cache"
-	"example/internal/output/mysql"
+	cache "example/internal/output/cache"
+	mysql "example/internal/output/mysql"
 	inputPort "example/internal/usecase/port"
 )
 
@@ -427,7 +426,6 @@ func InitCommandContainer() (*CommandContainer, error) {
 	wire.Build(
 
 		// bootstrap
-		bootstrap.NewMysql,
 		bootstrap.NewRedis,
 
 		// helper
