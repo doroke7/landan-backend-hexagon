@@ -17,7 +17,10 @@ var CommandCommand = &cobra.Command{
 }
 
 func init() {
-	var oContainer, _ = container.InitCommandContainer()
+	oContainer, err := container.InitCommandContainer()
+	if err != nil {
+		panic(err)
+	}
 
 	CommandCommand.AddCommand(oContainer.UserHandler.AddUser())
 	oRootCommand.AddCommand(CommandCommand)
