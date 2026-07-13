@@ -51,21 +51,10 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
-	connection, err := bootstrap.NewAmqp()
-	if err != nil {
-		return nil, err
-	}
-	abstractHandler := consumer.NewAbstractHandler(aesHelper, connection)
-	userConsumer, err := consumer.NewUserConsumer(userUsecase, abstractHandler)
-	if err != nil {
-		return nil, err
-	}
-	facadeAbstractHandler := facade.NewAbstractHandler(aesHelper)
-	userHandler := facade2.NewUserHandler(userUsecase, facadeAbstractHandler)
-	scannerHandler := facade3.NewScannerHandler(facadeAbstractHandler)
-	authenticatorHandler := facade4.NewAuthenticatorHandler(facadeAbstractHandler)
-	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
-	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
+	abstractHandler := facade.NewAbstractHandler(aesHelper)
+	userHandler := facade2.NewUserHandler(userUsecase, abstractHandler)
+	scannerHandler := facade3.NewScannerHandler(abstractHandler)
+	authenticatorHandler := facade4.NewAuthenticatorHandler(abstractHandler)
 	facadeContainer := &FacadeContainer{
 		Response:                 response,
 		AbstractHelper:           abstractHelper,
@@ -74,12 +63,10 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		LoggerHelper:             loggerHelper,
 		AbstractUsecase:          abstractUsecase,
 		UserUsecase:              userUsecase,
-		ConsumerUser:             userConsumer,
-		FacadeAbstract:           facadeAbstractHandler,
+		FacadeAbstract:           abstractHandler,
 		FacadeGameUser:           userHandler,
 		FacadeTableScanner:       scannerHandler,
 		FacadeTableAuthenticator: authenticatorHandler,
-		HttpAdminResourceUser:    handlerUserHandler,
 	}
 	return facadeContainer, nil
 }
@@ -244,17 +231,11 @@ type FacadeContainer struct {
 	*usecase.AbstractUsecase
 	port.UserUsecase
 
-	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
-
 	// gRPC Facade server
 	FacadeAbstract           *facade.AbstractHandler
 	FacadeGameUser           *facade2.UserHandler
 	FacadeTableScanner       *facade3.ScannerHandler
 	FacadeTableAuthenticator *facade4.AuthenticatorHandler
-
-	// HTTP server -Controller
-	HttpAdminResourceUser *handler2.UserHandler
 }
 
 type ResourceContainer struct {
