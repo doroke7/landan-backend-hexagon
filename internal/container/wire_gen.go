@@ -162,8 +162,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
 	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
-	websocketAbstractHandler := websocket.NewAbstractHandler(aesHelper)
-	websocketUserHandler := websocket.NewUserHandler(userUsecase, websocketAbstractHandler)
 	resourceContainer := &ResourceContainer{
 		Response:               response,
 		AbstractHelper:         abstractHelper,
@@ -177,7 +175,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		ResourceAbstract:       serviceAbstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
 		HttpAdminResourceUser:  handlerUserHandler,
-		WebsocketUser:          websocketUserHandler,
 	}
 	return resourceContainer, nil
 }
@@ -347,9 +344,6 @@ type ResourceContainer struct {
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler
-
-	// websocket server
-	WebsocketUser *websocket.UserHandler
 }
 
 type Container struct {

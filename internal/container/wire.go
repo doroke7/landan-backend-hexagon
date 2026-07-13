@@ -206,9 +206,6 @@ type ResourceContainer struct {
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *HttpAdminResource.UserHandler
-
-	// websocket server
-	WebsocketUser *websocket.UserHandler
 }
 
 func InitResourdeContainer() (*ResourceContainer, error) {
@@ -244,10 +241,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		// input-http
 		HttpAdmin.NewAbstractHandler,
 		HttpAdminResource.NewUserHandler,
-
-		// input-websocket
-		websocket.NewAbstractHandler,
-		websocket.NewUserHandler,
 
 		// input-client
 		client.NewAbstractHandler,
