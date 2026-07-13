@@ -8,7 +8,7 @@ import (
 	"example/internal/container"
 )
 
-func CronInit(oContainer *container.Container) *cron.Cron {
+func CronInit(oContainer *container.CronContainer) *cron.Cron {
 	oCron := cron.New()
 
 	if _, err := oCron.AddFunc("* * * * *", oContainer.CronUser.AddUser); err != nil {

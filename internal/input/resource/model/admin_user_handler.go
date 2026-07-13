@@ -3,15 +3,15 @@ package service
 import (
 	"context"
 
-	"example/internal/usecase/port"
 	resource "example/internal/input/resource"
+	"example/internal/usecase/port"
 	pb "example/pb/resource/model"
 )
 
 type AdminUserHandler struct {
 	pb.UnimplementedAdminUserServer
 	*resource.AbstractHandler
-	AdminUserUsecase port.AdminUserUsecase
+	port.AdminUserUsecase
 }
 
 func NewAdminUserHandler(oAbstractHandler *resource.AbstractHandler, oAdminUserUsecase port.AdminUserUsecase) *AdminUserHandler {

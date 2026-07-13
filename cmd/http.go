@@ -15,7 +15,7 @@ var oHttpCommand = &cobra.Command{
 	Use:   "http",
 	Short: "啟動 Gin HTTP 服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		oContainer, err := container.InitContainer()
+		oContainer, err := container.InitHttpContainer()
 		if err != nil {
 			log.Fatal(err)
 		}

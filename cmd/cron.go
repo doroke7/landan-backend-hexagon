@@ -11,7 +11,7 @@ var oCronCommand = &cobra.Command{
 	Use:   "cron",
 	Short: "啟動排程服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		oContainer, _ := container.InitContainer()
+		oContainer, _ := container.InitCronContainer()
 
 		oCron := register.CronInit(oContainer)
 		oCron.Start()

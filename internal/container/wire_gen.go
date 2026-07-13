@@ -103,8 +103,126 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	return resourceContainer, nil
 }
 
-func InitContainer() (*Container, error) {
+func InitHttpContainer() (*HttpContainer, error) {
 	response := pkg.NewResponse()
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	rsaHelper := helper.NewRsaHelper(abstractHelper)
+	loggerHelper := helper.NewLoggerHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	client, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractHandler := handler.NewAbstractHandler(response, aesHelper)
+	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
+	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper, loggerHelper)
+	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
+	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
+	decryptionMiddleware := middleware_admin.NewDecryptionMiddleware(abstractMiddleware)
+	encryptionMiddleware := middleware_admin.NewEncryptionMiddleware(abstractMiddleware)
+	errorMiddleware := middleware_admin.NewErrorMiddleware(abstractMiddleware)
+	loggerMiddleware := middleware_admin.NewLoggerMiddleware(abstractMiddleware)
+	nonexistentMiddleware := middleware_admin.NewNonexistentMiddleware(abstractMiddleware)
+	requestMiddleware := middleware_admin.NewRequestMiddleware(abstractMiddleware)
+	responseMiddleware := middleware_admin.NewResponseMiddleware(abstractMiddleware)
+	signatureMiddleware := middleware_admin.NewSignatureMiddleware(abstractMiddleware)
+	httpContainer := &HttpContainer{
+		Response:                      response,
+		AbstractHelper:                abstractHelper,
+		AesHelper:                     aesHelper,
+		RsaHelper:                     rsaHelper,
+		LoggerHelper:                  loggerHelper,
+		AbstractUsecase:               abstractUsecase,
+		UserUsecase:                   userUsecase,
+		HttpAdminResourceUser:         userHandler,
+		AdminAbstractMiddleware:       abstractMiddleware,
+		AdminAdminMiddleware:          adminMiddleware,
+		AdminAuthenticationMiddleware: authenticationMiddleware,
+		AdminDecryptionMiddleware:     decryptionMiddleware,
+		AdminEncryptionMiddleware:     encryptionMiddleware,
+		AdminErrorMiddleware:          errorMiddleware,
+		AdminLoggerMiddleware:         loggerMiddleware,
+		AdminNonexistentMiddleware:    nonexistentMiddleware,
+		AdminRequestMiddleware:        requestMiddleware,
+		AdminResponseMiddleware:       responseMiddleware,
+		AdminSignatureMiddleware:      signatureMiddleware,
+	}
+	return httpContainer, nil
+}
+
+func InitConsumerContainer() (*ConsumerContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	client, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	connection, err := bootstrap.NewAmqp()
+	if err != nil {
+		return nil, err
+	}
+	abstractHandler := consumer.NewAbstractHandler(aesHelper, connection)
+	userConsumer, err := consumer.NewUserConsumer(userUsecase, abstractHandler)
+	if err != nil {
+		return nil, err
+	}
+	consumerContainer := &ConsumerContainer{
+		AbstractHelper:  abstractHelper,
+		AesHelper:       aesHelper,
+		AbstractUsecase: abstractUsecase,
+		UserUsecase:     userUsecase,
+		ConsumerUser:    userConsumer,
+	}
+	return consumerContainer, nil
+}
+
+func InitCronContainer() (*CronContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	client, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractHandler := cron.NewAbstractHandler(aesHelper)
+	userCron, err := cron.NewUserCron(userUsecase, abstractHandler)
+	if err != nil {
+		return nil, err
+	}
+	cronContainer := &CronContainer{
+		AbstractHelper:  abstractHelper,
+		AesHelper:       aesHelper,
+		AbstractUsecase: abstractUsecase,
+		UserUsecase:     userUsecase,
+		CronUser:        userCron,
+	}
+	return cronContainer, nil
+}
+
+func InitContainer() (*Container, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
@@ -121,71 +239,29 @@ func InitContainer() (*Container, error) {
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
-	connection, err := bootstrap.NewAmqp()
-	if err != nil {
-		return nil, err
-	}
-	abstractHandler := consumer.NewAbstractHandler(aesHelper, connection)
-	userConsumer, err := consumer.NewUserConsumer(userUsecase, abstractHandler)
-	if err != nil {
-		return nil, err
-	}
 	clientConn, err := bootstrap.NewClient()
 	if err != nil {
 		return nil, err
 	}
 	clientClient := client.NewClient(clientConn)
-	clientAbstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
-	userHandler := client2.NewUserHandler(userUsecase, clientAbstractHandler)
+	abstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
+	userHandler := client2.NewUserHandler(userUsecase, abstractHandler)
 	facadeAbstractHandler := facade.NewAbstractHandler(aesHelper)
 	facadeUserHandler := facade2.NewUserHandler(userUsecase, facadeAbstractHandler)
 	scannerHandler := facade3.NewScannerHandler(facadeAbstractHandler)
-	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
-	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
-	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper, loggerHelper)
-	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
-	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
-	decryptionMiddleware := middleware_admin.NewDecryptionMiddleware(abstractMiddleware)
-	encryptionMiddleware := middleware_admin.NewEncryptionMiddleware(abstractMiddleware)
-	errorMiddleware := middleware_admin.NewErrorMiddleware(abstractMiddleware)
-	loggerMiddleware := middleware_admin.NewLoggerMiddleware(abstractMiddleware)
-	nonexistentMiddleware := middleware_admin.NewNonexistentMiddleware(abstractMiddleware)
-	requestMiddleware := middleware_admin.NewRequestMiddleware(abstractMiddleware)
-	responseMiddleware := middleware_admin.NewResponseMiddleware(abstractMiddleware)
-	signatureMiddleware := middleware_admin.NewSignatureMiddleware(abstractMiddleware)
-	cronAbstractHandler := cron.NewAbstractHandler(aesHelper)
-	userCron, err := cron.NewUserCron(userUsecase, cronAbstractHandler)
-	if err != nil {
-		return nil, err
-	}
 	websocketAbstractHandler := websocket.NewAbstractHandler(aesHelper)
 	websocketUserHandler := websocket.NewUserHandler(userUsecase, websocketAbstractHandler)
 	container := &Container{
-		Response:                      response,
-		AbstractHelper:                abstractHelper,
-		AesHelper:                     aesHelper,
-		RsaHelper:                     rsaHelper,
-		LoggerHelper:                  loggerHelper,
-		AbstractUsecase:               abstractUsecase,
-		UserUsecase:                   userUsecase,
-		ConsumerUser:                  userConsumer,
-		ClientUser:                    userHandler,
-		FacadeGameUser:                facadeUserHandler,
-		FacadeTableScannerUser:        scannerHandler,
-		HttpAdminResourceUser:         handlerUserHandler,
-		AdminAbstractMiddleware:       abstractMiddleware,
-		AdminAdminMiddleware:          adminMiddleware,
-		AdminAuthenticationMiddleware: authenticationMiddleware,
-		AdminDecryptionMiddleware:     decryptionMiddleware,
-		AdminEncryptionMiddleware:     encryptionMiddleware,
-		AdminErrorMiddleware:          errorMiddleware,
-		AdminLoggerMiddleware:         loggerMiddleware,
-		AdminNonexistentMiddleware:    nonexistentMiddleware,
-		AdminRequestMiddleware:        requestMiddleware,
-		AdminResponseMiddleware:       responseMiddleware,
-		AdminSignatureMiddleware:      signatureMiddleware,
-		CronUser:                      userCron,
-		WebsocketUser:                 websocketUserHandler,
+		AbstractHelper:         abstractHelper,
+		AesHelper:              aesHelper,
+		RsaHelper:              rsaHelper,
+		LoggerHelper:           loggerHelper,
+		AbstractUsecase:        abstractUsecase,
+		UserUsecase:            userUsecase,
+		ClientUser:             userHandler,
+		FacadeGameUser:         facadeUserHandler,
+		FacadeTableScannerUser: scannerHandler,
+		WebsocketUser:          websocketUserHandler,
 	}
 	return container, nil
 }
@@ -226,7 +302,8 @@ type ResourceContainer struct {
 	ResourceModelAdminUser *service2.AdminUserHandler
 }
 
-type Container struct {
+// HttpContainer 只給 `http` Gin 服務使用。
+type HttpContainer struct {
 
 	// pkg
 	*pkg.Response
@@ -239,16 +316,6 @@ type Container struct {
 
 	*usecase.AbstractUsecase
 	port.UserUsecase
-
-	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
-
-	// gRPC client stream 訂閱
-	ClientUser *client2.UserHandler
-
-	// gRPC server
-	FacadeGameUser         *facade2.UserHandler
-	FacadeTableScannerUser *facade3.ScannerHandler
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler
@@ -266,8 +333,53 @@ type Container struct {
 	AdminRequestMiddleware        *middleware_admin.RequestMiddleware
 	AdminResponseMiddleware       *middleware_admin.ResponseMiddleware
 	AdminSignatureMiddleware      *middleware_admin.SignatureMiddleware
+}
+
+// ConsumerContainer 只給 `consumer` MQ 消費者服務使用。
+type ConsumerContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
+
+	// MQ 消費者
+	ConsumerUser *consumer.UserConsumer
+}
+
+// CronContainer 只給 `cron` 排程服務使用。
+type CronContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
+
 	// 排程 server
 	CronUser *cron.UserCron
+}
+
+type Container struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+	*helper.RsaHelper
+	*helper.LoggerHelper
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
+
+	// gRPC client stream 訂閱
+	ClientUser *client2.UserHandler
+
+	// gRPC server
+	FacadeGameUser         *facade2.UserHandler
+	FacadeTableScannerUser *facade3.ScannerHandler
 
 	// websocket server
 	WebsocketUser *websocket.UserHandler

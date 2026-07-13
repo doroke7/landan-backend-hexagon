@@ -148,10 +148,177 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	return nil, nil
 }
 
-type Container struct {
+// HttpContainer 只給 `http` Gin 服務使用。
+type HttpContainer struct {
 
 	// pkg
 	*pkg.Response
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+	*helper.RsaHelper
+	*helper.LoggerHelper
+
+	*usecase.AbstractUsecase
+	inputPort.UserUsecase
+
+	// HTTP server -Controller
+	HttpAdminResourceUser *HttpAdminResource.UserHandler
+
+	// HTTP server -Middleware
+	// Middleware 部分
+	AdminAbstractMiddleware       *MiddlewareAdmin.AbstractMiddleware
+	AdminAdminMiddleware          *MiddlewareAdmin.AdminMiddleware
+	AdminAuthenticationMiddleware *MiddlewareAdmin.AuthenticationMiddleware
+	AdminDecryptionMiddleware     *MiddlewareAdmin.DecryptionMiddleware
+	AdminEncryptionMiddleware     *MiddlewareAdmin.EncryptionMiddleware
+	AdminErrorMiddleware          *MiddlewareAdmin.ErrorMiddleware
+	AdminLoggerMiddleware         *MiddlewareAdmin.LoggerMiddleware
+	AdminNonexistentMiddleware    *MiddlewareAdmin.NonexistentMiddleware
+	AdminRequestMiddleware        *MiddlewareAdmin.RequestMiddleware
+	AdminResponseMiddleware       *MiddlewareAdmin.ResponseMiddleware
+	AdminSignatureMiddleware      *MiddlewareAdmin.SignatureMiddleware
+}
+
+func InitHttpContainer() (*HttpContainer, error) {
+	wire.Build(
+
+		// pkg
+		pkg.NewResponse,
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewRsaHelper,
+		helper.NewCacheHelper,
+		helper.NewLoggerHelper,
+
+		// input-http
+		HttpAdmin.NewAbstractHandler,
+		HttpAdminResource.NewUserHandler,
+
+		// Middleware 部分
+		MiddlewareAdmin.NewAbstractMiddleware,
+		MiddlewareAdmin.NewAdminMiddleware,
+		MiddlewareAdmin.NewAuthenticationMiddleware,
+		MiddlewareAdmin.NewDecryptionMiddleware,
+		MiddlewareAdmin.NewEncryptionMiddleware,
+		MiddlewareAdmin.NewErrorMiddleware,
+		MiddlewareAdmin.NewLoggerMiddleware,
+		MiddlewareAdmin.NewNonexistentMiddleware,
+		MiddlewareAdmin.NewRequestMiddleware,
+		MiddlewareAdmin.NewResponseMiddleware,
+		MiddlewareAdmin.NewSignatureMiddleware,
+
+		// usecase
+		usecase.NewAbstractUsecase,
+		usecase.NewUserUsecase,
+
+		// output
+		cache.NewUserRepository,
+
+		wire.Struct(new(HttpContainer), "*"),
+	)
+	return nil, nil
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+// ConsumerContainer 只給 `consumer` MQ 消費者服務使用。
+type ConsumerContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	inputPort.UserUsecase
+
+	// MQ 消費者
+	ConsumerUser *consumer.UserConsumer
+}
+
+func InitConsumerContainer() (*ConsumerContainer, error) {
+	wire.Build(
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewAmqp,
+		bootstrap.NewRedis,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewCacheHelper,
+
+		// input-consumer
+		consumer.NewAbstractHandler,
+		consumer.NewUserConsumer,
+
+		// usecase
+		usecase.NewAbstractUsecase,
+		usecase.NewUserUsecase,
+
+		// output
+		cache.NewUserRepository,
+
+		wire.Struct(new(ConsumerContainer), "*"),
+	)
+	return nil, nil
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+// CronContainer 只給 `cron` 排程服務使用。
+type CronContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	inputPort.UserUsecase
+
+	// 排程 server
+	CronUser *cron.UserCron
+}
+
+func InitCronContainer() (*CronContainer, error) {
+	wire.Build(
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewCacheHelper,
+
+		// input-cron
+		cron.NewAbstractHandler,
+		cron.NewUserCron,
+
+		// usecase
+		usecase.NewAbstractUsecase,
+		usecase.NewUserUsecase,
+
+		// output
+		cache.NewUserRepository,
+
+		wire.Struct(new(CronContainer), "*"),
+	)
+	return nil, nil
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+type Container struct {
 
 	// Helper
 	*helper.AbstractHelper
@@ -170,34 +337,12 @@ type Container struct {
 
 	// Input Adapter：四種輸入來源共用同一個 UserUsecase
 
-	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
-
 	// gRPC client stream 訂閱
 	ClientUser *client.UserHandler
 
 	// gRPC server
 	FacadeGameUser         *FacadeGame.UserHandler
 	FacadeTableScannerUser *FacadeTable.ScannerHandler
-
-	// HTTP server -Controller
-	HttpAdminResourceUser *HttpAdminResource.UserHandler
-
-	// HTTP server -Middleware
-	// Middleware 部分
-	AdminAbstractMiddleware       *MiddlewareAdmin.AbstractMiddleware
-	AdminAdminMiddleware          *MiddlewareAdmin.AdminMiddleware
-	AdminAuthenticationMiddleware *MiddlewareAdmin.AuthenticationMiddleware
-	AdminDecryptionMiddleware     *MiddlewareAdmin.DecryptionMiddleware
-	AdminEncryptionMiddleware     *MiddlewareAdmin.EncryptionMiddleware
-	AdminErrorMiddleware          *MiddlewareAdmin.ErrorMiddleware
-	AdminLoggerMiddleware         *MiddlewareAdmin.LoggerMiddleware
-	AdminNonexistentMiddleware    *MiddlewareAdmin.NonexistentMiddleware
-	AdminRequestMiddleware        *MiddlewareAdmin.RequestMiddleware
-	AdminResponseMiddleware       *MiddlewareAdmin.ResponseMiddleware
-	AdminSignatureMiddleware      *MiddlewareAdmin.SignatureMiddleware
-	// 排程 server
-	CronUser *cron.UserCron
 
 	// websocket server
 	WebsocketUser *websocket.UserHandler
@@ -206,13 +351,9 @@ type Container struct {
 func InitContainer() (*Container, error) {
 	wire.Build(
 
-		// pkg
-		pkg.NewResponse,
-
 		// bootstrap
 		bootstrap.NewMysql,
 		bootstrap.NewClient,
-		bootstrap.NewAmqp,
 		bootstrap.NewRedis,
 
 		//
@@ -224,18 +365,6 @@ func InitContainer() (*Container, error) {
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
 		helper.NewLoggerHelper,
-
-		// input-consumer
-		consumer.NewAbstractHandler,
-		consumer.NewUserConsumer,
-
-		// input-http
-		HttpAdmin.NewAbstractHandler,
-		HttpAdminResource.NewUserHandler,
-
-		// input-cron
-		cron.NewAbstractHandler,
-		cron.NewUserCron,
 
 		// input-websocket
 		websocket.NewAbstractHandler,
@@ -249,19 +378,6 @@ func InitContainer() (*Container, error) {
 		// input-client
 		client.NewAbstractHandler,
 		client.NewUserHandler,
-
-		// Middleware 部分
-		MiddlewareAdmin.NewAbstractMiddleware,
-		MiddlewareAdmin.NewAdminMiddleware,
-		MiddlewareAdmin.NewAuthenticationMiddleware,
-		MiddlewareAdmin.NewDecryptionMiddleware,
-		MiddlewareAdmin.NewEncryptionMiddleware,
-		MiddlewareAdmin.NewErrorMiddleware,
-		MiddlewareAdmin.NewLoggerMiddleware,
-		MiddlewareAdmin.NewNonexistentMiddleware,
-		MiddlewareAdmin.NewRequestMiddleware,
-		MiddlewareAdmin.NewResponseMiddleware,
-		MiddlewareAdmin.NewSignatureMiddleware,
 
 		// usecase
 		usecase.NewAbstractUsecase,

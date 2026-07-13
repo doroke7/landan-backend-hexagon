@@ -13,7 +13,7 @@ var oConsumerCommand = &cobra.Command{
 	Use:   "consumer",
 	Short: "啟動 consumer 服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		oContainer, _ := container.InitContainer()
+		oContainer, _ := container.InitConsumerContainer()
 
 		oConsumerRouter := register.ConsumerInit(oContainer)
 

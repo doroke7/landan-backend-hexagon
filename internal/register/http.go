@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func adminMiddlewares(oContainer *container.Container) []gin.HandlerFunc {
+func adminMiddlewares(oContainer *container.HttpContainer) []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		// ALL middleware
 		oContainer.AdminLoggerMiddleware.Handle(),
@@ -23,7 +23,7 @@ func adminMiddlewares(oContainer *container.Container) []gin.HandlerFunc {
 	}
 }
 
-func HttpInit(oGin *gin.Engine, oContainer *container.Container) *gin.Engine {
+func HttpInit(oGin *gin.Engine, oContainer *container.HttpContainer) *gin.Engine {
 
 	oAdmin := oGin.Group("/Admin").Use(adminMiddlewares(oContainer)...)
 	{
