@@ -185,14 +185,6 @@ type ResourceContainer struct {
 
 	*usecase.AbstractUsecase
 	inputPort.UserUsecase
-	/*
-		usecase.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) inputPort.UserUsecase
-		回傳型別宣告的是介面 inputPort.UserUsecase，不是具體型別 *usecase.UserUsecase。
-
-		wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 inputPort.UserUsecase」，而不是「能生產 *usecase.UserUsecase」——即使後者在執行期其實是同一個值。
-	*/
-
-	// Input Adapter：四種輸入來源共用同一個 UserUsecase
 
 	// MQ 消費者
 	ConsumerUser *consumer.UserConsumer
