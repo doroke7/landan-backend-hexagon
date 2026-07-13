@@ -25,6 +25,7 @@ import (
 	"example/internal/input/websocket"
 	"example/internal/middleware/admin"
 	"example/internal/output/cache"
+	"example/internal/output/memory"
 	"example/internal/output/mysql"
 	"example/internal/usecase"
 	"example/internal/usecase/port"
@@ -285,27 +286,18 @@ func InitClientContainer() (*ClientContainer, error) {
 func InitCommandContainer() (*CommandContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := command.NewAbstractHandler(aesHelper)
-	userHandler := command.NewUserHandler()
+	userRepository := memory.NewUserRepository()
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	userHandler := command.NewUserHandler(userUsecase)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
-		AbstractUsecase: abstractUsecase,
-		UserUsecase:     userUsecase,
 		AbstractHandler: abstractHandler,
 		UserHandler:     userHandler,
+		AbstractUsecase: abstractUsecase,
+		UserUsecase:     userUsecase,
 	}
 	return commandContainer, nil
 }
@@ -442,9 +434,10 @@ type CommandContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecase.AbstractUsecase
-	port.UserUsecase
-
+	// command
 	*command.AbstractHandler
 	*command.UserHandler
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
 }

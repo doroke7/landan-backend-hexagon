@@ -20,10 +20,10 @@ import (
 
 	helper "example/internal/helper"
 
-	client "example/internal/input/client"
-	command "example/internal/input/command"
-	consumer "example/internal/input/consumer"
-	cron "example/internal/input/cron"
+	inputClient "example/internal/input/client"
+	inputCommand "example/internal/input/command"
+	inputConsumer "example/internal/input/consumer"
+	inputCron "example/internal/input/cron"
 	Facade "example/internal/input/facade"
 	FacadeGame "example/internal/input/facade/game"
 	FacadeRegister "example/internal/input/facade/register"
@@ -36,12 +36,14 @@ import (
 
 	MiddlewareAdmin "example/internal/middleware/admin"
 
+	inputPort "example/internal/usecase/port"
+
 	usecase "example/internal/usecase"
 	usecaseResource "example/internal/usecase/resource"
 
 	cache "example/internal/output/cache"
+	memory "example/internal/output/memory"
 	mysql "example/internal/output/mysql"
-	inputPort "example/internal/usecase/port"
 )
 
 /*
@@ -240,7 +242,7 @@ type ConsumerContainer struct {
 	inputPort.UserUsecase
 
 	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
+	ConsumerUser *inputConsumer.UserConsumer
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {
@@ -257,8 +259,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		helper.NewCacheHelper,
 
 		// input-consumer
-		consumer.NewAbstractHandler,
-		consumer.NewUserConsumer,
+		inputConsumer.NewAbstractHandler,
+		inputConsumer.NewUserConsumer,
 
 		// usecase
 		usecase.NewAbstractUsecase,
@@ -285,7 +287,7 @@ type CronContainer struct {
 	inputPort.UserUsecase
 
 	// 排程 server
-	CronUser *cron.UserCron
+	CronUser *inputCron.UserCron
 }
 
 func InitCronContainer() (*CronContainer, error) {
@@ -301,8 +303,8 @@ func InitCronContainer() (*CronContainer, error) {
 		helper.NewCacheHelper,
 
 		// input-cron
-		cron.NewAbstractHandler,
-		cron.NewUserCron,
+		inputCron.NewAbstractHandler,
+		inputCron.NewUserCron,
 
 		// usecase
 		usecase.NewAbstractUsecase,
@@ -373,7 +375,7 @@ type ClientContainer struct {
 	inputPort.UserUsecase
 
 	// gRPC client stream 訂閱
-	ClientUser *client.UserHandler
+	ClientUser *inputClient.UserHandler
 }
 
 func InitClientContainer() (*ClientContainer, error) {
@@ -393,8 +395,8 @@ func InitClientContainer() (*ClientContainer, error) {
 		helper.NewCacheHelper,
 
 		// input-client
-		client.NewAbstractHandler,
-		client.NewUserHandler,
+		inputClient.NewAbstractHandler,
+		inputClient.NewUserHandler,
 
 		// usecase
 		usecase.NewAbstractUsecase,
@@ -415,33 +417,30 @@ type CommandContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
+	// command
+	*inputCommand.AbstractHandler
+	*inputCommand.UserHandler
+
 	*usecase.AbstractUsecase
 	inputPort.UserUsecase
-
-	*command.AbstractHandler
-	*command.UserHandler
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
 	wire.Build(
 
-		// bootstrap
-		bootstrap.NewRedis,
-
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-		helper.NewCacheHelper,
 
-		command.NewAbstractHandler,
-		command.NewUserHandler,
+		inputCommand.NewAbstractHandler,
+		inputCommand.NewUserHandler,
 
 		// usecase
 		usecase.NewAbstractUsecase,
 		usecase.NewUserUsecase,
 
 		// output
-		cache.NewUserRepository,
+		memory.NewUserRepository,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)

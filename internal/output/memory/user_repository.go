@@ -17,13 +17,13 @@ func NewUserRepository() port.UserRepository {
 	}
 }
 
-func (r *UserRepository) AddOne(user *domain.User) error {
-	r.data[user.ID] = user
+func (oSelf *UserRepository) AddOne(user *domain.User) error {
+	oSelf.data[user.ID] = user
 	return nil
 }
 
-func (r *UserRepository) ShowOneById(id int) (*domain.User, error) {
-	user, ok := r.data[id]
+func (oSelf *UserRepository) ShowOneById(id int) (*domain.User, error) {
+	user, ok := oSelf.data[id]
 	if !ok {
 		return nil, errors.New("not found")
 	}
