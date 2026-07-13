@@ -4,10 +4,10 @@
 package container
 
 /*
-	usecase.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) inputPort.UserUsecase
-	回傳型別宣告的是介面 inputPort.UserUsecase，不是具體型別 *usecase.UserUsecase。
+	usecase.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) usecasePort.UserUsecase
+	回傳型別宣告的是介面 usecasePort.UserUsecase，不是具體型別 *usecase.UserUsecase。
 
-	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 inputPort.UserUsecase」，而不是「能生產 *usecase.UserUsecase」——即使後者在執行期其實是同一個值。
+	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 usecasePort.UserUsecase」，而不是「能生產 *usecase.UserUsecase」——即使後者在執行期其實是同一個值。
 */
 
 import (
@@ -37,7 +37,7 @@ import (
 
 	MiddlewareAdmin "example/internal/middleware/admin"
 
-	inputPort "example/internal/usecase/port"
+	usecasePort "example/internal/usecase/port"
 
 	usecase "example/internal/usecase"
 	usecaseResource "example/internal/usecase/resource"
@@ -60,7 +60,7 @@ type FacadeContainer struct {
 	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 
 	// gRPC Facade server
 	FacadeAbstract           *inputFacade.AbstractHandler
@@ -112,7 +112,7 @@ type ResourceContainer struct {
 	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
-	inputPort.AdminUserUsecase
+	usecasePort.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *inputResource.AbstractHandler
@@ -164,7 +164,7 @@ type HttpContainer struct {
 	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *inputHttpAdminResource.UserHandler
@@ -240,7 +240,7 @@ type ConsumerContainer struct {
 	*helper.AesHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 
 	// MQ 消費者
 	ConsumerUser *inputConsumer.UserConsumer
@@ -285,7 +285,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 
 	// 排程 server
 	CronUser *inputCron.UserCron
@@ -329,7 +329,7 @@ type WebsocketContainer struct {
 	*helper.AesHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 
 	// websocket server
 	WebsocketUser *inputWebsocket.UserHandler
@@ -373,7 +373,7 @@ type ClientContainer struct {
 	*helper.AesHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 
 	// gRPC client stream 訂閱
 	ClientUser *inputClient.UserHandler
@@ -423,7 +423,7 @@ type CommandContainer struct {
 	*inputCommand.UserHandler
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	usecasePort.UserUsecase
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
