@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb.resource.model;
+
+option go_package = "./pb_resource_model";
+
+service AdminUser {
+  rpc ShowOneByName(OneAdminUserRequest) returns (OneAdminUerResponse);
+}
+
+message OneAdminUserRequest {
+  string name = 1;
+}
+
+message OneAdminUerResponse {
+  int32 id = 1;
+  string name = 2;
+  string password = 3;
+}
+
+
+

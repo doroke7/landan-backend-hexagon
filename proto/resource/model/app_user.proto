@@ -5,14 +5,14 @@ package pb.resource.model;
 option go_package = "./pb_resource_model";
 
 service AppUser {
-  rpc AddUser(OneRequest) returns (OneResponse);
+  rpc AddAppUser(OneAppUserRequest) returns (OneAppUserResponse);
 }
 
-message OneRequest {
+message OneAppUserRequest {
   string name = 1;
 }
 
-message OneResponse {
+message OneAppUserResponse {
   string name = 1;
 }
 

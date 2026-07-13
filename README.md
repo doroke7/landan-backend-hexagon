@@ -1,93 +1,96 @@
-# landan-backend-hexagon
+## 六角架構圖
 
++----------------------------------------------------------------+
+|                            input                               |
+|        HTTP / gRPC / CLI / Cron / WebSocket / GraphQL          |
++----------------------------------------------------------------+
+                               |
+                               v
+                    +----------------------+
+                    |     input_port       |
+                    +----------------------+
+                               ^
+                               |
+                    +----------------------+      +----------------------+
+                    |                      |----->|                      |
+                    |                      |      |                      |
+                    |                      |      |                      |
+                    |                      |      |        domain        |
+                    |       use_case       |      |                      |
+                    |                      |      |                      |
+                    |                      |      |                      |
+                    |                      |      |                      |
+                    +----------+-----------+      +----------------------+
+                               |
+                               v
+                    +----------------------+
+                    |     output_port      |
+                    +----------------------+
+                               ^
+                               |
++----------------------------------------------------------------+
+|                            output                              |
+|      MySQL / Redis / Kafka / S3 / MQ / Third-party API         |
++----------------------------------------------------------------+
 
+## 六角架構核心優點
+1. 可以同時輸入 http grpc cron command 但是共用一個業務邏輯 usecase
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## 目錄結構
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/doroke7/landan-backend-hexagon.git
-git branch -M main
-git push -uf origin main
+.
+├── main.go                    # 進入點，實際邏輯委派給 cmd.Execute()
+├── cmd/                       # cobra 指令，每個檔案對應一個可獨立啟動的服務
+│   ├── root.go                #   root command，Execute() 供 main.go 呼叫
+│   ├── http.go                #   啟動 HTTP 服務
+│   ├── grpc.go                #   啟動 gRPC 服務
+│   ├── consumer.go            #   啟動 AMQP consumer
+│   ├── client.go               #   啟動 gRPC client stream 訂閱
+│   ├── cron.go                #   啟動排程服務
+│   └── websocket.go           #   啟動 websocket 服務
+│
+├── internal/
+│   ├── bootstrap/             # 讀 CONFIG、建立各種基礎設施連線（mysql / redis / amqp / mongo / grpc client）
+│   ├── domain/                # 領域物件（entity），跟任何框架、資料庫無關
+│   ├── helper/                # 通用工具（AES、RSA、快取讀寫……），跟業務邏輯無關可到處注入
+│   │
+│   ├── input/                 # Input Adapter：把外部請求轉換成呼叫 usecase
+│   │   ├── port/               #   input port，usecase 對外暴露的介面（driving port）
+│   │   ├── http/               #   HTTP handler
+│   │   ├── grpc/                #   gRPC server handler
+│   │   ├── client/              #   gRPC client（訂閱外部 stream）
+│   │   ├── consumer/            #   AMQP consumer handler
+│   │   ├── cron/                #   排程任務 handler
+│   │   ├── websocket/           #   websocket handler
+│   │   └── command/             #   CLI 指令 handler
+│   │   （每個 adapter 底下都有自己獨立的 abstract_handler.go，
+│   │    彼此不共用，只共用 usecase 這個核心業務邏輯）
+│   │
+│   ├── usecase/                # 業務邏輯本體，只依賴 input/port、output/port，不依賴任何 adapter
+│   │
+│   ├── output/                 # Output Adapter：usecase 依賴的下游資源實作
+│   │   ├── port/                #   output port，usecase 依賴的介面（driven port）
+│   │   ├── mysql/                #   MySQL 實作（gorm）
+│   │   ├── cache/                #   裝飾器（Decorator），包住 mysql 實作，加上 redis 讀寫快取
+│   │   ├── memory/               #   記憶體實作（測試/範例用）
+│   │   └── producer/             #   訊息生產者實作
+│   │
+│   ├── register/               # 組裝層：把 container 生好的 handler 註冊到對應的 server/router 上
+│   │                            #   （http.HandleFunc / grpc.RegisterXxxServer / cron.AddFunc ...），
+│   │                            #   cmd/ 只管呼叫 XxxInit 拿到 server 物件再 Serve，不碰組裝細節
+│   │
+│   └── container/              # wire 組裝根：wire.go 手寫、wire_gen.go 自動產生，別手改後者
+│
+├── pkg/                        # 跟 domain 無關、可重用的通用元件
+│   ├── consumer_router.go       #   queue name -> handler 的路由表（AMQP 沒有內建路由機制）
+│   ├── client_router.go         #   多個 client-side 訂閱方法的並行啟動器
+│   ├── websocket_router.go      #   websocket 路由的路徑前綴分組（模仿 gin Group）
+│   └── aop.go                   #   泛型 Cacheable / CachePut / CacheEvict，AOP 風格的快取包裝
+│
+├── config/                     # viper 讀取的 yaml 設定檔，一個檔案對應一個頂層命名空間
+└── pb/                          # protoc 產生的程式碼，對應 proto/ 底下的定義
 ```
 
-## Integrate with your tools
-
-* [Set up project integrations](https://gitlab.com/doroke7/landan-backend-hexagon/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+依賴方向永遠是「外層指向內層」：`input adapter → input/port → usecase → output/port ← output adapter`，
+`usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是 redis。
