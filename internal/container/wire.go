@@ -91,7 +91,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		usecase.NewUserUsecase,
 
 		// output
-		mysql.NewUserRepository,
 		cache.NewUserRepository,
 
 		wire.Struct(new(FacadeContainer), "*"),
@@ -141,7 +140,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		usecaseResource.NewAdminUserUsecase,
 
 		// output
-		mysql.NewUserRepository,
 		cache.NewUserRepository,
 		mysql.NewAdminUserRepository,
 
@@ -270,7 +268,6 @@ func InitContainer() (*Container, error) {
 		usecase.NewUserUsecase,
 
 		// output
-		mysql.NewUserRepository,
 		cache.NewUserRepository,
 
 		wire.Struct(new(Container), "*"),

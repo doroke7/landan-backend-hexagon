@@ -43,14 +43,13 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	userRepository := mysql.NewUserRepository(db)
 	client, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
-	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := facade.NewAbstractHandler(aesHelper)
 	userHandler := facade2.NewUserHandler(userUsecase, abstractHandler)
 	scannerHandler := facade3.NewScannerHandler(abstractHandler)
@@ -81,14 +80,13 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		return nil, err
 	}
 	adminUserRepository := mysql.NewAdminUserRepository(db)
-	userRepository := mysql.NewUserRepository(db)
 	client, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
-	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	usecaseAbstractUsecase := usecase2.NewAbstractUsecase(portUserRepository, aesHelper)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	usecaseAbstractUsecase := usecase2.NewAbstractUsecase(userRepository, aesHelper)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, usecaseAbstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
@@ -116,14 +114,13 @@ func InitContainer() (*Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	userRepository := mysql.NewUserRepository(db)
 	redisClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
 		return nil, err

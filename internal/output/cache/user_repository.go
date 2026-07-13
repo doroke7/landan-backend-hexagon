@@ -3,6 +3,8 @@ package cache
 import (
 	"fmt"
 
+	"gorm.io/gorm"
+
 	"example/internal/domain"
 	"example/internal/helper"
 	"example/internal/output/mysql"
@@ -13,13 +15,13 @@ import (
 // 對外一樣實作 port.UserRepository，寫入時順便寫一份到 redis（write-through），
 // 讀取時先查 redis，沒有才 fallback 查 mysql。usecase 完全不知道背後多包了一層快取。
 type UserRepository struct {
-	next *mysql.UserRepository // 5. 這樣看來 六角框架 的輸出 支持 多種ouput 嵌套（如 mysql 嵌套 redis 輸出）
+	next port.UserRepository // 5. 這樣看來 六角框架 的輸出 支持 多種ouput 嵌套（如 mysql 嵌套 redis 輸出）
 
 	cacheHelper *helper.CacheHelper
 }
 
-func NewUserRepository(oInner *mysql.UserRepository, oCacheHelper *helper.CacheHelper) port.UserRepository {
-	return &UserRepository{next: oInner, cacheHelper: oCacheHelper}
+func NewUserRepository(db *gorm.DB, oCacheHelper *helper.CacheHelper) port.UserRepository {
+	return &UserRepository{next: mysql.NewUserRepository(db), cacheHelper: oCacheHelper}
 }
 
 func (oSelf *UserRepository) AddOne(user *domain.User) error {
