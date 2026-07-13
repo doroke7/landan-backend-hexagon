@@ -11,7 +11,7 @@ import (
 func ResourceInit(oContainer *container.ResourceContainer) *grpc.Server {
 	oGrpcServer := grpc.NewServer()
 
-	pbResourceModel.RegisterAdminUserServer(oGrpcServer, oContainer.)
+	pbResourceModel.RegisterAdminUserServer(oGrpcServer, oContainer.ResourceModelAdminUser)
 
 	return oGrpcServer
 }
