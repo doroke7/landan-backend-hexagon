@@ -222,11 +222,36 @@ func InitCronContainer() (*CronContainer, error) {
 	return cronContainer, nil
 }
 
-func InitContainer() (*Container, error) {
+func InitWebsocketContainer() (*WebsocketContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	loggerHelper := helper.NewLoggerHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	client, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractHandler := websocket.NewAbstractHandler(aesHelper)
+	userHandler := websocket.NewUserHandler(userUsecase, abstractHandler)
+	websocketContainer := &WebsocketContainer{
+		AbstractHelper:  abstractHelper,
+		AesHelper:       aesHelper,
+		AbstractUsecase: abstractUsecase,
+		UserUsecase:     userUsecase,
+		WebsocketUser:   userHandler,
+	}
+	return websocketContainer, nil
+}
+
+func InitClientContainer() (*ClientContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
@@ -246,24 +271,14 @@ func InitContainer() (*Container, error) {
 	clientClient := client.NewClient(clientConn)
 	abstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
 	userHandler := client2.NewUserHandler(userUsecase, abstractHandler)
-	facadeAbstractHandler := facade.NewAbstractHandler(aesHelper)
-	facadeUserHandler := facade2.NewUserHandler(userUsecase, facadeAbstractHandler)
-	scannerHandler := facade3.NewScannerHandler(facadeAbstractHandler)
-	websocketAbstractHandler := websocket.NewAbstractHandler(aesHelper)
-	websocketUserHandler := websocket.NewUserHandler(userUsecase, websocketAbstractHandler)
-	container := &Container{
-		AbstractHelper:         abstractHelper,
-		AesHelper:              aesHelper,
-		RsaHelper:              rsaHelper,
-		LoggerHelper:           loggerHelper,
-		AbstractUsecase:        abstractUsecase,
-		UserUsecase:            userUsecase,
-		ClientUser:             userHandler,
-		FacadeGameUser:         facadeUserHandler,
-		FacadeTableScannerUser: scannerHandler,
-		WebsocketUser:          websocketUserHandler,
+	clientContainer := &ClientContainer{
+		AbstractHelper:  abstractHelper,
+		AesHelper:       aesHelper,
+		AbstractUsecase: abstractUsecase,
+		UserUsecase:     userUsecase,
+		ClientUser:      userHandler,
 	}
-	return container, nil
+	return clientContainer, nil
 }
 
 // wire.go:
@@ -363,24 +378,30 @@ type CronContainer struct {
 	CronUser *cron.UserCron
 }
 
-type Container struct {
+// WebsocketContainer 只給 `websocket` 服務使用。
+type WebsocketContainer struct {
 
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-	*helper.RsaHelper
-	*helper.LoggerHelper
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
+
+	// websocket server
+	WebsocketUser *websocket.UserHandler
+}
+
+// ClientContainer 只給 `client` / `socket`（訂閱外部 gRPC stream）服務使用。
+type ClientContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
 
 	*usecase.AbstractUsecase
 	port.UserUsecase
 
 	// gRPC client stream 訂閱
 	ClientUser *client2.UserHandler
-
-	// gRPC server
-	FacadeGameUser         *facade2.UserHandler
-	FacadeTableScannerUser *facade3.ScannerHandler
-
-	// websocket server
-	WebsocketUser *websocket.UserHandler
 }

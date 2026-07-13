@@ -318,37 +318,65 @@ func InitCronContainer() (*CronContainer, error) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-type Container struct {
+// WebsocketContainer 只給 `websocket` 服務使用。
+type WebsocketContainer struct {
 
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
 	inputPort.UserUsecase
-	/*
-		usecase.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) inputPort.UserUsecase
-		回傳型別宣告的是介面 inputPort.UserUsecase，不是具體型別 *usecase.UserUsecase。
-
-		wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 inputPort.UserUsecase」，而不是「能生產 *usecase.UserUsecase」——即使後者在執行期其實是同一個值。
-	*/
-
-	// Input Adapter：四種輸入來源共用同一個 UserUsecase
-
-	// gRPC client stream 訂閱
-	ClientUser *client.UserHandler
-
-	// gRPC server
-	FacadeGameUser         *FacadeGame.UserHandler
-	FacadeTableScannerUser *FacadeTable.ScannerHandler
 
 	// websocket server
 	WebsocketUser *websocket.UserHandler
 }
 
-func InitContainer() (*Container, error) {
+func InitWebsocketContainer() (*WebsocketContainer, error) {
+	wire.Build(
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewCacheHelper,
+
+		// input-websocket
+		websocket.NewAbstractHandler,
+		websocket.NewUserHandler,
+
+		// usecase
+		usecase.NewAbstractUsecase,
+		usecase.NewUserUsecase,
+
+		// output
+		cache.NewUserRepository,
+
+		wire.Struct(new(WebsocketContainer), "*"),
+	)
+	return nil, nil
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+// ClientContainer 只給 `client` / `socket`（訂閱外部 gRPC stream）服務使用。
+type ClientContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	inputPort.UserUsecase
+
+	// gRPC client stream 訂閱
+	ClientUser *client.UserHandler
+}
+
+func InitClientContainer() (*ClientContainer, error) {
 	wire.Build(
 
 		// bootstrap
@@ -362,18 +390,7 @@ func InitContainer() (*Container, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-		helper.NewRsaHelper,
 		helper.NewCacheHelper,
-		helper.NewLoggerHelper,
-
-		// input-websocket
-		websocket.NewAbstractHandler,
-		websocket.NewUserHandler,
-
-		// input-facade
-		Facade.NewAbstractHandler,
-		FacadeGame.NewUserHandler,
-		FacadeTable.NewScannerHandler,
 
 		// input-client
 		client.NewAbstractHandler,
@@ -386,7 +403,7 @@ func InitContainer() (*Container, error) {
 		// output
 		cache.NewUserRepository,
 
-		wire.Struct(new(Container), "*"),
+		wire.Struct(new(ClientContainer), "*"),
 	)
 	return nil, nil
 }

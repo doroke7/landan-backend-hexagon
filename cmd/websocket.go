@@ -12,7 +12,7 @@ var oWebsocketCommand = &cobra.Command{
 	Use:   "websocket",
 	Short: "啟動 websocket 服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		oContainer, err := container.InitContainer()
+		oContainer, err := container.InitWebsocketContainer()
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -8,7 +8,7 @@ import (
 	container "example/internal/container"
 )
 
-func WebsocketInit(oContainer *container.Container) *http.Server {
+func WebsocketInit(oContainer *container.WebsocketContainer) *http.Server {
 	oGroup := pkg.NewWebsocketRouter("/websocket")
 	oGroup.HandleFunc("/user/add", oContainer.WebsocketUser.AddUser)
 

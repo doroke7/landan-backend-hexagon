@@ -12,7 +12,7 @@ var oClientCommand = &cobra.Command{
 	Use:   "client",
 	Short: "啟動 Client 服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		oContainer, _ := container.InitContainer()
+		oContainer, _ := container.InitClientContainer()
 
 		oClientRouter := register.ClientInit(oContainer)
 		oClientRouter.Serve(context.Background())
