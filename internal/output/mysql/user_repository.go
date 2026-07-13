@@ -3,6 +3,8 @@ package mysql
 import (
 	"errors"
 
+	"example/internal/output/port"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -13,7 +15,7 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
+func NewUserRepository(db *gorm.DB) port.UserRepository {
 	return &UserRepository{db: db}
 }
 

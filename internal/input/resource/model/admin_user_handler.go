@@ -14,9 +14,10 @@ type AdminUserHandler struct {
 	AdminUserUsecase port.AdminUserUsecase
 }
 
-func NewAdminUserHandler(oAbstractHandler *resource.AbstractHandler) *AdminUserHandler {
+func NewAdminUserHandler(oAbstractHandler *resource.AbstractHandler, oAdminUserUsecase port.AdminUserUsecase) *AdminUserHandler {
 	return &AdminUserHandler{
-		AbstractHandler: oAbstractHandler,
+		AbstractHandler:  oAbstractHandler,
+		AdminUserUsecase: oAdminUserUsecase,
 	}
 }
 

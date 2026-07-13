@@ -27,6 +27,7 @@ import (
 	"example/internal/output/cache"
 	"example/internal/output/mysql"
 	"example/internal/usecase"
+	usecase2 "example/internal/usecase/resource"
 	"example/pkg"
 )
 
@@ -69,7 +70,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	return facadeContainer, nil
 }
 
-func InitResourdeContainer() (*ResourceContainer, error) {
+func InitResourceContainer() (*ResourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
@@ -79,6 +80,7 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	if err != nil {
 		return nil, err
 	}
+	adminUserRepository := mysql.NewAdminUserRepository(db)
 	userRepository := mysql.NewUserRepository(db)
 	client, err := bootstrap.NewRedis()
 	if err != nil {
@@ -86,16 +88,17 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
+	usecaseAbstractUsecase := usecase2.NewAbstractUsecase(portUserRepository, aesHelper)
+	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, usecaseAbstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
-	adminUserHandler := service2.NewAdminUserHandler(abstractHandler)
+	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
 	resourceContainer := &ResourceContainer{
 		AbstractHelper:         abstractHelper,
 		AesHelper:              aesHelper,
 		RsaHelper:              rsaHelper,
 		LoggerHelper:           loggerHelper,
 		AbstractUsecase:        abstractUsecase,
-		UserUsecase:            userUsecase,
+		AdminUserUsecase:       adminUserUsecase,
 		ResourceAbstract:       abstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
 	}
@@ -219,7 +222,7 @@ type ResourceContainer struct {
 	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
-	port.UserUsecase
+	port.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler

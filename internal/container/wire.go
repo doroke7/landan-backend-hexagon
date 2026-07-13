@@ -35,11 +35,13 @@ import (
 	HttpAdmin "example/internal/input/http/admin"
 	HttpAdminResource "example/internal/input/http/admin/resource"
 
+	usecase "example/internal/usecase"
+	usecaseResource "example/internal/usecase/resource"
+
 	inputPort "example/internal/input/port"
 	"example/internal/input/websocket"
 	"example/internal/output/cache"
 	"example/internal/output/mysql"
-	"example/internal/usecase"
 )
 
 /*
@@ -108,14 +110,14 @@ type ResourceContainer struct {
 	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
-	inputPort.UserUsecase
+	inputPort.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *Resource.AbstractHandler
 	ResourceModelAdminUser *ResourceModel.AdminUserHandler
 }
 
-func InitResourdeContainer() (*ResourceContainer, error) {
+func InitResourceContainer() (*ResourceContainer, error) {
 	wire.Build(
 
 		// bootstrap
@@ -135,11 +137,13 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 
 		// usecase
 		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseResource.NewAbstractUsecase,
+		usecaseResource.NewAdminUserUsecase,
 
 		// output
 		mysql.NewUserRepository,
 		cache.NewUserRepository,
+		mysql.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
 	)

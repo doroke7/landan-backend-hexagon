@@ -6,13 +6,14 @@ import (
 	"gorm.io/gorm"
 
 	"example/internal/domain"
+	"example/internal/output/port"
 )
 
 type AdminUserRepository struct {
 	db *gorm.DB
 }
 
-func NewAdminUserRepository(db *gorm.DB) *AdminUserRepository {
+func NewAdminUserRepository(db *gorm.DB) port.AdminUserRepository {
 	return &AdminUserRepository{db: db}
 }
 
