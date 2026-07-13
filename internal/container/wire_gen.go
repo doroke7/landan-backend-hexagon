@@ -162,17 +162,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
 	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
-	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper, loggerHelper)
-	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
-	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
-	decryptionMiddleware := middleware_admin.NewDecryptionMiddleware(abstractMiddleware)
-	encryptionMiddleware := middleware_admin.NewEncryptionMiddleware(abstractMiddleware)
-	errorMiddleware := middleware_admin.NewErrorMiddleware(abstractMiddleware)
-	loggerMiddleware := middleware_admin.NewLoggerMiddleware(abstractMiddleware)
-	nonexistentMiddleware := middleware_admin.NewNonexistentMiddleware(abstractMiddleware)
-	requestMiddleware := middleware_admin.NewRequestMiddleware(abstractMiddleware)
-	responseMiddleware := middleware_admin.NewResponseMiddleware(abstractMiddleware)
-	signatureMiddleware := middleware_admin.NewSignatureMiddleware(abstractMiddleware)
 	cronAbstractHandler := cron.NewAbstractHandler(aesHelper)
 	userCron, err := cron.NewUserCron(userUsecase, cronAbstractHandler)
 	if err != nil {
@@ -181,31 +170,20 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	websocketAbstractHandler := websocket.NewAbstractHandler(aesHelper)
 	websocketUserHandler := websocket.NewUserHandler(userUsecase, websocketAbstractHandler)
 	resourceContainer := &ResourceContainer{
-		Response:                      response,
-		AbstractHelper:                abstractHelper,
-		AesHelper:                     aesHelper,
-		RsaHelper:                     rsaHelper,
-		LoggerHelper:                  loggerHelper,
-		AbstractUsecase:               abstractUsecase,
-		UserUsecase:                   userUsecase,
-		ConsumerUser:                  userConsumer,
-		ClientUser:                    userHandler,
-		ResourceAbstract:              serviceAbstractHandler,
-		ResourceModelAdminUser:        adminUserHandler,
-		HttpAdminResourceUser:         handlerUserHandler,
-		AdminAbstractMiddleware:       abstractMiddleware,
-		AdminAdminMiddleware:          adminMiddleware,
-		AdminAuthenticationMiddleware: authenticationMiddleware,
-		AdminDecryptionMiddleware:     decryptionMiddleware,
-		AdminEncryptionMiddleware:     encryptionMiddleware,
-		AdminErrorMiddleware:          errorMiddleware,
-		AdminLoggerMiddleware:         loggerMiddleware,
-		AdminNonexistentMiddleware:    nonexistentMiddleware,
-		AdminRequestMiddleware:        requestMiddleware,
-		AdminResponseMiddleware:       responseMiddleware,
-		AdminSignatureMiddleware:      signatureMiddleware,
-		CronUser:                      userCron,
-		WebsocketUser:                 websocketUserHandler,
+		Response:               response,
+		AbstractHelper:         abstractHelper,
+		AesHelper:              aesHelper,
+		RsaHelper:              rsaHelper,
+		LoggerHelper:           loggerHelper,
+		AbstractUsecase:        abstractUsecase,
+		UserUsecase:            userUsecase,
+		ConsumerUser:           userConsumer,
+		ClientUser:             userHandler,
+		ResourceAbstract:       serviceAbstractHandler,
+		ResourceModelAdminUser: adminUserHandler,
+		HttpAdminResourceUser:  handlerUserHandler,
+		CronUser:               userCron,
+		WebsocketUser:          websocketUserHandler,
 	}
 	return resourceContainer, nil
 }
@@ -376,19 +354,6 @@ type ResourceContainer struct {
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler
 
-	// HTTP server -Middleware
-	// Middleware 部分
-	AdminAbstractMiddleware       *middleware_admin.AbstractMiddleware
-	AdminAdminMiddleware          *middleware_admin.AdminMiddleware
-	AdminAuthenticationMiddleware *middleware_admin.AuthenticationMiddleware
-	AdminDecryptionMiddleware     *middleware_admin.DecryptionMiddleware
-	AdminEncryptionMiddleware     *middleware_admin.EncryptionMiddleware
-	AdminErrorMiddleware          *middleware_admin.ErrorMiddleware
-	AdminLoggerMiddleware         *middleware_admin.LoggerMiddleware
-	AdminNonexistentMiddleware    *middleware_admin.NonexistentMiddleware
-	AdminRequestMiddleware        *middleware_admin.RequestMiddleware
-	AdminResponseMiddleware       *middleware_admin.ResponseMiddleware
-	AdminSignatureMiddleware      *middleware_admin.SignatureMiddleware
 	// 排程 server
 	CronUser *cron.UserCron
 

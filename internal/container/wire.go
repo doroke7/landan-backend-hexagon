@@ -207,19 +207,6 @@ type ResourceContainer struct {
 	// HTTP server -Controller
 	HttpAdminResourceUser *HttpAdminResource.UserHandler
 
-	// HTTP server -Middleware
-	// Middleware 部分
-	AdminAbstractMiddleware       *MiddlewareAdmin.AbstractMiddleware
-	AdminAdminMiddleware          *MiddlewareAdmin.AdminMiddleware
-	AdminAuthenticationMiddleware *MiddlewareAdmin.AuthenticationMiddleware
-	AdminDecryptionMiddleware     *MiddlewareAdmin.DecryptionMiddleware
-	AdminEncryptionMiddleware     *MiddlewareAdmin.EncryptionMiddleware
-	AdminErrorMiddleware          *MiddlewareAdmin.ErrorMiddleware
-	AdminLoggerMiddleware         *MiddlewareAdmin.LoggerMiddleware
-	AdminNonexistentMiddleware    *MiddlewareAdmin.NonexistentMiddleware
-	AdminRequestMiddleware        *MiddlewareAdmin.RequestMiddleware
-	AdminResponseMiddleware       *MiddlewareAdmin.ResponseMiddleware
-	AdminSignatureMiddleware      *MiddlewareAdmin.SignatureMiddleware
 	// 排程 server
 	CronUser *cron.UserCron
 
@@ -272,19 +259,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		// input-client
 		client.NewAbstractHandler,
 		client.NewUserHandler,
-
-		// Middleware 部分
-		MiddlewareAdmin.NewAbstractMiddleware,
-		MiddlewareAdmin.NewAdminMiddleware,
-		MiddlewareAdmin.NewAuthenticationMiddleware,
-		MiddlewareAdmin.NewDecryptionMiddleware,
-		MiddlewareAdmin.NewEncryptionMiddleware,
-		MiddlewareAdmin.NewErrorMiddleware,
-		MiddlewareAdmin.NewLoggerMiddleware,
-		MiddlewareAdmin.NewNonexistentMiddleware,
-		MiddlewareAdmin.NewRequestMiddleware,
-		MiddlewareAdmin.NewResponseMiddleware,
-		MiddlewareAdmin.NewSignatureMiddleware,
 
 		// usecase
 		usecase.NewAbstractUsecase,
