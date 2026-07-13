@@ -106,8 +106,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	userHandler := client2.NewUserHandler(userUsecase, clientAbstractHandler)
 	serviceAbstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
-	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
-	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
 	resourceContainer := &ResourceContainer{
 		Response:               response,
 		AbstractHelper:         abstractHelper,
@@ -120,7 +118,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		ClientUser:             userHandler,
 		ResourceAbstract:       serviceAbstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
-		HttpAdminResourceUser:  handlerUserHandler,
 	}
 	return resourceContainer, nil
 }
@@ -256,9 +253,6 @@ type ResourceContainer struct {
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
 	ResourceModelAdminUser *service2.AdminUserHandler
-
-	// HTTP server -Controller
-	HttpAdminResourceUser *handler2.UserHandler
 }
 
 type Container struct {
