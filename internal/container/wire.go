@@ -4,10 +4,10 @@
 package container
 
 /*
-	usecase.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) usecasePort.UserUsecase
-	回傳型別宣告的是介面 usecasePort.UserUsecase，不是具體型別 *usecase.UserUsecase。
+	usecaseLogic.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) usecasePort.UserUsecase
+	回傳型別宣告的是介面 usecasePort.UserUsecase，不是具體型別 *usecaseLogic.UserUsecase。
 
-	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 usecasePort.UserUsecase」，而不是「能生產 *usecase.UserUsecase」——即使後者在執行期其實是同一個值。
+	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 usecasePort.UserUsecase」，而不是「能生產 *usecaseLogic.UserUsecase」——即使後者在執行期其實是同一個值。
 */
 
 import (
@@ -39,7 +39,6 @@ import (
 
 	usecasePort "example/internal/usecase/port"
 
-	usecase "example/internal/usecase"
 	usecaseLogic "example/internal/usecase/logic"
 
 	outputCache "example/internal/output/cache"
@@ -59,7 +58,7 @@ type FacadeContainer struct {
 	*helper.RsaHelper
 	*helper.LoggerHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
 
 	// gRPC Facade server
@@ -90,8 +89,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		inputFacadeRegister.NewAuthenticatorHandler,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -111,7 +110,7 @@ type ResourceContainer struct {
 	*helper.RsaHelper
 	*helper.LoggerHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.AdminUserUsecase
 
 	// gRPC Resource server
@@ -138,7 +137,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		inputResourceModel.NewAdminUserHandler,
 
 		// usecase
-		usecase.NewAbstractUsecase,
 		usecaseLogic.NewAbstractUsecase,
 		usecaseLogic.NewAdminUserUsecase,
 
@@ -163,7 +161,7 @@ type HttpContainer struct {
 	*helper.RsaHelper
 	*helper.LoggerHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
 
 	// HTTP server -Controller
@@ -219,8 +217,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		MiddlewareAdmin.NewSignatureMiddleware,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -239,7 +237,7 @@ type ConsumerContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
 
 	// MQ 消費者
@@ -264,8 +262,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		inputConsumer.NewUserConsumer,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -284,7 +282,7 @@ type CronContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
 
 	// 排程 server
@@ -308,8 +306,8 @@ func InitCronContainer() (*CronContainer, error) {
 		inputCron.NewUserCron,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -328,7 +326,7 @@ type WebsocketContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
 
 	// websocket server
@@ -352,8 +350,8 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		inputWebsocket.NewUserHandler,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -372,7 +370,7 @@ type ClientContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
 
 	// gRPC client stream 訂閱
@@ -400,8 +398,8 @@ func InitClientContainer() (*ClientContainer, error) {
 		inputClient.NewUserHandler,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -422,7 +420,7 @@ type CommandContainer struct {
 	*inputCommand.AbstractHandler
 	*inputCommand.UserHandler
 
-	*usecase.AbstractUsecase
+	*usecaseLogic.AbstractUsecase
 	// usecasePort.UserUsecase
 }
 
@@ -438,8 +436,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 		inputCommand.NewUserHandler,
 
 		// usecase
-		usecase.NewAbstractUsecase,
-		usecase.NewUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewUserUsecase,
 
 		// output
 		outputMemory.NewUserRepository,

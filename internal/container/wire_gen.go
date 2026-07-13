@@ -27,8 +27,7 @@ import (
 	"example/internal/output/cache"
 	"example/internal/output/memory"
 	"example/internal/output/mysql"
-	"example/internal/usecase"
-	usecase2 "example/internal/usecase/logic"
+	"example/internal/usecase/logic"
 	"example/internal/usecase/port"
 	"example/pkg"
 )
@@ -40,7 +39,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	loggerHelper := helper.NewLoggerHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -51,7 +49,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	abstractHandler := facade.NewAbstractHandler(aesHelper)
 	userHandler := facade2.NewUserHandler(userUsecase, abstractHandler)
 	scannerHandler := facade3.NewScannerHandler(abstractHandler)
@@ -76,20 +75,19 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	loggerHelper := helper.NewLoggerHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
 	}
-	adminUserRepository := mysql.NewAdminUserRepository(db)
 	client, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	usecaseAbstractUsecase := usecase2.NewAbstractUsecase(userRepository, aesHelper)
-	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, usecaseAbstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	adminUserRepository := mysql.NewAdminUserRepository(db)
+	adminUserUsecase := usecase.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
 	resourceContainer := &ResourceContainer{
@@ -111,7 +109,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	loggerHelper := helper.NewLoggerHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -122,7 +119,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper, loggerHelper)
@@ -163,7 +161,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 func InitConsumerContainer() (*ConsumerContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -174,7 +171,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
 		return nil, err
@@ -197,7 +195,6 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -208,7 +205,8 @@ func InitCronContainer() (*CronContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	abstractHandler := cron.NewAbstractHandler(aesHelper)
 	userCron, err := cron.NewUserCron(userUsecase, abstractHandler)
 	if err != nil {
@@ -227,7 +225,6 @@ func InitCronContainer() (*CronContainer, error) {
 func InitWebsocketContainer() (*WebsocketContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -238,7 +235,8 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	abstractHandler := websocket.NewAbstractHandler(aesHelper)
 	userHandler := websocket.NewUserHandler(userUsecase, abstractHandler)
 	websocketContainer := &WebsocketContainer{
@@ -254,7 +252,6 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 func InitClientContainer() (*ClientContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -265,7 +262,8 @@ func InitClientContainer() (*ClientContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	clientConn, err := bootstrap.NewClient()
 	if err != nil {
 		return nil, err
@@ -288,8 +286,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := command.NewAbstractHandler(aesHelper)
 	userRepository := memory.NewUserRepository()
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(userRepository, aesHelper)
+	userUsecase := usecase.NewUserUsecase(abstractUsecase)
 	userHandler := command.NewUserHandler(userUsecase)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
