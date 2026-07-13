@@ -73,13 +73,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	authenticatorHandler := facade4.NewAuthenticatorHandler(facadeAbstractHandler)
 	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
-	cronAbstractHandler := cron.NewAbstractHandler(aesHelper)
-	userCron, err := cron.NewUserCron(userUsecase, cronAbstractHandler)
-	if err != nil {
-		return nil, err
-	}
-	websocketAbstractHandler := websocket.NewAbstractHandler(aesHelper)
-	websocketUserHandler := websocket.NewUserHandler(userUsecase, websocketAbstractHandler)
 	facadeContainer := &FacadeContainer{
 		Response:                 response,
 		AbstractHelper:           abstractHelper,
@@ -95,8 +88,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		FacadeTableScanner:       scannerHandler,
 		FacadeTableAuthenticator: authenticatorHandler,
 		HttpAdminResourceUser:    handlerUserHandler,
-		CronUser:                 userCron,
-		WebsocketUser:            websocketUserHandler,
 	}
 	return facadeContainer, nil
 }
@@ -275,12 +266,6 @@ type FacadeContainer struct {
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler
-
-	// 排程 server
-	CronUser *cron.UserCron
-
-	// websocket server
-	WebsocketUser *websocket.UserHandler
 }
 
 type ResourceContainer struct {
