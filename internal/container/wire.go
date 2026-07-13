@@ -19,6 +19,7 @@ import (
 	internalClient "example/internal/client"
 	helper "example/internal/helper"
 	client "example/internal/input/client"
+	command "example/internal/input/command"
 	consumer "example/internal/input/consumer"
 	cron "example/internal/input/cron"
 
@@ -38,10 +39,10 @@ import (
 	usecase "example/internal/usecase"
 	usecaseResource "example/internal/usecase/resource"
 
-	inputPort "example/internal/usecase/port"
 	"example/internal/input/websocket"
 	"example/internal/output/cache"
 	"example/internal/output/mysql"
+	inputPort "example/internal/usecase/port"
 )
 
 /*
@@ -362,7 +363,7 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// ClientContainer 只給 `client` / `socket`（訂閱外部 gRPC stream）服務使用。
+// ClientContainer 只給 `client` （訂閱外部 gRPC stream）服務使用。
 type ClientContainer struct {
 
 	// Helper
@@ -404,6 +405,47 @@ func InitClientContainer() (*ClientContainer, error) {
 		cache.NewUserRepository,
 
 		wire.Struct(new(ClientContainer), "*"),
+	)
+	return nil, nil
+}
+
+// 、
+type CommandContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	inputPort.UserUsecase
+
+	*command.AbstractHandler
+	*command.UserHandler
+}
+
+func InitCommandContainer() (*CommandContainer, error) {
+	wire.Build(
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewCacheHelper,
+
+		command.NewAbstractHandler,
+		command.NewUserHandler,
+
+		// usecase
+		usecase.NewAbstractUsecase,
+		usecase.NewUserUsecase,
+
+		// output
+		cache.NewUserRepository,
+
+		wire.Struct(new(CommandContainer), "*"),
 	)
 	return nil, nil
 }

@@ -11,6 +11,7 @@ import (
 	"example/internal/client"
 	"example/internal/helper"
 	client2 "example/internal/input/client"
+	"example/internal/input/command"
 	"example/internal/input/consumer"
 	"example/internal/input/cron"
 	"example/internal/input/facade"
@@ -281,6 +282,34 @@ func InitClientContainer() (*ClientContainer, error) {
 	return clientContainer, nil
 }
 
+func InitCommandContainer() (*CommandContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	abstractHandler := command.NewAbstractHandler(aesHelper)
+	userHandler := command.NewUserHandler()
+	commandContainer := &CommandContainer{
+		AbstractHelper:  abstractHelper,
+		AesHelper:       aesHelper,
+		AbstractUsecase: abstractUsecase,
+		UserUsecase:     userUsecase,
+		AbstractHandler: abstractHandler,
+		UserHandler:     userHandler,
+	}
+	return commandContainer, nil
+}
+
 // wire.go:
 
 type FacadeContainer struct {
@@ -392,7 +421,7 @@ type WebsocketContainer struct {
 	WebsocketUser *websocket.UserHandler
 }
 
-// ClientContainer 只給 `client` / `socket`（訂閱外部 gRPC stream）服務使用。
+// ClientContainer 只給 `client` （訂閱外部 gRPC stream）服務使用。
 type ClientContainer struct {
 
 	// Helper
@@ -404,4 +433,18 @@ type ClientContainer struct {
 
 	// gRPC client stream 訂閱
 	ClientUser *client2.UserHandler
+}
+
+// 、
+type CommandContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
+
+	*command.AbstractHandler
+	*command.UserHandler
 }
