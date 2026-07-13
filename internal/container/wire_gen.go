@@ -20,6 +20,8 @@ import (
 	"example/internal/input/http/admin"
 	handler2 "example/internal/input/http/admin/resource"
 	"example/internal/input/port"
+	"example/internal/input/resource"
+	service2 "example/internal/input/resource/model"
 	"example/internal/input/websocket"
 	"example/internal/middleware/admin"
 	"example/internal/output/cache"
@@ -36,6 +38,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	loggerHelper := helper.NewLoggerHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -47,8 +50,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(portUserRepository, aesHelper)
-	userUsecase := usecase.NewUserUsecase(abstractUsecase)
+	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
 		return nil, err
@@ -99,6 +101,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		UserUsecase:                   userUsecase,
 		ConsumerUser:                  userConsumer,
 		ClientUser:                    userHandler,
+		FacadeAbstract:                facadeAbstractHandler,
 		FacadeGameUser:                facadeUserHandler,
 		FacadeTableScanner:            scannerHandler,
 		FacadeTableAuthenticator:      authenticatorHandler,
@@ -126,6 +129,7 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	loggerHelper := helper.NewLoggerHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -137,8 +141,7 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(portUserRepository, aesHelper)
-	userUsecase := usecase.NewUserUsecase(abstractUsecase)
+	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
 		return nil, err
@@ -155,9 +158,8 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	clientClient := client.NewClient(clientConn)
 	clientAbstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
 	userHandler := client2.NewUserHandler(userUsecase, clientAbstractHandler)
-	facadeAbstractHandler := facade.NewAbstractHandler(aesHelper)
-	facadeUserHandler := facade2.NewUserHandler(userUsecase, facadeAbstractHandler)
-	scannerHandler := facade3.NewScannerHandler(facadeAbstractHandler)
+	serviceAbstractHandler := service.NewAbstractHandler()
+	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
 	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper, loggerHelper)
@@ -188,8 +190,8 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		UserUsecase:                   userUsecase,
 		ConsumerUser:                  userConsumer,
 		ClientUser:                    userHandler,
-		FacadeGameUser:                facadeUserHandler,
-		FacadeTableScannerUser:        scannerHandler,
+		ResourceAbstract:              serviceAbstractHandler,
+		ResourceModelAdminUser:        adminUserHandler,
 		HttpAdminResourceUser:         handlerUserHandler,
 		AdminAbstractMiddleware:       abstractMiddleware,
 		AdminAdminMiddleware:          adminMiddleware,
@@ -214,6 +216,7 @@ func InitContainer() (*Container, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	loggerHelper := helper.NewLoggerHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -225,8 +228,7 @@ func InitContainer() (*Container, error) {
 	}
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(portUserRepository, aesHelper)
-	userUsecase := usecase.NewUserUsecase(abstractUsecase)
+	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
 		return nil, err
@@ -318,7 +320,8 @@ type FacadeContainer struct {
 	// gRPC client stream 訂閱
 	ClientUser *client2.UserHandler
 
-	// gRPC server
+	// gRPC Facade server
+	FacadeAbstract           *facade.AbstractHandler
 	FacadeGameUser           *facade2.UserHandler
 	FacadeTableScanner       *facade3.ScannerHandler
 	FacadeTableAuthenticator *facade4.AuthenticatorHandler
@@ -366,9 +369,9 @@ type ResourceContainer struct {
 	// gRPC client stream 訂閱
 	ClientUser *client2.UserHandler
 
-	// gRPC server
-	FacadeGameUser         *facade2.UserHandler
-	FacadeTableScannerUser *facade3.ScannerHandler
+	// gRPC Resource server
+	ResourceAbstract       *service.AbstractHandler
+	ResourceModelAdminUser *service2.AdminUserHandler
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler

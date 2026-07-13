@@ -14,10 +14,14 @@ import (
 	client "example/internal/input/client"
 	consumer "example/internal/input/consumer"
 	cron "example/internal/input/cron"
+
 	Facade "example/internal/input/facade"
 	FacadeGame "example/internal/input/facade/game"
 	FacadeRegister "example/internal/input/facade/register"
 	FacadeTable "example/internal/input/facade/table"
+
+	Resource "example/internal/input/resource"
+	ResourceModel "example/internal/input/resource/model"
 
 	MiddlewareAdmin "example/internal/middleware/admin"
 
@@ -63,7 +67,8 @@ type FacadeContainer struct {
 	// gRPC client stream 訂閱
 	ClientUser *client.UserHandler
 
-	// gRPC server
+	// gRPC Facade server
+	FacadeAbstract           *Facade.AbstractHandler
 	FacadeGameUser           *FacadeGame.UserHandler
 	FacadeTableScanner       *FacadeTable.ScannerHandler
 	FacadeTableAuthenticator *FacadeRegister.AuthenticatorHandler
@@ -165,6 +170,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	return nil, nil
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 type ResourceContainer struct {
 
 	// pkg
@@ -193,9 +200,9 @@ type ResourceContainer struct {
 	// gRPC client stream 訂閱
 	ClientUser *client.UserHandler
 
-	// gRPC server
-	FacadeGameUser         *FacadeGame.UserHandler
-	FacadeTableScannerUser *FacadeTable.ScannerHandler
+	// gRPC Resource server
+	ResourceAbstract       *Resource.AbstractHandler
+	ResourceModelAdminUser *ResourceModel.AdminUserHandler
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *HttpAdminResource.UserHandler
@@ -246,6 +253,10 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		consumer.NewAbstractHandler,
 		consumer.NewUserConsumer,
 
+		// input-resource
+		Resource.NewAbstractHandler,
+		ResourceModel.NewAdminUserHandler,
+
 		// input-http
 		HttpAdmin.NewAbstractHandler,
 		HttpAdminResource.NewUserHandler,
@@ -257,11 +268,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		// input-websocket
 		websocket.NewAbstractHandler,
 		websocket.NewUserHandler,
-
-		// input-facade
-		Facade.NewAbstractHandler,
-		FacadeGame.NewUserHandler,
-		FacadeTable.NewScannerHandler,
 
 		// input-client
 		client.NewAbstractHandler,

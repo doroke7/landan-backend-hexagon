@@ -4,16 +4,17 @@ import (
 	"context"
 
 	"example/internal/input/port"
+	resource "example/internal/input/resource"
 	pb "example/pb/resource/model"
 )
 
 type AdminUserHandler struct {
 	pb.UnimplementedAdminUserServer
-	*AbstractHandler
+	*resource.AbstractHandler
 	AdminUserUsecase port.AdminUserUsecase
 }
 
-func NewAdminUserHandler(oAbstractHandler *AbstractHandler) *AdminUserHandler {
+func NewAdminUserHandler(oAbstractHandler *resource.AbstractHandler) *AdminUserHandler {
 	return &AdminUserHandler{
 		AbstractHandler: oAbstractHandler,
 	}

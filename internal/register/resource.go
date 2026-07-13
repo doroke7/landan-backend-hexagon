@@ -5,15 +5,13 @@ import (
 
 	container "example/internal/container"
 
-	pbFacadeGame "example/pb/facade/game"
-	pbFacadeTable "example/pb/facade/table"
+	pbResourceModel "example/pb/resource/model"
 )
 
 func ResourceInit(oContainer *container.ResourceContainer) *grpc.Server {
 	oGrpcServer := grpc.NewServer()
 
-	pbFacadeTable.RegisterScannerServer(oGrpcServer, oContainer.FacadeTableScannerUser)
-	pbFacadeGame.RegisterUserServiceServer(oGrpcServer, oContainer.FacadeGameUser)
+	pbResourceModel.RegisterAdminUserServer(oGrpcServer, oContainer.)
 
 	return oGrpcServer
 }
