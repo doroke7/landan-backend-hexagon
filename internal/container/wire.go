@@ -24,8 +24,8 @@ import (
 	inputCommand "example/internal/input/command"
 	inputConsumer "example/internal/input/consumer"
 	inputCron "example/internal/input/cron"
-	Facade "example/internal/input/facade"
-	FacadeGame "example/internal/input/facade/game"
+	inputFacade "example/internal/input/facade"
+	inputFacadeGame "example/internal/input/facade/game"
 	inputFacadeRegister "example/internal/input/facade/register"
 	inputFacadeTable "example/internal/input/facade/table"
 	HttpAdmin "example/internal/input/http/admin"
@@ -62,8 +62,8 @@ type FacadeContainer struct {
 	inputPort.UserUsecase
 
 	// gRPC Facade server
-	FacadeAbstract           *Facade.AbstractHandler
-	FacadeGameUser           *FacadeGame.UserHandler
+	FacadeAbstract           *inputFacade.AbstractHandler
+	FacadeGameUser           *inputFacadeGame.UserHandler
 	inputFacadeTableScanner  *inputFacadeTable.ScannerHandler
 	FacadeTableAuthenticator *inputFacadeRegister.AuthenticatorHandler
 }
@@ -83,8 +83,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		helper.NewLoggerHelper,
 
 		// input-facade
-		Facade.NewAbstractHandler,
-		FacadeGame.NewUserHandler,
+		inputFacade.NewAbstractHandler,
+		inputFacadeGame.NewUserHandler,
 		inputFacadeTable.NewScannerHandler,
 		inputFacadeRegister.NewAuthenticatorHandler,
 
