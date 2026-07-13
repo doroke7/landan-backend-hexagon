@@ -3,7 +3,7 @@ package cron
 import (
 	"log"
 
-	"example/internal/input/port"
+	"example/internal/usecase/port"
 )
 
 type createUserMessage struct {

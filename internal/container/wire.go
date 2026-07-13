@@ -38,7 +38,7 @@ import (
 	usecase "example/internal/usecase"
 	usecaseResource "example/internal/usecase/resource"
 
-	inputPort "example/internal/input/port"
+	inputPort "example/internal/usecase/port"
 	"example/internal/input/websocket"
 	"example/internal/output/cache"
 	"example/internal/output/mysql"

@@ -5,7 +5,7 @@ import (
 	"io"
 	"log"
 
-	"example/internal/input/port"
+	"example/internal/usecase/port"
 	pb "example/pb/client"
 )
 

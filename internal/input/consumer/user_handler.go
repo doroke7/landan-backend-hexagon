@@ -6,7 +6,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"example/internal/input/port"
+	"example/internal/usecase/port"
 )
 
 type createUserMessage struct {

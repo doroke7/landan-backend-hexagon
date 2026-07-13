@@ -19,7 +19,6 @@ import (
 	facade3 "example/internal/input/facade/table"
 	"example/internal/input/http/admin"
 	handler2 "example/internal/input/http/admin/resource"
-	"example/internal/input/port"
 	"example/internal/input/resource"
 	service2 "example/internal/input/resource/model"
 	"example/internal/input/websocket"
@@ -27,6 +26,7 @@ import (
 	"example/internal/output/cache"
 	"example/internal/output/mysql"
 	"example/internal/usecase"
+	"example/internal/usecase/port"
 	usecase2 "example/internal/usecase/resource"
 	"example/pkg"
 )
