@@ -162,11 +162,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
 	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	handlerUserHandler := handler2.NewUserHandler(userUsecase, handlerAbstractHandler)
-	cronAbstractHandler := cron.NewAbstractHandler(aesHelper)
-	userCron, err := cron.NewUserCron(userUsecase, cronAbstractHandler)
-	if err != nil {
-		return nil, err
-	}
 	websocketAbstractHandler := websocket.NewAbstractHandler(aesHelper)
 	websocketUserHandler := websocket.NewUserHandler(userUsecase, websocketAbstractHandler)
 	resourceContainer := &ResourceContainer{
@@ -182,7 +177,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		ResourceAbstract:       serviceAbstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
 		HttpAdminResourceUser:  handlerUserHandler,
-		CronUser:               userCron,
 		WebsocketUser:          websocketUserHandler,
 	}
 	return resourceContainer, nil
@@ -353,9 +347,6 @@ type ResourceContainer struct {
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler
-
-	// 排程 server
-	CronUser *cron.UserCron
 
 	// websocket server
 	WebsocketUser *websocket.UserHandler

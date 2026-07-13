@@ -207,9 +207,6 @@ type ResourceContainer struct {
 	// HTTP server -Controller
 	HttpAdminResourceUser *HttpAdminResource.UserHandler
 
-	// 排程 server
-	CronUser *cron.UserCron
-
 	// websocket server
 	WebsocketUser *websocket.UserHandler
 }
@@ -247,10 +244,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		// input-http
 		HttpAdmin.NewAbstractHandler,
 		HttpAdminResource.NewUserHandler,
-
-		// input-cron
-		cron.NewAbstractHandler,
-		cron.NewUserCron,
 
 		// input-websocket
 		websocket.NewAbstractHandler,
