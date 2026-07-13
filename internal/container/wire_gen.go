@@ -70,7 +70,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 }
 
 func InitResourdeContainer() (*ResourceContainer, error) {
-	response := pkg.NewResponse()
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
@@ -107,7 +106,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	serviceAbstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
 	resourceContainer := &ResourceContainer{
-		Response:               response,
 		AbstractHelper:         abstractHelper,
 		AesHelper:              aesHelper,
 		RsaHelper:              rsaHelper,
@@ -231,9 +229,6 @@ type FacadeContainer struct {
 }
 
 type ResourceContainer struct {
-
-	// pkg
-	*pkg.Response
 
 	// Helper
 	*helper.AbstractHelper

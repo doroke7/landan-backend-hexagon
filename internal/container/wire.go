@@ -101,9 +101,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 
 type ResourceContainer struct {
 
-	// pkg
-	*pkg.Response
-
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
@@ -126,9 +123,6 @@ type ResourceContainer struct {
 
 func InitResourdeContainer() (*ResourceContainer, error) {
 	wire.Build(
-
-		// pkg
-		pkg.NewResponse,
 
 		// bootstrap
 		bootstrap.NewMysql,
