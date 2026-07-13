@@ -41,9 +41,6 @@ import (
 
 type FacadeContainer struct {
 
-	// pkg
-	*pkg.Response
-
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
@@ -68,9 +65,6 @@ type FacadeContainer struct {
 
 func InitFacadeContainer() (*FacadeContainer, error) {
 	wire.Build(
-
-		// pkg
-		pkg.NewResponse,
 
 		// bootstrap
 		bootstrap.NewMysql,

@@ -33,7 +33,6 @@ import (
 // Injectors from wire.go:
 
 func InitFacadeContainer() (*FacadeContainer, error) {
-	response := pkg.NewResponse()
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
@@ -56,7 +55,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	scannerHandler := facade3.NewScannerHandler(abstractHandler)
 	authenticatorHandler := facade4.NewAuthenticatorHandler(abstractHandler)
 	facadeContainer := &FacadeContainer{
-		Response:                 response,
 		AbstractHelper:           abstractHelper,
 		AesHelper:                aesHelper,
 		RsaHelper:                rsaHelper,
@@ -218,9 +216,6 @@ func InitContainer() (*Container, error) {
 // wire.go:
 
 type FacadeContainer struct {
-
-	// pkg
-	*pkg.Response
 
 	// Helper
 	*helper.AbstractHelper
