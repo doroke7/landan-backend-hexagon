@@ -32,8 +32,8 @@ import (
 	inputHttpAdminResource "example/internal/input/http/admin/resource"
 	inputWebsocket "example/internal/input/websocket"
 
-	Resource "example/internal/input/resource"
-	ResourceModel "example/internal/input/resource/model"
+	inputResource "example/internal/input/resource"
+	inputResourceModel "example/internal/input/resource/model"
 
 	MiddlewareAdmin "example/internal/middleware/admin"
 
@@ -115,8 +115,8 @@ type ResourceContainer struct {
 	inputPort.AdminUserUsecase
 
 	// gRPC Resource server
-	ResourceAbstract       *Resource.AbstractHandler
-	ResourceModelAdminUser *ResourceModel.AdminUserHandler
+	ResourceAbstract       *inputResource.AbstractHandler
+	ResourceModelAdminUser *inputResourceModel.AdminUserHandler
 }
 
 func InitResourceContainer() (*ResourceContainer, error) {
@@ -134,8 +134,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		helper.NewLoggerHelper,
 
 		// input-resource
-		Resource.NewAbstractHandler,
-		ResourceModel.NewAdminUserHandler,
+		inputResource.NewAbstractHandler,
+		inputResourceModel.NewAdminUserHandler,
 
 		// usecase
 		usecase.NewAbstractUsecase,
