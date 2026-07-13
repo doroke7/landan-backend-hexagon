@@ -28,11 +28,12 @@ import (
 	inputFacadeGame "example/internal/input/facade/game"
 	inputFacadeRegister "example/internal/input/facade/register"
 	inputFacadeTable "example/internal/input/facade/table"
-	HttpAdmin "example/internal/input/http/admin"
-	HttpAdminResource "example/internal/input/http/admin/resource"
+	inputHttpAdmin "example/internal/input/http/admin"
+	inputHttpAdminResource "example/internal/input/http/admin/resource"
+	inputWebsocket "example/internal/input/websocket"
+
 	Resource "example/internal/input/resource"
 	ResourceModel "example/internal/input/resource/model"
-	websocket "example/internal/input/websocket"
 
 	MiddlewareAdmin "example/internal/middleware/admin"
 
@@ -166,7 +167,7 @@ type HttpContainer struct {
 	inputPort.UserUsecase
 
 	// HTTP server -Controller
-	HttpAdminResourceUser *HttpAdminResource.UserHandler
+	HttpAdminResourceUser *inputHttpAdminResource.UserHandler
 
 	// HTTP server -Middleware
 	// Middleware 部分
@@ -201,8 +202,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewLoggerHelper,
 
 		// input-http
-		HttpAdmin.NewAbstractHandler,
-		HttpAdminResource.NewUserHandler,
+		inputHttpAdmin.NewAbstractHandler,
+		inputHttpAdminResource.NewUserHandler,
 
 		// Middleware 部分
 		MiddlewareAdmin.NewAbstractMiddleware,
@@ -331,7 +332,7 @@ type WebsocketContainer struct {
 	inputPort.UserUsecase
 
 	// websocket server
-	WebsocketUser *websocket.UserHandler
+	WebsocketUser *inputWebsocket.UserHandler
 }
 
 func InitWebsocketContainer() (*WebsocketContainer, error) {
@@ -347,8 +348,8 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		helper.NewCacheHelper,
 
 		// input-websocket
-		websocket.NewAbstractHandler,
-		websocket.NewUserHandler,
+		inputWebsocket.NewAbstractHandler,
+		inputWebsocket.NewUserHandler,
 
 		// usecase
 		usecase.NewAbstractUsecase,
