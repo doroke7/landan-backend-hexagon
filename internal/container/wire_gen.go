@@ -44,11 +44,11 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		return nil, err
 	}
 	userRepository := mysql.NewUserRepository(db)
-	redisClient, err := bootstrap.NewRedis()
+	client, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
@@ -60,15 +60,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	clientConn, err := bootstrap.NewClient()
-	if err != nil {
-		return nil, err
-	}
-	clientClient := client.NewClient(clientConn)
-	clientAbstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
-	userHandler := client2.NewUserHandler(userUsecase, clientAbstractHandler)
 	facadeAbstractHandler := facade.NewAbstractHandler(aesHelper)
-	facadeUserHandler := facade2.NewUserHandler(userUsecase, facadeAbstractHandler)
+	userHandler := facade2.NewUserHandler(userUsecase, facadeAbstractHandler)
 	scannerHandler := facade3.NewScannerHandler(facadeAbstractHandler)
 	authenticatorHandler := facade4.NewAuthenticatorHandler(facadeAbstractHandler)
 	handlerAbstractHandler := handler.NewAbstractHandler(response, aesHelper)
@@ -82,9 +75,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		AbstractUsecase:          abstractUsecase,
 		UserUsecase:              userUsecase,
 		ConsumerUser:             userConsumer,
-		ClientUser:               userHandler,
 		FacadeAbstract:           facadeAbstractHandler,
-		FacadeGameUser:           facadeUserHandler,
+		FacadeGameUser:           userHandler,
 		FacadeTableScanner:       scannerHandler,
 		FacadeTableAuthenticator: authenticatorHandler,
 		HttpAdminResourceUser:    handlerUserHandler,
@@ -254,9 +246,6 @@ type FacadeContainer struct {
 
 	// MQ 消費者
 	ConsumerUser *consumer.UserConsumer
-
-	// gRPC client stream 訂閱
-	ClientUser *client2.UserHandler
 
 	// gRPC Facade server
 	FacadeAbstract           *facade.AbstractHandler

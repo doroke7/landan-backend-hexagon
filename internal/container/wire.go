@@ -64,9 +64,6 @@ type FacadeContainer struct {
 	// MQ 消費者
 	ConsumerUser *consumer.UserConsumer
 
-	// gRPC client stream 訂閱
-	ClientUser *client.UserHandler
-
 	// gRPC Facade server
 	FacadeAbstract           *Facade.AbstractHandler
 	FacadeGameUser           *FacadeGame.UserHandler
@@ -85,12 +82,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewClient,
 		bootstrap.NewAmqp,
 		bootstrap.NewRedis,
-
-		//
-		internalClient.NewClient,
 
 		// helper
 		helper.NewAbstractHelper,
@@ -112,10 +105,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		FacadeGame.NewUserHandler,
 		FacadeTable.NewScannerHandler,
 		FacadeRegister.NewAuthenticatorHandler,
-
-		// input-client
-		client.NewAbstractHandler,
-		client.NewUserHandler,
 
 		// usecase
 		usecase.NewAbstractUsecase,
