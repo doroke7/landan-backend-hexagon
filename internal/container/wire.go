@@ -40,7 +40,7 @@ import (
 	usecasePort "example/internal/usecase/port"
 
 	usecase "example/internal/usecase"
-	usecaseResource "example/internal/usecase/resource"
+	usecaseLogic "example/internal/usecase/logic"
 
 	outputCache "example/internal/output/cache"
 	outputMemory "example/internal/output/memory"
@@ -139,8 +139,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 
 		// usecase
 		usecase.NewAbstractUsecase,
-		usecaseResource.NewAbstractUsecase,
-		usecaseResource.NewAdminUserUsecase,
+		usecaseLogic.NewAbstractUsecase,
+		usecaseLogic.NewAdminUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,

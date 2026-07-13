@@ -28,8 +28,8 @@ import (
 	"example/internal/output/memory"
 	"example/internal/output/mysql"
 	"example/internal/usecase"
+	usecase2 "example/internal/usecase/logic"
 	"example/internal/usecase/port"
-	usecase2 "example/internal/usecase/resource"
 	"example/pkg"
 )
 
