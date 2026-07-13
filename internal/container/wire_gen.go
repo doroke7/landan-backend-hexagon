@@ -65,7 +65,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		UserUsecase:              userUsecase,
 		FacadeAbstract:           abstractHandler,
 		FacadeGameUser:           userHandler,
-		FacadeTableScanner:       scannerHandler,
+		inputFacadeTableScanner:  scannerHandler,
 		FacadeTableAuthenticator: authenticatorHandler,
 	}
 	return facadeContainer, nil
@@ -318,7 +318,7 @@ type FacadeContainer struct {
 	// gRPC Facade server
 	FacadeAbstract           *facade.AbstractHandler
 	FacadeGameUser           *facade2.UserHandler
-	FacadeTableScanner       *facade3.ScannerHandler
+	inputFacadeTableScanner  *facade3.ScannerHandler
 	FacadeTableAuthenticator *facade4.AuthenticatorHandler
 }
 
