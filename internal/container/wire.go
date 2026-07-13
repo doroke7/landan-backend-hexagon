@@ -110,9 +110,6 @@ type ResourceContainer struct {
 	*usecase.AbstractUsecase
 	inputPort.UserUsecase
 
-	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
-
 	// gRPC Resource server
 	ResourceAbstract       *Resource.AbstractHandler
 	ResourceModelAdminUser *ResourceModel.AdminUserHandler
@@ -123,7 +120,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewAmqp,
 		bootstrap.NewRedis,
 
 		// helper
@@ -132,10 +128,6 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
 		helper.NewLoggerHelper,
-
-		// input-consumer
-		consumer.NewAbstractHandler,
-		consumer.NewUserConsumer,
 
 		// input-resource
 		Resource.NewAbstractHandler,

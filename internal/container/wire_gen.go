@@ -87,17 +87,8 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
 	portUserRepository := cache.NewUserRepository(userRepository, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(portUserRepository, abstractUsecase)
-	connection, err := bootstrap.NewAmqp()
-	if err != nil {
-		return nil, err
-	}
-	abstractHandler := consumer.NewAbstractHandler(aesHelper, connection)
-	userConsumer, err := consumer.NewUserConsumer(userUsecase, abstractHandler)
-	if err != nil {
-		return nil, err
-	}
-	serviceAbstractHandler := service.NewAbstractHandler()
-	adminUserHandler := service2.NewAdminUserHandler(serviceAbstractHandler)
+	abstractHandler := service.NewAbstractHandler()
+	adminUserHandler := service2.NewAdminUserHandler(abstractHandler)
 	resourceContainer := &ResourceContainer{
 		AbstractHelper:         abstractHelper,
 		AesHelper:              aesHelper,
@@ -105,8 +96,7 @@ func InitResourdeContainer() (*ResourceContainer, error) {
 		LoggerHelper:           loggerHelper,
 		AbstractUsecase:        abstractUsecase,
 		UserUsecase:            userUsecase,
-		ConsumerUser:           userConsumer,
-		ResourceAbstract:       serviceAbstractHandler,
+		ResourceAbstract:       abstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
 	}
 	return resourceContainer, nil
@@ -230,9 +220,6 @@ type ResourceContainer struct {
 
 	*usecase.AbstractUsecase
 	port.UserUsecase
-
-	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
 
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
