@@ -4,16 +4,19 @@ import (
 	"errors"
 
 	"example/internal/domain"
+	outputPort "example/internal/output/port"
 	inputPort "example/internal/usecase/port"
 )
 
 type UserUsecase struct {
 	*AbstractUsecase
+	outputPort.UserRepository
 }
 
-func NewUserUsecase(oAbstractUsecase *AbstractUsecase) inputPort.UserUsecase {
+func NewUserUsecase(oUserRepository outputPort.UserRepository, oAbstractUsecase *AbstractUsecase) inputPort.UserUsecase {
 	return &UserUsecase{
 		AbstractUsecase: oAbstractUsecase,
+		UserRepository:  oUserRepository,
 	}
 }
 

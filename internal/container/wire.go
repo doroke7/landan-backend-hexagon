@@ -123,13 +123,11 @@ func InitResourceContainer() (*ResourceContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewRedis,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
-		helper.NewCacheHelper,
 		helper.NewLoggerHelper,
 
 		// input-resource
@@ -141,7 +139,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		usecaseLogic.NewAdminUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
 		outputMysql.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
