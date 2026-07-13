@@ -65,7 +65,7 @@ type FacadeContainer struct {
 	// gRPC Facade server
 	FacadeAbstract           *inputFacade.AbstractHandler
 	FacadeGameUser           *inputFacadeGame.UserHandler
-	inputFacadeTableScanner  *inputFacadeTable.ScannerHandler
+	FacadeTableScanner       *inputFacadeTable.ScannerHandler
 	FacadeTableAuthenticator *inputFacadeRegister.AuthenticatorHandler
 }
 
@@ -423,7 +423,7 @@ type CommandContainer struct {
 	*inputCommand.UserHandler
 
 	*usecase.AbstractUsecase
-	usecasePort.UserUsecase
+	// usecasePort.UserUsecase
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -433,6 +433,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
+		// command
 		inputCommand.NewAbstractHandler,
 		inputCommand.NewUserHandler,
 
