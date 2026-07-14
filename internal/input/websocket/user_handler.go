@@ -1,10 +1,12 @@
 package websocket
 
 import (
-	"log"
 	"net/http"
 
 	"example/internal/usecase/port"
+	pkg "example/pkg"
+
+	"go.uber.org/zap"
 )
 
 type createUserMessage struct {
@@ -28,7 +30,9 @@ func NewUserHandler(oUserUsecase port.UserUsecase, oAbstractHandler *AbstractHan
 func (oSelf *UserHandler) AddUser(w http.ResponseWriter, r *http.Request) {
 	oConn, err := oSelf.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("websocket upgrade failed: %v", err)
+		pkg.Logger(pkg.Websocket).Error("websocket upgrade 失敗",
+			zap.Error(err),
+		)
 		return
 	}
 	defer oConn.Close()
@@ -36,16 +40,29 @@ func (oSelf *UserHandler) AddUser(w http.ResponseWriter, r *http.Request) {
 	for {
 		var payload createUserMessage
 		if err := oConn.ReadJSON(&payload); err != nil {
+			pkg.Logger(pkg.Websocket).Error("ReadJSON 失敗",
+				zap.Error(err),
+			)
 			return
 		}
 
 		user, err := oSelf.userUsecase.AddUserByName(payload.Name)
 		if err != nil {
-			log.Printf("create user failed: %v", err)
+			pkg.Logger(pkg.Websocket).Error("AddUser 失敗",
+				zap.String("name", payload.Name),
+				zap.Error(err),
+			)
 			continue
 		}
 
+		pkg.Logger(pkg.Websocket).Info("AddUser 成功",
+			zap.String("name", payload.Name),
+		)
+
 		if err := oConn.WriteJSON(user); err != nil {
+			pkg.Logger(pkg.Websocket).Error("WriteJSON 失敗",
+				zap.Error(err),
+			)
 			return
 		}
 	}

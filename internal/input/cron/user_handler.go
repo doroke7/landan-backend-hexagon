@@ -1,9 +1,10 @@
 package cron
 
 import (
-	"log"
-
 	"example/internal/usecase/port"
+	pkg "example/pkg"
+
+	"go.uber.org/zap"
 )
 
 type createUserMessage struct {
@@ -27,7 +28,14 @@ func (oSelf *UserCron) AddUser() {
 	}
 
 	if _, err := oSelf.userUsecase.AddUserByName(payload.Name); err != nil {
-		log.Printf("create user failed: %v", err)
+		pkg.Logger(pkg.Cron).Error("AddUser 失敗",
+			zap.String("name", payload.Name),
+			zap.Error(err),
+		)
+		return
 	}
 
+	pkg.Logger(pkg.Cron).Info("AddUser 成功",
+		zap.String("name", payload.Name),
+	)
 }

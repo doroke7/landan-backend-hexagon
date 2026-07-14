@@ -3,10 +3,12 @@ package client
 import (
 	"context"
 	"io"
-	"log"
 
 	"example/internal/usecase/port"
 	pb "example/pb/client"
+	pkg "example/pkg"
+
+	"go.uber.org/zap"
 )
 
 // UserHandler 主動訂閱外部 gRPC stream server 推送的 User 事件，
@@ -27,6 +29,9 @@ func (oSelf *UserHandler) AddUser(ctx context.Context) error {
 
 	stream, err := oSelf.Client.User.SubscribeUsers(ctx, &pb.SubscribeUsersRequest{})
 	if err != nil {
+		pkg.Logger(pkg.Grpc).Error("SubscribeUsers 失敗",
+			zap.Error(err),
+		)
 		return err
 	}
 
@@ -37,11 +42,22 @@ func (oSelf *UserHandler) AddUser(ctx context.Context) error {
 			return nil
 		}
 		if err != nil {
+			pkg.Logger(pkg.Grpc).Error("stream.Recv 失敗",
+				zap.Error(err),
+			)
 			return err
 		}
 
 		if _, err := oSelf.userUsecase.AddUserByName(user.GetName()); err != nil {
-			log.Printf("create user failed: %v", err)
+			pkg.Logger(pkg.Grpc).Error("AddUser 失敗",
+				zap.String("name", user.GetName()),
+				zap.Error(err),
+			)
+			continue
 		}
+
+		pkg.Logger(pkg.Grpc).Info("AddUser 成功",
+			zap.String("name", user.GetName()),
+		)
 	}
 }

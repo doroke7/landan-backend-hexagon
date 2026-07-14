@@ -29,7 +29,7 @@ func (oSelf *LoggerMiddleware) Handle() gin.HandlerFunc {
 		sPath := oContext.Request.URL.Path
 		sRawQuery := oContext.Request.URL.RawQuery
 		oMapHeaders := oContext.Request.Header
-		pkg.Logger("middleware").Info(
+		pkg.Logger(pkg.Middleware).Info(
 			"進入 http",
 			zap.String("path", sPath),
 			zap.String("query", sRawQuery),
@@ -39,7 +39,7 @@ func (oSelf *LoggerMiddleware) Handle() gin.HandlerFunc {
 		oContext.Next()
 		iTime2 := utility.Time[int](true)
 
-		pkg.Logger("middleware").Info(
+		pkg.Logger(pkg.Middleware).Info(
 			"結束 http",
 			zap.String("path", sPath),
 			zap.String("query", sRawQuery),

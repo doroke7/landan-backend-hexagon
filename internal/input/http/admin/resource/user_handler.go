@@ -6,8 +6,10 @@ import (
 
 	HttpAdmin "example/internal/input/http/admin"
 	"example/internal/usecase/port"
+	pkg "example/pkg"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type UserHandler struct {
@@ -28,10 +30,18 @@ func (oSelf *UserHandler) AddUser(oContext *gin.Context) {
 
 	user, err := oSelf.userUsecase.AddUserByName(name)
 	if err != nil {
+		pkg.Logger(pkg.Controller).Error("AddUser 失敗",
+			zap.String("name", name),
+			zap.Error(err),
+		)
 		oContext.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
+	pkg.Logger(pkg.Controller).Info("AddUser 成功",
+		zap.Int("id", user.ID),
+		zap.String("name", user.Name),
+	)
 	oContext.JSON(http.StatusOK, user)
 }
 
@@ -43,9 +53,17 @@ func (oSelf *UserHandler) ShowUser(oContext *gin.Context) {
 
 	user, err := oSelf.userUsecase.ShowUserById(id)
 	if err != nil {
+		pkg.Logger(pkg.Controller).Warn("ShowUser 失敗",
+			zap.Int("id", id),
+			zap.Error(err),
+		)
 		oContext.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
+	pkg.Logger(pkg.Controller).Info("ShowUser 成功",
+		zap.Int("id", user.ID),
+		zap.String("name", user.Name),
+	)
 	oContext.JSON(http.StatusOK, user)
 }

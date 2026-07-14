@@ -2,11 +2,13 @@ package consumer
 
 import (
 	"encoding/json"
-	"log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"example/internal/usecase/port"
+	pkg "example/pkg"
+
+	"go.uber.org/zap"
 )
 
 type createUserMessage struct {
@@ -28,16 +30,25 @@ type UserConsumer struct {
 func (oSelf *UserConsumer) AddUser(msg amqp.Delivery) {
 	var payload createUserMessage
 	if err := json.Unmarshal(msg.Body, &payload); err != nil {
+		pkg.Logger(pkg.Consumer).Error("AddUser 訊息格式錯誤",
+			zap.Error(err),
+		)
 		msg.Nack(false, false)
 		return
 	}
 
 	if _, err := oSelf.userUsecase.AddUserByName(payload.Name); err != nil {
-		log.Printf("create user failed: %v", err)
+		pkg.Logger(pkg.Consumer).Error("AddUser 失敗",
+			zap.String("name", payload.Name),
+			zap.Error(err),
+		)
 		msg.Nack(false, true)
 		return
 	}
 
+	pkg.Logger(pkg.Consumer).Info("AddUser 成功",
+		zap.String("name", payload.Name),
+	)
 	msg.Ack(false)
 }
 
