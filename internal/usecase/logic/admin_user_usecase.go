@@ -5,15 +5,15 @@ import (
 
 	"example/internal/domain"
 	inputPort "example/internal/usecase/port"
-	outputPortModel "example/internal/output/port/model"
+	outputPort "example/internal/output/port"
 )
 
 type AdminUserUsecase struct {
 	*AbstractUsecase
-	outputPortModel.AdminUserRepository
+	outputPort.AdminUserRepository
 }
 
-func NewAdminUserUsecase(oAminUserRepository outputPortModel.AdminUserRepository, oAbstractUsecase *AbstractUsecase) inputPort.AdminUserUsecase {
+func NewAdminUserUsecase(oAminUserRepository outputPort.AdminUserRepository, oAbstractUsecase *AbstractUsecase) inputPort.AdminUserUsecase {
 	return &AdminUserUsecase{
 		AbstractUsecase:     oAbstractUsecase,
 		AdminUserRepository: oAminUserRepository,

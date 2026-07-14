@@ -41,9 +41,9 @@ import (
 
 	usecaseLogic "example/internal/usecase/logic"
 
-	outputCacheModel "example/internal/output/cache/model"
-	outputMemoryModel "example/internal/output/memory/model"
-	outputMysqlModel "example/internal/output/mysql/model"
+	outputCache "example/internal/output/cache"
+	outputMemory "example/internal/output/memory"
+	outputMysql "example/internal/output/mysql"
 )
 
 /*
@@ -91,7 +91,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputCacheModel.NewUserRepository,
+		outputCache.NewUserRepository,
 
 		wire.Struct(new(FacadeContainer), "*"),
 	)
@@ -135,7 +135,7 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		usecaseLogic.NewAdminUserUsecase,
 
 		// output
-		outputMysqlModel.NewAdminUserRepository,
+		outputMysql.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
 	)
@@ -212,7 +212,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputCacheModel.NewUserRepository,
+		outputCache.NewUserRepository,
 
 		wire.Struct(new(HttpContainer), "*"),
 	)
@@ -257,7 +257,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputCacheModel.NewUserRepository,
+		outputCache.NewUserRepository,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -301,7 +301,7 @@ func InitCronContainer() (*CronContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputCacheModel.NewUserRepository,
+		outputCache.NewUserRepository,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -345,7 +345,7 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputCacheModel.NewUserRepository,
+		outputCache.NewUserRepository,
 
 		wire.Struct(new(WebsocketContainer), "*"),
 	)
@@ -393,7 +393,7 @@ func InitClientContainer() (*ClientContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputCacheModel.NewUserRepository,
+		outputCache.NewUserRepository,
 
 		wire.Struct(new(ClientContainer), "*"),
 	)
@@ -431,7 +431,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 		usecaseLogic.NewUserUsecase,
 
 		// output
-		outputMemoryModel.NewUserRepository,
+		outputMemory.NewUserRepository,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)
