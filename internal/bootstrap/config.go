@@ -163,16 +163,14 @@ type Config struct {
 			MAX_SIZE    int    `mapstructure:"max_size"`
 			MAX_BACKUPS int    `mapstructure:"max_backups"`
 			MAX_AGE     int    `mapstructure:"max_age"`
-
-			COMPRESS bool `mapstructure:"compress"`
+			COMPRESS    bool   `mapstructure:"compress"`
 		} `mapstructure:"controller"`
 		SDK struct {
 			DIRECTORY   string `mapstructure:"directory"`
 			MAX_SIZE    int    `mapstructure:"max_size"`
 			MAX_BACKUPS int    `mapstructure:"max_backups"`
 			MAX_AGE     int    `mapstructure:"max_age"`
-
-			COMPRESS bool `mapstructure:"compress"`
+			COMPRESS    bool   `mapstructure:"compress"`
 		} `mapstructure:"sdk"`
 		SERVICE struct {
 			DIRECTORY   string `mapstructure:"directory"`
