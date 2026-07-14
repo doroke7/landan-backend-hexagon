@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	HttpAdmin "example/internal/input/http/admin"
-	"example/internal/usecase/port"
+	"example/internal/usecase/port/model"
 	pkg "example/pkg"
 
 	"github.com/gin-gonic/gin"

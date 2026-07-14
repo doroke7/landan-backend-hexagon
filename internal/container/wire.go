@@ -4,10 +4,10 @@
 package container
 
 /*
-	usecaseLogic.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) usecasePort.UserUsecase
-	回傳型別宣告的是介面 usecasePort.UserUsecase，不是具體型別 *usecaseLogic.UserUsecase。
+	usecaseResourceModel.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) usecasePortModel.UserUsecase
+	回傳型別宣告的是介面 usecasePortModel.UserUsecase，不是具體型別 *usecaseResourceModel.UserUsecase。
 
-	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 usecasePort.UserUsecase」，而不是「能生產 *usecaseLogic.UserUsecase」——即使後者在執行期其實是同一個值。
+	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 usecasePortModel.UserUsecase」，而不是「能生產 *usecaseResourceModel.UserUsecase」——即使後者在執行期其實是同一個值。
 */
 
 import (
@@ -37,9 +37,9 @@ import (
 	inputResource "example/internal/input/resource"
 	inputResourceModel "example/internal/input/resource/model"
 
-	usecasePort "example/internal/usecase/port"
+	usecasePortModel "example/internal/usecase/port/model"
 
-	usecaseLogic "example/internal/usecase/logic"
+	usecaseResourceModel "example/internal/usecase/resource/model"
 
 	outputCache "example/internal/output/cache"
 	outputMemory "example/internal/output/memory"
@@ -57,8 +57,8 @@ type FacadeContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.UserUsecase
 
 	// gRPC Facade server
 	FacadeAbstract           *inputFacade.AbstractHandler
@@ -87,8 +87,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		inputFacadeRegister.NewAuthenticatorHandler,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -107,8 +107,8 @@ type ResourceContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.AdminUserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *inputResource.AbstractHandler
@@ -131,8 +131,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		inputResourceModel.NewAdminUserHandler,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewAdminUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewAdminUserUsecase,
 
 		// output
 		outputMysql.NewAdminUserRepository,
@@ -153,8 +153,8 @@ type HttpContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.UserUsecase
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *inputHttpAdminResource.UserHandler
@@ -208,8 +208,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		MiddlewareAdmin.NewSignatureMiddleware,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -228,8 +228,8 @@ type ConsumerContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.UserUsecase
 
 	// MQ 消費者
 	ConsumerUser *inputConsumer.UserConsumer
@@ -253,8 +253,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		inputConsumer.NewUserConsumer,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -273,8 +273,8 @@ type CronContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.UserUsecase
 
 	// 排程 server
 	CronUser *inputCron.UserCron
@@ -297,8 +297,8 @@ func InitCronContainer() (*CronContainer, error) {
 		inputCron.NewUserCron,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -317,8 +317,8 @@ type WebsocketContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.UserUsecase
 
 	// websocket server
 	WebsocketUser *inputWebsocket.UserHandler
@@ -341,8 +341,8 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		inputWebsocket.NewUserHandler,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -361,8 +361,8 @@ type ClientContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseLogic.AbstractUsecase
-	usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	usecasePortModel.UserUsecase
 
 	// gRPC client stream 訂閱
 	ClientUser *inputClient.UserHandler
@@ -389,8 +389,8 @@ func InitClientContainer() (*ClientContainer, error) {
 		inputClient.NewUserHandler,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -411,8 +411,8 @@ type CommandContainer struct {
 	*inputCommand.AbstractHandler
 	*inputCommand.UserHandler
 
-	*usecaseLogic.AbstractUsecase
-	// usecasePort.UserUsecase
+	*usecaseResourceModel.AbstractUsecase
+	// usecasePortModel.UserUsecase
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -427,8 +427,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 		inputCommand.NewUserHandler,
 
 		// usecase
-		usecaseLogic.NewAbstractUsecase,
-		usecaseLogic.NewUserUsecase,
+		usecaseResourceModel.NewAbstractUsecase,
+		usecaseResourceModel.NewUserUsecase,
 
 		// output
 		outputMemory.NewUserRepository,

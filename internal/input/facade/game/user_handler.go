@@ -4,7 +4,7 @@ import (
 	"context"
 
 	inputFacade "example/internal/input/facade"
-	"example/internal/usecase/port"
+	"example/internal/usecase/port/model"
 	pb "example/pb/facade/game"
 )
 
