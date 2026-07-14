@@ -14,13 +14,15 @@ type Module string
 
 const (
 	Default         Module = "default"
+	Cron            Module = "cron"
+	Consumer        Module = "consumer"
+	Websocket       Module = "websocket"
 	HttpAdmin       Module = "http-admin"
 	HttpApp         Module = "http-app"
 	HttpThird       Module = "http-third"
 	MiddlewareAdmin Module = "middleware-admin"
 	MiddlewareApp   Module = "middleware-app"
 	MiddlewareThird Module = "middleware-third"
-	Cron            Module = "cron"
 	Client          Module = "client"
 	FacadeGame      Module = "facade-game"
 	FacadeTable     Module = "facade-table"
@@ -28,8 +30,6 @@ const (
 	ResourceLogic   Module = "resource-logic"
 	ResourceModel   Module = "resource-model"
 	Repository      Module = "repository"
-	Websocket       Module = "websocket"
-	Consumer        Module = "consumer"
 	Publisher       Module = "publisher"
 )
 

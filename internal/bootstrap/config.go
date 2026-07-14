@@ -17,9 +17,6 @@ type Config struct {
 	WEBSOCKET struct {
 		PORT string `mapstructure:"port"`
 	} `mapstructure:"websocket"`
-	GRPC struct {
-		PORT string `mapstructure:"port"`
-	} `mapstructure:"grpc"`
 	SERVICES struct {
 		HTTP struct {
 			HOST string `mapstructure:"host"`
