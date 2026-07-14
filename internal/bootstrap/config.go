@@ -20,12 +20,6 @@ type Config struct {
 	GRPC struct {
 		PORT string `mapstructure:"port"`
 	} `mapstructure:"grpc"`
-	FACADE struct {
-		PORT string `mapstructure:"port"`
-	} `mapstructure:"facade"`
-	RESOURCE struct {
-		PORT string `mapstructure:"port"`
-	} `mapstructure:"resource"`
 	SERVICES struct {
 		HTTP struct {
 			HOST string `mapstructure:"host"`
