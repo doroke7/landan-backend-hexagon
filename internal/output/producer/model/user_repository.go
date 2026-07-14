@@ -7,7 +7,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"example/internal/domain"
-	"example/internal/output/port"
+	"example/internal/output/port/model"
 )
 
 type UserProducer struct {
