@@ -1,7 +1,7 @@
 package cron
 
 import (
-	"example/internal/usecase/port/model"
+	"example/internal/usecase/resource/port/model"
 	pkg "example/pkg"
 
 	"go.uber.org/zap"
