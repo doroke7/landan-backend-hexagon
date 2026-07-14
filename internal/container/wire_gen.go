@@ -38,7 +38,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	loggerHelper := helper.NewLoggerHelper(abstractHelper)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
@@ -59,7 +58,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		AbstractHelper:           abstractHelper,
 		AesHelper:                aesHelper,
 		RsaHelper:                rsaHelper,
-		LoggerHelper:             loggerHelper,
 		AbstractUsecase:          abstractUsecase,
 		UserUsecase:              userUsecase,
 		FacadeAbstract:           abstractHandler,
@@ -74,7 +72,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	loggerHelper := helper.NewLoggerHelper(abstractHelper)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
@@ -88,7 +85,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		AbstractHelper:         abstractHelper,
 		AesHelper:              aesHelper,
 		RsaHelper:              rsaHelper,
-		LoggerHelper:           loggerHelper,
 		AbstractUsecase:        abstractUsecase,
 		AdminUserUsecase:       adminUserUsecase,
 		ResourceAbstract:       abstractHandler,
@@ -102,7 +98,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	loggerHelper := helper.NewLoggerHelper(abstractHelper)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
@@ -117,7 +112,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
-	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper, loggerHelper)
+	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
 	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
 	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
 	decryptionMiddleware := middleware_admin.NewDecryptionMiddleware(abstractMiddleware)
@@ -133,7 +128,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 		AbstractHelper:                abstractHelper,
 		AesHelper:                     aesHelper,
 		RsaHelper:                     rsaHelper,
-		LoggerHelper:                  loggerHelper,
 		AbstractUsecase:               abstractUsecase,
 		UserUsecase:                   userUsecase,
 		HttpAdminResourceUser:         userHandler,
@@ -301,7 +295,6 @@ type FacadeContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
 	port.UserUsecase
@@ -319,7 +312,6 @@ type ResourceContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
 	port.AdminUserUsecase
@@ -339,7 +331,6 @@ type HttpContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecase.AbstractUsecase
 	port.UserUsecase

@@ -37,6 +37,7 @@ func NewMysql() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	fmt.Println("[INFO] MySQL 連線. ", sDSN)
 	oSqlDB, err := oDB.DB()
 	if err != nil {
 		return nil, err

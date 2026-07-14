@@ -56,7 +56,6 @@ type FacadeContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
@@ -80,7 +79,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
-		helper.NewLoggerHelper,
 
 		// input-facade
 		inputFacade.NewAbstractHandler,
@@ -108,7 +106,6 @@ type ResourceContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecaseLogic.AbstractUsecase
 	usecasePort.AdminUserUsecase
@@ -128,7 +125,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
-		helper.NewLoggerHelper,
 
 		// input-resource
 		inputResource.NewAbstractHandler,
@@ -156,7 +152,6 @@ type HttpContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
-	*helper.LoggerHelper
 
 	*usecaseLogic.AbstractUsecase
 	usecasePort.UserUsecase
@@ -194,7 +189,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
-		helper.NewLoggerHelper,
 
 		// input-http
 		inputHttpAdmin.NewAbstractHandler,

@@ -2,6 +2,8 @@ package middleware_admin
 
 import (
 	"example/internal/utility"
+	pkg "example/pkg"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -27,7 +29,7 @@ func (oSelf *LoggerMiddleware) Handle() gin.HandlerFunc {
 		sPath := oContext.Request.URL.Path
 		sRawQuery := oContext.Request.URL.RawQuery
 		oMapHeaders := oContext.Request.Header
-		oSelf.loggerHelper.Logger.Info(
+		pkg.Logger("middleware").Info(
 			"進入 http",
 			zap.String("path", sPath),
 			zap.String("query", sRawQuery),
@@ -37,7 +39,7 @@ func (oSelf *LoggerMiddleware) Handle() gin.HandlerFunc {
 		oContext.Next()
 		iTime2 := utility.Time[int](true)
 
-		oSelf.loggerHelper.Logger.Info(
+		pkg.Logger("middleware").Info(
 			"結束 http",
 			zap.String("path", sPath),
 			zap.String("query", sRawQuery),

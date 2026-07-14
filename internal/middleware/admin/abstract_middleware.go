@@ -14,18 +14,16 @@ import (
 
 type AbstractMiddleware struct {
 	*pkg.Response
-	rsaHelper    *helper.RsaHelper
-	aesHelper    *helper.AesHelper
-	loggerHelper *helper.LoggerHelper // 因為 AbstractMiddleware 跟其他 middleware在同一個 package
+	rsaHelper *helper.RsaHelper
+	aesHelper *helper.AesHelper
 }
 
 // 2. 在結構體上定義一個「構造函數」
-func NewAbstractMiddleware(oResponse *pkg.Response, oRsaHelper *helper.RsaHelper, oAesHelper *helper.AesHelper, oLoggerHelper *helper.LoggerHelper) *AbstractMiddleware {
+func NewAbstractMiddleware(oResponse *pkg.Response, oRsaHelper *helper.RsaHelper, oAesHelper *helper.AesHelper) *AbstractMiddleware {
 	return &AbstractMiddleware{
-		Response:     oResponse,
-		rsaHelper:    oRsaHelper,
-		aesHelper:    oAesHelper,
-		loggerHelper: oLoggerHelper,
+		Response:  oResponse,
+		rsaHelper: oRsaHelper,
+		aesHelper: oAesHelper,
 	}
 }
 
