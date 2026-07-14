@@ -27,16 +27,24 @@ type Config struct {
 		PORT string `mapstructure:"port"`
 	} `mapstructure:"resource"`
 	SERVICES struct {
+		HTTP struct {
+			HOST string `mapstructure:"host"`
+			PORT string `mapstructure:"port"`
+		} `mapstructure:"http"`
 		FACADE struct {
 			HOST string `mapstructure:"host"`
 			PORT string `mapstructure:"port"`
 		} `mapstructure:"facade"`
-		DOMAIN struct {
+		RESOURCE struct {
 			HOST     string `mapstructure:"host"`
 			PORT     string `mapstructure:"port"`
 			NAME     string `mapstructure:"name"`
 			PASSWORD string `mapstructure:"password"`
-		} `mapstructure:"domain"`
+		} `mapstructure:"resource"`
+		WEBSOCKET struct {
+			HOST string `mapstructure:"host"`
+			PORT string `mapstructure:"port"`
+		} `mapstructure:"websocket"`
 	} `mapstructure:"services"`
 	CLIENTS struct {
 		FACADE struct {
