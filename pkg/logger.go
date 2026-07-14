@@ -13,15 +13,26 @@ import (
 type Module string
 
 const (
-	Default    Module = "default"
-	Controller Module = "controller"
-	Middleware Module = "middleware"
-	Cron       Module = "cron"
-	Grpc       Module = "grpc"
-	Repository Module = "repository"
-	Websocket  Module = "websocket"
-	Consumer   Module = "consumer"
-	Publisher  Module = "publisher"
+	Default         Module = "default"
+	Controller      Module = "controller"
+	HttpAdmin       Module = "http-admin"
+	HttpApp         Module = "http-app"
+	HttpThird       Module = "http-third"
+	Middleware      Module = "middleware"
+	MiddlewareAdmin Module = "middleware-admin"
+	MiddlewareApp   Module = "middleware-app"
+	MiddlewareThird Module = "middleware-third"
+	Cron            Module = "cron"
+	Grpc            Module = "grpc"
+	FacadeGame      Module = "facade-game"
+	FacadeTable     Module = "facade-table"
+	FacadeRegister  Module = "facade-register"
+	ResourceLogic   Module = "resource-logic"
+	ResourceModel   Module = "resource-model"
+	Repository      Module = "repository"
+	Websocket       Module = "websocket"
+	Consumer        Module = "consumer"
+	Publisher       Module = "publisher"
 )
 
 var (
