@@ -22,7 +22,7 @@ var oHttpCommand = &cobra.Command{
 		oGin := gin.Default()
 
 		oEngine := register.HttpInit(oGin, oContainer)
-		log.Fatal(oEngine.Run(":" + bootstrap.CONFIG.HTTP.PORT))
+		log.Fatal(oEngine.Run(":" + bootstrap.CONFIG.SERVICES.HTTP.PORT))
 	},
 }
 

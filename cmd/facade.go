@@ -17,7 +17,7 @@ var oFacadeCommand = &cobra.Command{
 		oContainer, err := container.InitFacadeContainer()
 		oFacadeServer := register.FacadeInit(oContainer)
 
-		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.FACADE.PORT)
+		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.SERVICES.FACADE.PORT)
 		if err != nil {
 			log.Fatal(err)
 		}

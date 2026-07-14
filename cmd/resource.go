@@ -20,7 +20,7 @@ var oResourceCommand = &cobra.Command{
 		}
 		oResourceServer := register.ResourceInit(oContainer)
 
-		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.RESOURCE.PORT)
+		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.SERVICES.RESOURCE.PORT)
 		if err != nil {
 			log.Fatal(err)
 		}
