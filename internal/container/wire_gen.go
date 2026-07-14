@@ -27,8 +27,8 @@ import (
 	"example/internal/output/cache"
 	"example/internal/output/memory"
 	"example/internal/output/mysql"
-	"example/internal/usecase/resource/application/model"
-	"example/internal/usecase/resource/port/model"
+	"example/internal/usecase/resource/model/application"
+	"example/internal/usecase/resource/model/port"
 	"example/pkg"
 )
 

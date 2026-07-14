@@ -3,7 +3,7 @@ package command
 import (
 	"github.com/spf13/cobra"
 
-	"example/internal/usecase/resource/port/model"
+	"example/internal/usecase/resource/model/port"
 	"log"
 )
 

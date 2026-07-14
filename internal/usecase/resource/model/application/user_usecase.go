@@ -5,7 +5,7 @@ import (
 
 	"example/internal/domain"
 	outputPort "example/internal/output/port"
-	inputPort "example/internal/usecase/resource/port/model"
+	inputPort "example/internal/usecase/resource/model/port"
 )
 
 type UserUsecase struct {
