@@ -30,7 +30,7 @@ func (oSelf *UserHandler) AddUser(oContext *gin.Context) {
 
 	user, err := oSelf.userUsecase.AddUserByName(name)
 	if err != nil {
-		pkg.Logger(pkg.Controller).Error("AddUser 失敗",
+		pkg.Logger(pkg.HttpAdmin).Error("AddUser 失敗",
 			zap.String("name", name),
 			zap.Error(err),
 		)
@@ -38,7 +38,7 @@ func (oSelf *UserHandler) AddUser(oContext *gin.Context) {
 		return
 	}
 
-	pkg.Logger(pkg.Controller).Info("AddUser 成功",
+	pkg.Logger(pkg.HttpAdmin).Info("AddUser 成功",
 		zap.Int("id", user.ID),
 		zap.String("name", user.Name),
 	)
@@ -53,7 +53,7 @@ func (oSelf *UserHandler) ShowUser(oContext *gin.Context) {
 
 	user, err := oSelf.userUsecase.ShowUserById(id)
 	if err != nil {
-		pkg.Logger(pkg.Controller).Warn("ShowUser 失敗",
+		pkg.Logger(pkg.HttpAdmin).Warn("ShowUser 失敗",
 			zap.Int("id", id),
 			zap.Error(err),
 		)
@@ -61,7 +61,7 @@ func (oSelf *UserHandler) ShowUser(oContext *gin.Context) {
 		return
 	}
 
-	pkg.Logger(pkg.Controller).Info("ShowUser 成功",
+	pkg.Logger(pkg.HttpAdmin).Info("ShowUser 成功",
 		zap.Int("id", user.ID),
 		zap.String("name", user.Name),
 	)

@@ -29,7 +29,7 @@ func (oSelf *UserHandler) AddUser(ctx context.Context) error {
 
 	stream, err := oSelf.Client.User.SubscribeUsers(ctx, &pb.SubscribeUsersRequest{})
 	if err != nil {
-		pkg.Logger(pkg.Grpc).Error("SubscribeUsers 失敗",
+		pkg.Logger(pkg.Client).Error("SubscribeUsers 失敗",
 			zap.Error(err),
 		)
 		return err
@@ -42,21 +42,21 @@ func (oSelf *UserHandler) AddUser(ctx context.Context) error {
 			return nil
 		}
 		if err != nil {
-			pkg.Logger(pkg.Grpc).Error("stream.Recv 失敗",
+			pkg.Logger(pkg.Client).Error("stream.Recv 失敗",
 				zap.Error(err),
 			)
 			return err
 		}
 
 		if _, err := oSelf.userUsecase.AddUserByName(user.GetName()); err != nil {
-			pkg.Logger(pkg.Grpc).Error("AddUser 失敗",
+			pkg.Logger(pkg.Client).Error("AddUser 失敗",
 				zap.String("name", user.GetName()),
 				zap.Error(err),
 			)
 			continue
 		}
 
-		pkg.Logger(pkg.Grpc).Info("AddUser 成功",
+		pkg.Logger(pkg.Client).Info("AddUser 成功",
 			zap.String("name", user.GetName()),
 		)
 	}
