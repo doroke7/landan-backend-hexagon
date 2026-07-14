@@ -15,6 +15,9 @@ var oResourceCommand = &cobra.Command{
 	Short: "啟動 Resource 服務",
 	Run: func(cmd *cobra.Command, args []string) {
 		oContainer, err := container.InitResourceContainer()
+		if err != nil {
+			log.Fatal(err)
+		}
 		oResourceServer := register.ResourceInit(oContainer)
 
 		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.RESOURCE.PORT)
