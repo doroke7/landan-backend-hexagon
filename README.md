@@ -94,9 +94,7 @@
 │   │
 │   └── container/                 # wire 組裝根：wire.go 手寫、wire_gen.go 自動產生，別手改後者
 │       （每個服務各自一個 Container + InitXxxContainer：FacadeContainer / ResourceContainer /
-│        HttpContainer / ConsumerContainer / CronContainer / WebsocketContainer /
-│        ClientContainer / CommandContainer。各自只 wire.Build 自己需要的 provider，
-│        例如 CronContainer 不會意外連上 AMQP，CommandContainer 完全不碰 MySQL/Redis。）
+
 │
 ├── pkg/                            # 跟 domain 無關、可重用的通用元件
 │   ├── logger.go                    #   pkg.Logger(pkg.Controller / .Middleware / .Cron / .Consumer ...)

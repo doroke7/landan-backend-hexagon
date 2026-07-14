@@ -27,8 +27,10 @@ import (
 	"example/internal/output/cache"
 	"example/internal/output/memory"
 	"example/internal/output/mysql"
-	"example/internal/usecase/resource/model/application"
-	"example/internal/usecase/resource/model/port"
+	"example/internal/usecase/facade/model/application"
+	"example/internal/usecase/facade/model/port"
+	usecase2 "example/internal/usecase/resource/model/application"
+	port2 "example/internal/usecase/resource/model/port"
 	"example/pkg"
 )
 
@@ -72,13 +74,13 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	abstractUsecase := usecase2.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
 	}
 	adminUserRepository := mysql.NewAdminUserRepository(db)
-	adminUserUsecase := usecase.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
+	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
 	resourceContainer := &ResourceContainer{
@@ -313,8 +315,8 @@ type ResourceContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecase.AbstractUsecase
-	port.AdminUserUsecase
+	*usecase2.AbstractUsecase
+	port2.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
