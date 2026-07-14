@@ -51,12 +51,12 @@ type Config struct {
 			HOSTS []string `mapstructure:"hosts"`
 			PORTS []string `mapstructure:"ports"`
 		} `mapstructure:"facade"`
-		DOMAIN struct {
+		RESOURCE struct {
 			HOSTS    []string `mapstructure:"hosts"`
 			PORTS    []string `mapstructure:"ports"`
 			NAME     string   `mapstructure:"name"`
 			PASSWORD string   `mapstructure:"password"`
-		} `mapstructure:"domain"`
+		} `mapstructure:"resource"`
 	} `mapstructure:"clients"`
 	DATABASE struct {
 		USER                 string `mapstructure:"user"`
