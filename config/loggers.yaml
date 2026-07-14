@@ -16,6 +16,12 @@ controller:
   max_backups: 7
   max_age: 30
   compress: true
+cron:
+  directory: './runtime/logger/cron'
+  max_size: 10000
+  max_backups: 7
+  max_age: 30
+  compress: true
 sdk:
   directory: './runtime/logger/sdk'
   max_size: 10000
