@@ -1,7 +1,7 @@
 user: "root"
 password: "mysql_pass_cli"
-name: "gogin"
-prefix: "gin-"
+name: "resource"
+prefix: "tx-"
 charset: "utf8mb4"
 max_idle_connections: 12
 
