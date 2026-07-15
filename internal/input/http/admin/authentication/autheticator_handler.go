@@ -1,9 +1,9 @@
 package controller_admin_authentication
 
 import (
-	HttpAdmin "example/internal/input/http/admin"
-
 	"github.com/gin-gonic/gin"
+
+	HttpAdmin "example/internal/input/http/admin"
 )
 
 type AuthenticatorController struct {
@@ -20,18 +20,23 @@ func NewAuthenticatorController(oAbstractHandler *HttpAdmin.AbstractHandler) *Au
 }
 
 func (oSelf *AuthenticatorController) SignIn(oContext *gin.Context) {
-	// sParamName := oContext.PostForm("param.name")
-	// sParamPassword := oContext.PostForm("param.password")
+	sParamName := oContext.PostForm("param.name")
+	sParamPassword := oContext.PostForm("param.password")
 
-	// if sParamName == "" {
-	// 	oSelf.Response.SetWithNext(oContext, 200, -1, "name 不能為空", struct{}{}, "")
-	// }
+	if sParamName == "" {
+		oSelf.Response.SetWithNext(oContext, 200, -1, "name 不能為空", struct{}{}, "")
+	}
 
-	// if sParamPassword == "" {
-	// 	oSelf.Response.SetWithNext(oContext, 200, -1, "password 不能為空", struct{}{}, "")
-	// }
+	if sParamPassword == "" {
+		oSelf.Response.SetWithNext(oContext, 200, -1, "password 不能為空", struct{}{}, "")
+	}
 
-	// oAdminUserModel, err := pkg.DatabaseInit[*modelDatabase.AdminUserModel](oSelf.DatabaseFactory, "AdminUser", "1")
+	// oAdminUserModel, err := oSelf.ResourceClient.Model.AdminUser.ShowOneByName(
+	// 	oContext,
+	// 	&pbResourceModel.OneAdminUserRequest{
+	// 		Name: sParamName,
+	// 	},
+	// )
 
 	// if err != nil {
 	// 	oSelf.Response.SetWithNext(oContext, 200, -2, "AdminUser 不能建立", struct{}{}, "")

@@ -115,7 +115,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	clientConn := bootstrap.NewResource()
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
-	abstractHandler := handler.NewAbstractHandler(response, aesHelper)
+	abstractHandler := handler.NewAbstractHandler(response, aesHelper, resourceClient)
 	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
 	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
