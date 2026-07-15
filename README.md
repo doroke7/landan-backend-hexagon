@@ -82,11 +82,20 @@
 │   │       還沒有依用途拆成 facade/ 跟 resource/ 兩個獨立 package）
 │   │
 │   ├── output/                    # Output Adapter：usecase 依賴的下游資源實作
-│   │   ├── port/                   #   UserRepository / AdminUserRepository 介面（driven port）
-│   │   ├── mysql/                   #   MySQL 實作（gorm）
-│   │   ├── cache/                   #   裝飾器（Decorator），包住 mysql 實作，加上 redis 讀寫快取
-│   │   ├── memory/                  #   記憶體實作，只給 `command` 這個輕量 CLI 用
-│   │   └── producer/                #   AMQP 訊息生產者實作（UserProducer）
+│   │   │                            每個 adapter 底下統一分成 model/ 跟 logic/ 兩種：
+│   │   │                            - model/：單一輸出，一次呼叫對應一次底層操作（如單純寫 DB、單純發一筆訊息）
+│   │   │                            - logic/：組合型輸出，介面上看起來是一次呼叫，實際上內部
+│   │   │                              關聯、協調多組輸出（如 cache 裝飾器要同時處理
+│   │   │                              mysql 寫入 + redis 快取失效）
+│   │   │                            目前多數 adapter 的 logic/ 還只是預留空資料夾（gitkeep），
+│   │   │                            等真的出現組合型需求時才會補檔案進去
+│   │   │
+│   │   ├── port/model/              #   UserRepository / AdminUserRepository 介面（driven port）
+│   │   ├── mysql/model/               #   MySQL 實作（gorm）
+│   │   ├── cache/model/               #   裝飾器（Decorator），包住 mysql 實作，加上 redis 讀寫快取
+│   │   ├── memory/model/              #   記憶體實作，只給 `command` 這個輕量 CLI 用
+│   │   ├── producer/model/            #   AMQP 訊息生產者實作（UserProducer）
+│   │   └── resource/model/            #   對 resource gRPC 服務的 client 實作（AdminUserRepository）
 │   │
 │   ├── register/                  # 組裝層：把 container 生好的 handler 註冊到對應的 server/router
 │   │                                #   （grpc.RegisterXxxServer / gin.Group / cron.AddFunc ...），

@@ -47,9 +47,9 @@ import (
 	usecaseFacadeModelApplication "example/internal/usecase/facade/model/application"
 	usecaseResourceModelApplication "example/internal/usecase/resource/model/application"
 
-	outputCache "example/internal/output/cache"
-	outputMemory "example/internal/output/memory"
-	outputMysql "example/internal/output/mysql"
+	outputCache "example/internal/output/cache/model"
+	outputMemory "example/internal/output/memory/model"
+	outputMysql "example/internal/output/mysql/model"
 )
 
 /*

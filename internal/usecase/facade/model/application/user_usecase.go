@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"example/internal/domain"
-	outputPort "example/internal/output/port"
+	outputPort "example/internal/output/port/model"
 	inputPort "example/internal/usecase/facade/model/port"
 )
 

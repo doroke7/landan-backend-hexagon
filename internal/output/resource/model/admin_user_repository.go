@@ -5,7 +5,7 @@ import (
 
 	client "example/internal/client"
 	"example/internal/domain"
-	"example/internal/output/port"
+	"example/internal/output/port/model"
 	pbResourceModel "example/pb/resource/model"
 )
 
