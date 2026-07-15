@@ -38,8 +38,8 @@ func NewResourceClient(oClientConn *grpc.ClientConn, oModel *Model) *ResourceCli
 }
 
 type ResourceClient struct {
-	conn   *grpc.ClientConn
-	*Model // 這樣不厭其煩的命名 【嵌套結構】，是為了與 server 【命名空間一致性】，增加可讀性。
+	conn  *grpc.ClientConn
+	Model *Model // 這樣不厭其煩的命名 【嵌套結構】，是為了與 server 【命名空間一致性】，增加可讀性。
 }
 
 func (oClient *ResourceClient) Close() error {
