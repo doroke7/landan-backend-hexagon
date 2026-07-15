@@ -20,7 +20,7 @@ import (
 	pkg "example/pkg"
 
 	bootstrap "example/internal/bootstrap"
-	internalClient "example/internal/client"
+	Client "example/internal/client"
 
 	helper "example/internal/helper"
 
@@ -41,11 +41,11 @@ import (
 	inputResource "example/internal/input/resource"
 	inputResourceModel "example/internal/input/resource/model"
 
-	usecaseResourceModelPort "example/internal/usecase/resource/model/port"
 	usecaseFacadeModelPort "example/internal/usecase/facade/model/port"
+	usecaseResourceModelPort "example/internal/usecase/resource/model/port"
 
-	usecaseResourceModelApplication "example/internal/usecase/resource/model/application"
 	usecaseFacadeModelApplication "example/internal/usecase/facade/model/application"
+	usecaseResourceModelApplication "example/internal/usecase/resource/model/application"
 
 	outputCache "example/internal/output/cache"
 	outputMemory "example/internal/output/memory"
@@ -154,6 +154,9 @@ type HttpContainer struct {
 	// pkg
 	*pkg.Response
 
+	// bootstrap
+	Resource *bootstrap.Resource
+
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
@@ -161,6 +164,9 @@ type HttpContainer struct {
 
 	*usecaseFacadeModelApplication.AbstractUsecase
 	usecaseFacadeModelPort.UserUsecase
+
+	// Clients
+	ResourceClient *Client.ResourceClient
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *inputHttpAdminResource.UserHandler
@@ -189,12 +195,16 @@ func InitHttpContainer() (*HttpContainer, error) {
 		// bootstrap
 		bootstrap.NewMysql,
 		bootstrap.NewRedis,
+		bootstrap.NewResource,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
+
+		// client
+		bootstrap.NewResourceClient,
 
 		// input-http
 		inputHttpAdmin.NewAbstractHandler,
@@ -383,7 +393,7 @@ func InitClientContainer() (*ClientContainer, error) {
 		bootstrap.NewRedis,
 
 		//
-		internalClient.NewClient,
+		Client.NewClient,
 
 		// helper
 		helper.NewAbstractHelper,
