@@ -10,20 +10,22 @@ import (
 )
 
 type AdminUserRepository struct {
-	AdminUserClient pbResourceModel.AdminUserClient
+	AdminUserModelClient pbResourceModel.AdminUserClient
 }
 
 func NewAdminUserRepository(oResourceClient *client.ResourceClient) port.AdminUserRepository {
 	return &AdminUserRepository{
-		AdminUserClient: oResourceClient.Model.AdminUser,
+		AdminUserModelClient: oResourceClient.Model.AdminUser,
 	}
 }
 
 func (oSelf *AdminUserRepository) ShowOneByName(sName string) (*domain.AdminUser, error) {
-	oResp, err := oSelf.AdminUserClient.ShowOneByName(
+
+	oResp, err := oSelf.AdminUserModelClient.ShowOneByName(
 		context.Background(),
 		&pbResourceModel.OneAdminUserRequest{Name: sName},
 	)
+
 	if err != nil {
 		return nil, err
 	}
