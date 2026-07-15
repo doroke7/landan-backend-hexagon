@@ -154,9 +154,6 @@ type HttpContainer struct {
 	// pkg
 	*pkg.Response
 
-	// bootstrap
-	Resource *bootstrap.Resource
-
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
@@ -204,7 +201,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewCacheHelper,
 
 		// client
-		bootstrap.NewResourceClient,
+		Client.NewModel,
+		Client.NewResourceClient,
 
 		// input-http
 		inputHttpAdmin.NewAbstractHandler,

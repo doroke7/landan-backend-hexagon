@@ -105,13 +105,16 @@ func InitHttpContainer() (*HttpContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	client, err := bootstrap.NewRedis()
+	redisClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	clientConn := bootstrap.NewResource()
+	model := client.NewModel(clientConn)
+	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper)
 	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
@@ -132,6 +135,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 		RsaHelper:                     rsaHelper,
 		AbstractUsecase:               abstractUsecase,
 		UserUsecase:                   userUsecase,
+		ResourceClient:                resourceClient,
 		HttpAdminResourceUser:         userHandler,
 		AdminAbstractMiddleware:       abstractMiddleware,
 		AdminAdminMiddleware:          adminMiddleware,
@@ -156,11 +160,11 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	client, err := bootstrap.NewRedis()
+	redisClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
@@ -190,11 +194,11 @@ func InitCronContainer() (*CronContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	client, err := bootstrap.NewRedis()
+	redisClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := cron.NewAbstractHandler(aesHelper)
@@ -220,11 +224,11 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	client, err := bootstrap.NewRedis()
+	redisClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := websocket.NewAbstractHandler(aesHelper)
@@ -336,6 +340,9 @@ type HttpContainer struct {
 
 	*usecase.AbstractUsecase
 	port.UserUsecase
+
+	// Clients
+	ResourceClient *client.ResourceClient
 
 	// HTTP server -Controller
 	HttpAdminResourceUser *handler2.UserHandler
