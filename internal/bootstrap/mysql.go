@@ -1,10 +1,16 @@
 package bootstrap
 
 import (
+	"example/pkg"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
 // DDL:
@@ -14,6 +20,7 @@ import (
 // );
 
 func NewMysql() (*gorm.DB, error) {
+
 	var sHost, sPort string
 	if len(CONFIG.DATABASE.WRITE.HOSTS) > 0 {
 		sHost = CONFIG.DATABASE.WRITE.HOSTS[0]
@@ -31,18 +38,36 @@ func NewMysql() (*gorm.DB, error) {
 		CONFIG.DATABASE.NAME,
 		CONFIG.DATABASE.CHARSET,
 	)
+	var oLogLevel logger.LogLevel = logger.Error
+	if CONFIG.DEFAULT.DEBUG {
+		oLogLevel = logger.Info
+	}
 
-	oDB, err := gorm.Open(mysql.Open(sDSN), &gorm.Config{})
+	oDB, err := gorm.Open(mysql.Open(sDSN), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // 輸出到標準輸出
+			logger.Config{
+				SlowThreshold:             time.Second, // 慢查詢閾值
+				LogLevel:                  oLogLevel,   // 日誌級別：Silent, Error, Warn, Info
+				IgnoreRecordNotFoundError: true,        // 是否忽略 ErrRecordNotFound 錯誤
+				ParameterizedQueries:      false,       // 是否在日誌中顯示參數值（設為 false 會顯示具體數值）
+				Colorful:                  true,        // 是否啟用彩色字體
+			},
+		),
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: CONFIG.DATABASE.PREFIX, // 例如所有表都加上 sys_ 前綴
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("[INFO] MySQL 連線. ", sDSN)
 	oSqlDB, err := oDB.DB()
 	if err != nil {
 		return nil, err
 	}
 	oSqlDB.SetMaxIdleConns(CONFIG.DATABASE.MAX_IDLE_CONNECTIONS)
+	pkg.Logger(pkg.Default).Info("連線。 port: " + sPort)
 
 	return oDB, nil
 }

@@ -128,3 +128,10 @@
 
 依賴方向永遠是「外層指向內層」：`input adapter → usecase/port → usecase → output/port ← output adapter`，
 `usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是 redis 還是記憶體。
+
+
+## 如何 watch 开发
+1. go mod 安装下载 air 套件
+```zsh
+go install github.com/air-verse/air@latest
+```

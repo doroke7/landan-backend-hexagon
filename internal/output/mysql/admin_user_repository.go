@@ -20,11 +20,12 @@ func NewAdminUserRepository(db *gorm.DB) port.AdminUserRepository {
 func (oSelf *AdminUserRepository) ShowOneByName(sName string) (*domain.AdminUser, error) {
 	var oAdminUser domain.AdminUser
 
-	if err := oSelf.db.Where("name = ?", sName).Error; err != nil {
+	if err := oSelf.db.Where("name = ?", sName).First(&oAdminUser).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("not found")
 		}
 		return nil, err
 	}
+
 	return &oAdminUser, nil
 }

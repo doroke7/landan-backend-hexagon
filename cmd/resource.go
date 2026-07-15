@@ -1,19 +1,24 @@
 package cmd
 
 import (
-	"example/internal/bootstrap"
-	"example/internal/container"
-	"example/internal/register"
 	"log"
 	"net"
 
 	"github.com/spf13/cobra"
+
+	pkg "example/pkg"
+
+	bootstrap "example/internal/bootstrap"
+	container "example/internal/container"
+	register "example/internal/register"
 )
 
 var oResourceCommand = &cobra.Command{
 	Use:   "resource",
 	Short: "啟動 Resource 服務",
 	Run: func(cmd *cobra.Command, args []string) {
+		pkg.Logger(pkg.Default).Info("啟動 resource 服務。 port: " + bootstrap.CONFIG.SERVICES.RESOURCE.PORT)
+
 		oContainer, err := container.InitResourceContainer()
 		if err != nil {
 			log.Fatal(err)

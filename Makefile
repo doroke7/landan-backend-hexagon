@@ -7,13 +7,6 @@ help:
 
 
 
-
-
-
-.PHONY: wire
-wire:
-	cd internal/container/ && wire
-
 .PHONY: protoc
 protoc:
 	@protoc \
@@ -21,3 +14,20 @@ protoc:
 	--go_out=paths=source_relative:./pb \
 	--go-grpc_out=paths=source_relative:./pb \
 	$(shell find ./proto -name "*.proto")
+
+
+.PHONY: wire
+wire:
+	cd internal/container/ && wire
+
+
+
+
+
+.PHONY: watch-facade
+watch-facade:
+	air -c .air.facade.toml
+
+.PHONY: watch-resource
+watch-resource:
+	air -c .air.resource.toml
