@@ -3,18 +3,18 @@ package service
 import (
 	"context"
 
-	resource "example/internal/input/resource"
-	"example/internal/usecase/resource/model/port"
+	inputResource "example/internal/input/resource"
+	port "example/internal/usecase/resource/model/port"
 	pb "example/pb/resource/model"
 )
 
 type AdminUserHandler struct {
 	pb.UnimplementedAdminUserServer
-	*resource.AbstractHandler
+	*inputResource.AbstractHandler
 	port.AdminUserUsecase
 }
 
-func NewAdminUserHandler(oAbstractHandler *resource.AbstractHandler, oAdminUserUsecase port.AdminUserUsecase) *AdminUserHandler {
+func NewAdminUserHandler(oAbstractHandler *inputResource.AbstractHandler, oAdminUserUsecase port.AdminUserUsecase) *AdminUserHandler {
 	return &AdminUserHandler{
 		AbstractHandler:  oAbstractHandler,
 		AdminUserUsecase: oAdminUserUsecase,
