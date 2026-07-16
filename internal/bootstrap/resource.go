@@ -85,11 +85,11 @@ func NewResource() *grpc.ClientConn {
 	// 在背景啟動常駐任務，檢查連線
 	go func() {
 		defer ticker.Stop()
-		// oLogger.Info("🛡️ gRPC 定時重連守護進程已啟動，每 10s 巡邏一次...")
+		oLogger.Info("🛡️ gRPC 定時重連守護進程已啟動，每 10s 巡邏一次...")
 
 		for range ticker.C {
 			state := conn.GetState()
-			oLogger.Info("⚠️ 檢查狀態")
+			// oLogger.Info("⚠️ 檢查狀態")
 			// 2. 核心判斷邏輯：
 			// - 如果是 TransientFailure：代表剛斷線，Backoff 正在數鬧鐘，我們進來加速它，打破等待窗期。
 			// - 如果是 Idle：代表因為無人點餐，Backoff 已經罷工了！我們必須進來重新點火。

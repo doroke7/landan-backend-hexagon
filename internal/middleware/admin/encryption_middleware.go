@@ -37,9 +37,9 @@ func (oSelf *EncryptionMiddleware) Handle() gin.HandlerFunc {
 		mAuthorization, _ := oContext.Get("authorization")
 
 		sCode := fmt.Sprintf("%d", mCode)
-		sKey := fmt.Sprintf("%d", mKey)
-		sIv := fmt.Sprintf("%d", mIv)
-		sAuthorization := fmt.Sprintf("%d", mAuthorization)
+		sKey := fmt.Sprintf("%s", mKey)
+		sIv := fmt.Sprintf("%s", mIv)
+		sAuthorization := fmt.Sprintf("%s", mAuthorization)
 
 		sMessage := mMessage.(string)
 

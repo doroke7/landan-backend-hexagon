@@ -8,8 +8,7 @@ import (
 	pbResourceModel "example/pb/resource/model"
 )
 
-func ResourceInit(oContainer *container.ResourceContainer) *grpc.Server {
-	oGrpcServer := grpc.NewServer()
+func ResourceInit(oContainer *container.ResourceContainer, oGrpcServer *grpc.Server) *grpc.Server {
 
 	pbResourceModel.RegisterAdminUserServer(oGrpcServer, oContainer.ResourceModelAdminUser)
 

@@ -3,6 +3,7 @@ package middleware_admin
 import (
 	"example/internal/bootstrap"
 	"example/internal/utility"
+	"fmt"
 	"net/url"
 	"reflect"
 	"unsafe"
@@ -23,6 +24,10 @@ func NewDecryptionMiddleware(oAbstractMiddleware *AbstractMiddleware) *Decryptio
 	}
 }
 
+type RequestPayload struct {
+	P string `json:"p" form:"p" binding:"required"`
+}
+
 // 3. 定義一個方法，返回 gin.HandlerFunc
 func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 	return func(oContext *gin.Context) {
@@ -33,7 +38,19 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 
 		sQueryS := oContext.DefaultQuery("s", "")
 		sQueryO := oContext.DefaultQuery("o", "")
-		sPostP := oContext.PostForm("p")
+		sP := oContext.PostForm("p")
+
+		var oRequestPayload RequestPayload
+
+		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
+		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
+		if err := oContext.ShouldBind(&oRequestPayload); err != nil {
+			oContext.AbortWithStatus(400)
+			_ = oContext.Error(err)
+
+			return
+		}
+		sP = oRequestPayload.P
 
 		sKeys, oErr := oSelf.rsaHelper.Decrypt(sHeaderK, bootstrap.CONFIG.ADMIN.RSA.PRIVATE_KEY)
 		if oErr != nil {
@@ -41,6 +58,9 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 			_ = oContext.Error(oErr)
 			return
 		}
+
+		fmt.Println("46....")
+		fmt.Println("sKeys=", sKeys)
 
 		// Go 的 encoding/json 只能反序列化到 exported（大写开头） 的字段。
 		// 小写字段是 unexported 的，json.Unmarshal 无法访问，
@@ -50,13 +70,19 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 			Key string `json:"key"`
 			Iv  string `json:"iv"`
 		}](sKeys)
+		fmt.Println("oKeys.Key=", oKeys.Key)
+		fmt.Println("oKeys.Iv=", oKeys.Iv)
 
 		oContext.Set("key", oKeys.Key)
 		oContext.Set("iv", oKeys.Iv)
+		fmt.Println("sP=", sP)
 
-		sO := oSelf.aesHelper.Decrypt(sQueryO, oKeys.Key, oKeys.Iv)
-		sS := oSelf.aesHelper.Decrypt(sQueryS, oKeys.Key, oKeys.Iv)
-		sP := oSelf.aesHelper.Decrypt(sPostP, oKeys.Key, oKeys.Iv)
+		sOption := oSelf.aesHelper.Decrypt(sQueryO, oKeys.Key, oKeys.Iv)
+
+		sSearch := oSelf.aesHelper.Decrypt(sQueryS, oKeys.Key, oKeys.Iv)
+
+		sParam := oSelf.aesHelper.Decrypt(sP, oKeys.Key, oKeys.Iv)
+
 		sAuthorizaion := oSelf.aesHelper.Decrypt(sHeaderA, bootstrap.CONFIG.ADMIN.JWT.KEY, bootstrap.CONFIG.ADMIN.JWT.IV)
 		oContext.Set("Authrization", sAuthorizaion)
 
@@ -64,10 +90,10 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 			Size  string `json:"size"`
 			Page  string `json:"page"`
 			AppId string `json:"app_id"`
-		}](sO)
+		}](sOption)
 
-		oSearch, _ := utility.JsonDecode[map[string]interface{}](sS)
-		oParam, _ := utility.JsonDecode[map[string]interface{}](sP)
+		oSearch, _ := utility.JsonDecode[map[string]interface{}](sSearch)
+		oParam, _ := utility.JsonDecode[map[string]interface{}](sParam)
 
 		oUrlQuery := oContext.Request.URL.Query()
 

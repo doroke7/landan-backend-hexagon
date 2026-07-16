@@ -22,6 +22,11 @@ gw55ZcBQOW-lgUmjzCRyzA==
   └────────────────────┴───────────────────┴────────────────────────────────────┘
 */
 
+/*
+Aes 128 需要 128 個 bit
+然後 一個 英文字 可以 用一個 8bits（1byte） 的 utf8 表示
+16 個英文字 剛好 等於 128bits
+*/
 type AesHelper struct {
 	*AbstractHelper
 }
@@ -63,6 +68,10 @@ func (oSelf *AesHelper) Decrypt(sText string, sKey string, sIv string) string {
 	// 使用 base64.UrlEncoding.DecodeString ->
 	// 策略, 需要让前端传入 url版本的base64 (base64 原来版本的，用到了 http 协议的特殊符号 + / ， 使用了会造成 http 解析异常)，
 	// 然后 后端 使用 url base64 版本 直接解密
+
+	if sText == "" {
+		return ""
+	}
 
 	oByteText, _ := base64.URLEncoding.DecodeString(sText)
 
