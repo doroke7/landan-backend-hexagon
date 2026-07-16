@@ -59,43 +59,73 @@
 │   ├── helper/                    # 通用工具（AES、RSA、Cache 讀寫……），跟業務邏輯無關可到處注入
 │   ├── client/                    # 對外部 gRPC stream server 的 client 封裝
 │   │
-│   ├── input/                     # Input Adapter：把外部請求轉換成呼叫 usecase
-│   │   ├── facade/                #   facade gRPC server handler（game / register / table）
-│   │   ├── resource/               #   resource gRPC server handler（model/admin_user_handler.go）
-│   │   ├── http/admin/             #   HTTP handler（含 authentication、resource 子路由）
-│   │   ├── client/                 #   gRPC client（訂閱外部 stream）
-│   │   ├── consumer/                #   AMQP consumer handler
-│   │   ├── cron/                    #   排程任務 handler
-│   │   ├── websocket/               #   websocket handler
-│   │   └── command/                 #   CLI 指令 handler（走記憶體 repository）
-│   │   （每個 adapter 底下都有自己獨立的 abstract_handler.go，彼此不共用，
-│   │    只共用 usecase 這個核心業務邏輯）
+│   ├── input/
+│   │   └── application/           # Input Adapter：把外部請求轉換成呼叫 usecase（全部統一收在 application/ 底下）
+│   │       ├── facade/            #   facade gRPC server handler（game / register / table）
+│   │       ├── resource/          #   resource gRPC server handler（model/admin_user_handler.go）
+│   │       ├── http/
+│   │       │   └── admin/         #   HTTP handler（含 authentication、resource 子路由）
+│   │       │       ├── authentication/
+│   │       │       └── resource/
+│   │       ├── client/            #   gRPC client（訂閱外部 stream）
+│   │       ├── consumer/          #   AMQP consumer handler
+│   │       ├── cron/              #   排程任務 handler
+│   │       ├── websocket/         #   websocket handler
+│   │       └── command/           #   CLI 指令 handler（走記憶體 repository）
+│   │       （每個 adapter 底下都有自己獨立的 abstract_handler.go，彼此不共用，
+│   │        只共用 usecase 這個核心業務邏輯）
 │   │
-│   ├── middleware/admin/          # HTTP 專用 middleware 鏈（logger / signature / decryption / encryption / error ...）
+│   ├── middleware/
+│   │   └── admin/                 # HTTP 專用 middleware 鏈（logger / signature / decryption / encryption / error ...）
 │   │
-│   ├── usecase/resource/          # 業務邏輯本體（目前唯一一份，供全部 adapter 共用）
-│   │   ├── model/
-│   │   │   ├── application/        #   AbstractUsecase / UserUsecase / AdminUserUsecase 具體實作
-│   │   │   └── port/                #   UserUsecase / AdminUserUsecase 介面（driving port）
-│   │   └── （注意：目錄叫 resource，但 UserUsecase 其實是 facade 跟其他週邊 adapter
-│   │       共用的，只有 AdminUserUsecase 才是 resource 服務專屬——這是歷史命名，
-│   │       還沒有依用途拆成 facade/ 跟 resource/ 兩個獨立 package）
+│   ├── usecase/                   # 業務邏輯本體，依「實作」跟「介面（driving port）」拆成兩棵對稱的樹：
+│   │   ├── application/           #   AbstractUsecase / UserUsecase / AdminUserUsecase 具體實作
+│   │   │   ├── facade/
+│   │   │   │   └── model/         #   UserUsecase（facade 跟其他週邊 adapter 共用）
+│   │   │   ├── http/
+│   │   │   │   └── admin/
+│   │   │   │       └── authentication/  #   http 登入專用的 AdminUserUsecase
+│   │   │   └── resource/
+│   │   │       └── model/         #   resource 服務專屬的 AdminUserUsecase
+│   │   └── port/                  #   對應的介面定義，路徑跟 application/ 一一對應
+│   │       ├── facade/
+│   │       │   └── model/         #   UserUsecase 介面
+│   │       ├── http/
+│   │       │   └── admin/
+│   │       │       └── authentication/  #   AdminUserUsecase 介面（http 專用）
+│   │       └── resource/
+│   │           └── model/         #   AdminUserUsecase 介面（resource 服務專屬）
+│   │   （這裡的 model/ 跟 output/ 底下的 model/ 是同一套命名慣例：
+│   │    model/ 代表單一資源的輸出，logic/ 代表多種資源的輸出——
+│   │    目前 usecase 這邊還沒有 logic/ 的需求，所以只看到 model/）
+│   │   （facade/model 底下的 UserUsecase 是 facade 跟其他週邊 adapter 共用的；
+│   │    resource/model 底下的 AdminUserUsecase 才是 resource 服務專屬；
+│   │    http/admin/authentication 則是另外獨立、只給 http 登入用的第三份——
+│   │    三者商業邏輯差異大，故意不共用同一個 AbstractUsecase，這是歷史命名，
+│   │    還沒有進一步合併）
 │   │
-│   ├── output/                    # Output Adapter：usecase 依賴的下游資源實作
-│   │   │                            每個 adapter 底下統一分成 model/ 跟 logic/ 兩種：
-│   │   │                            - model/：單一輸出，一次呼叫對應一次底層操作（如單純寫 DB、單純發一筆訊息）
-│   │   │                            - logic/：組合型輸出，介面上看起來是一次呼叫，實際上內部
-│   │   │                              關聯、協調多組輸出（如 cache 裝飾器要同時處理
-│   │   │                              mysql 寫入 + redis 快取失效）
-│   │   │                            目前多數 adapter 的 logic/ 還只是預留空資料夾（gitkeep），
-│   │   │                            等真的出現組合型需求時才會補檔案進去
-│   │   │
-│   │   ├── port/model/              #   UserRepository / AdminUserRepository 介面（driven port）
-│   │   ├── mysql/model/               #   MySQL 實作（gorm）
-│   │   ├── cache/model/               #   裝飾器（Decorator），包住 mysql 實作，加上 redis 讀寫快取
-│   │   ├── memory/model/              #   記憶體實作，只給 `command` 這個輕量 CLI 用
-│   │   ├── producer/model/            #   AMQP 訊息生產者實作（UserProducer）
-│   │   └── resource/model/            #   對 resource gRPC 服務的 client 實作（AdminUserRepository）
+│   ├── output/                    # Output Adapter：usecase 依賴的下游資源實作，一樣拆成「實作」跟「介面」：
+│   │   ├── application/           #   每個 adapter 底下統一分成 model/ 跟 logic/ 兩種：
+│   │   │                          #   - model/：代表單一資源的輸出，一次呼叫只對應一個底層資源（如單純寫 DB、單純發一筆訊息）
+│   │   │                          #   - logic/：代表多種資源的輸出，介面上看起來是一次呼叫，實際上內部
+│   │   │                          #     關聯、協調多個資源（如 cache 裝飾器要同時處理 mysql 寫入 + redis 快取失效）
+│   │   │                          #   目前多數 adapter 的 logic/ 還只是預留空資料夾（gitkeep），
+│   │   │                          #   等真的出現組合型需求時才會補檔案進去
+│   │   │   ├── mysql/
+│   │   │   │   └── model/         #   MySQL 實作（gorm）
+│   │   │   ├── cache/
+│   │   │   │   └── model/         #   裝飾器（Decorator），包住 mysql 實作，加上 redis 讀寫快取
+│   │   │   ├── memory/
+│   │   │   │   └── model/         #   記憶體實作，只給 `command` 這個輕量 CLI 用
+│   │   │   ├── producer/
+│   │   │   │   └── model/         #   AMQP 訊息生產者實作（UserProducer）
+│   │   │   └── resource/
+│   │   │       └── model/         #   對 resource gRPC 服務的 client 實作（AdminUserRepository）
+│   │   └── port/
+│   │       └── any/
+│   │           └── model/         #   UserRepository / AdminUserRepository 介面（driven port）
+│   │       （介面本身不分 model/logic——不管底下是單一輸出還是組合型輸出，
+│   │        usecase 依賴的都是同一份介面，所以叫 any；logic/ 目前也只是空的佔位）
 │   │
 │   ├── register/                  # 組裝層：把 container 生好的 handler 註冊到對應的 server/router
 │   │                                #   （grpc.RegisterXxxServer / gin.Group / cron.AddFunc ...），
@@ -103,7 +133,8 @@
 │   │
 │   └── container/                 # wire 組裝根：wire.go 手寫、wire_gen.go 自動產生，別手改後者
 │       （每個服務各自一個 Container + InitXxxContainer：FacadeContainer / ResourceContainer /
-
+│        HttpContainer / ConsumerContainer / CronContainer / WebsocketContainer /
+│        ClientContainer / CommandContainer）
 │
 ├── pkg/                            # 跟 domain 無關、可重用的通用元件
 │   ├── logger.go                    #   pkg.Logger(pkg.Controller / .Middleware / .Cron / .Consumer ...)
@@ -133,7 +164,7 @@
 - **resource**：內部資料服務，直接讀寫 DB，僅供 facade 呼叫（`AdminUserUsecase` 專屬於這條路徑）。
 - **http**：Gin REST API，走跟 facade 相同的 `UserUsecase`。
 - **consumer / cron / websocket / client**：週邊輸入來源，各自訂閱不同來源的事件，一樣共用 `UserUsecase`。
-- **command**：一次性 CLI 工具，刻意繞過 MySQL/Redis，改用 `output/memory` 的記憶體 repository，方便本機測試不需要起資料庫。
+- **command**：一次性 CLI 工具，刻意繞過 MySQL/Redis，改用 `output/application/memory` 的記憶體 repository，方便本機測試不需要起資料庫。
 
 依賴方向永遠是「外層指向內層」：`input adapter → usecase/port → usecase → output/port ← output adapter`，
 `usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是 redis 還是記憶體。

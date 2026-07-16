@@ -43,6 +43,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
+	jwtHelper := helper.NewJwtHelper(abstractHelper)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
@@ -58,7 +59,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	clientConn := bootstrap.NewResource()
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
-	abstractHandler := handler.NewAbstractHandler(response, aesHelper, resourceClient)
+	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
 	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
 	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
 	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, adminUserRepository)
@@ -78,6 +79,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 		AbstractHelper:                       abstractHelper,
 		AesHelper:                            aesHelper,
 		RsaHelper:                            rsaHelper,
+		JwtHelper:                            jwtHelper,
 		AbstractUsecase:                      abstractUsecase,
 		UserUsecase:                          userUsecase,
 		ResourceClient:                       resourceClient,
@@ -310,6 +312,7 @@ type HttpContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
+	*helper.JwtHelper
 
 	*usecase.AbstractUsecase
 	port.UserUsecase

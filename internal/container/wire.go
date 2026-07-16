@@ -57,6 +57,7 @@ type HttpContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
+	*helper.JwtHelper
 
 	*usecaseApplicationFacadeModel.AbstractUsecase
 	usecasePortFacadeModel.UserUsecase
@@ -99,6 +100,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
+		helper.NewJwtHelper,
 
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,

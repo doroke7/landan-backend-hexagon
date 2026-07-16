@@ -62,14 +62,15 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 
 	if oAdminUser.Password != sMd5 {
 		oSelf.Response.SetWithNext(oContext, 200, -2, "密碼錯誤", struct{}{}, "")
+		return
 	}
 
-	// sAuthorization, oErrJwt := oSelf.JwtHelper.Generate(oAdminUser.Id, 0, map[string]any{})
+	sAuthorization, oErr := oSelf.JwtHelper.Generate(int64(oAdminUser.Id), 0, map[string]any{})
 
-	// if oErrJwt != nil {
-	// 	oSelf.Response.SetWithNext(oContext, 200, -2, "JWT 產生失敗", struct{}{}, "")
-	// }
+	if oErr != nil {
+		oSelf.Response.SetWithNext(oContext, 200, -2, "JWT 產生失敗", struct{}{}, "")
+	}
 
-	// oSelf.Response.SetWithNext(oContext, 200, 1, "成功登入", struct{}{}, sAuthorization)
+	oSelf.Response.SetWithNext(oContext, 200, 1, "成功登入", struct{}{}, sAuthorization)
 
 }
