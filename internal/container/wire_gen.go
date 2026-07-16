@@ -29,10 +29,10 @@ import (
 	"example/internal/output/memory/model"
 	"example/internal/output/mysql/model"
 	"example/internal/output/resource/model"
-	"example/internal/usecase/facade/model/application"
-	"example/internal/usecase/facade/model/port"
-	usecase2 "example/internal/usecase/resource/model/application"
-	port2 "example/internal/usecase/resource/model/port"
+	"example/internal/usecase/application/facade/model"
+	usecase2 "example/internal/usecase/application/resource/model"
+	"example/internal/usecase/port/facade/model"
+	port2 "example/internal/usecase/port/resource/model"
 	"example/pkg"
 )
 

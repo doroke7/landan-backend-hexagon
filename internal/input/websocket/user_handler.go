@@ -3,7 +3,7 @@ package websocket
 import (
 	"net/http"
 
-	"example/internal/usecase/facade/model/port"
+	"example/internal/usecase/port/facade/model"
 	pkg "example/pkg"
 
 	"go.uber.org/zap"

@@ -42,11 +42,11 @@ import (
 	inputResource "example/internal/input/resource"
 	inputResourceModel "example/internal/input/resource/model"
 
-	usecaseFacadeModelPort "example/internal/usecase/facade/model/port"
-	usecaseResourceModelPort "example/internal/usecase/resource/model/port"
+	usecaseFacadeModelPort "example/internal/usecase/port/facade/model"
+	usecaseResourceModelPort "example/internal/usecase/port/resource/model"
 
-	usecaseFacadeModelApplication "example/internal/usecase/facade/model/application"
-	usecaseResourceModelApplication "example/internal/usecase/resource/model/application"
+	usecaseFacadeModelApplication "example/internal/usecase/application/facade/model"
+	usecaseResourceModelApplication "example/internal/usecase/application/resource/model"
 
 	outputCache "example/internal/output/cache/model"
 	outputMemory "example/internal/output/memory/model"

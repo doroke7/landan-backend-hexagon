@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"example/internal/usecase/facade/model/port"
+	"example/internal/usecase/port/facade/model"
 	pb "example/pb/client"
 	pkg "example/pkg"
 

@@ -5,7 +5,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"example/internal/usecase/facade/model/port"
+	"example/internal/usecase/port/facade/model"
 	pkg "example/pkg"
 
 	"go.uber.org/zap"
