@@ -81,7 +81,7 @@ func NewResource() *grpc.ClientConn {
 	// 在背景啟動常駐任務，檢查連線
 	go func() {
 		defer ticker.Stop()
-		fmt.Printf("[%s] 🛡️ gRPC 定時重連守護進程已啟動，11每 %v 巡邏一次...\n",
+		fmt.Printf("[%s] 🛡️ gRPC 定時重連守護進程已啟動，每 %v 巡邏一次...\n",
 			time.Now().Format("15:04:05"), 4*time.Second)
 
 		for range ticker.C {

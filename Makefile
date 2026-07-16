@@ -22,7 +22,9 @@ wire:
 
 
 
-
+.PHONY: watch-http
+watch-http:
+	air -c .air.http.toml
 
 .PHONY: watch-facade
 watch-facade:

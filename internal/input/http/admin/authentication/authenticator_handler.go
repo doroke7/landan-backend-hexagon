@@ -1,21 +1,26 @@
 package controller_admin_authentication
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	inputHttpAdmin "example/internal/input/http/admin"
+	outputPortModel "example/internal/output/port/model"
 )
 
 type AuthenticatorHandler struct {
 	*inputHttpAdmin.AbstractHandler
+	AdminUserModelRepository outputPortModel.AdminUserRepository
 }
 
 // NewUserHandler 構造函數 (Go 的慣用法)，
 // 相当 PHP 的 __construct()
 
-func NewAuthenticatorHandler(oAbstractHandler *inputHttpAdmin.AbstractHandler) *AuthenticatorHandler {
+func NewAuthenticatorHandler(oAbstractHandler *inputHttpAdmin.AbstractHandler, oAdminUserModelRepository outputPortModel.AdminUserRepository) *AuthenticatorHandler {
 	return &AuthenticatorHandler{
-		AbstractHandler: oAbstractHandler,
+		AbstractHandler:          oAbstractHandler,
+		AdminUserModelRepository: oAdminUserModelRepository,
 	}
 }
 
@@ -31,20 +36,15 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 		oSelf.Response.SetWithNext(oContext, 200, -1, "password 不能為空", struct{}{}, "")
 	}
 
-	// oAdminUserModel, err := oSelf.ResourceClient.Model.AdminUser.ShowOneByName(
-	// 	oContext,
-	// 	&pbResourceModel.OneAdminUserRequest{
-	// 		Name: sParamName,
-	// 	},
-	// )
+	oAdminUserModel, err := oSelf.AdminUserModelRepository.ShowOneByName(
+		sParamName,
+	)
 
-	// if err != nil {
-	// 	oSelf.Response.SetWithNext(oContext, 200, -2, "AdminUser 不能建立", struct{}{}, "")
-	// }
+	if err != nil {
+		oSelf.Response.SetWithNext(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
+	}
 
-	// oAdminUser, oErr := pkg.Cacheable[*modelDatabase.AdminUserModel]("", time.Hour, func() (*modelDatabase.AdminUserModel, error) {
-	// 	return oAdminUserModel.ShowOneByName(sParamName)
-	// }, sParamName)
+	fmt.Println(oAdminUserModel)
 
 	// if oErr != nil {
 	// 	if errors.Is(err, gorm.ErrRecordNotFound) {
