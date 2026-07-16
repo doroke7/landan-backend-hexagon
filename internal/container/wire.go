@@ -41,10 +41,10 @@ import (
 	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
-	outputCache "example/internal/output/application/cache/model"
-	outputMemory "example/internal/output/application/memory/model"
-	outputMysql "example/internal/output/application/mysql/model"
-	outputResourceModel "example/internal/output/application/resource/model"
+	outputApplicationCacheModel "example/internal/output/application/cache/model"
+	outputApplicationMemoryModel "example/internal/output/application/memory/model"
+	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
+	outputApplicationResourceModel "example/internal/output/application/resource/model"
 )
 
 // HttpContainer 只給 `http` Gin 服務使用。
@@ -105,8 +105,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
-		outputResourceModel.NewAdminUserRepository,
+		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationResourceModel.NewAdminUserRepository,
 
 		// client
 		Client.NewModel,
@@ -177,7 +177,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
+		outputApplicationCacheModel.NewUserRepository,
 
 		wire.Struct(new(FacadeContainer), "*"),
 	)
@@ -221,7 +221,7 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		usecaseApplicationResourceModel.NewAdminUserUsecase,
 
 		// output
-		outputMysql.NewAdminUserRepository,
+		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
 	)
@@ -266,7 +266,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
+		outputApplicationCacheModel.NewUserRepository,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -310,7 +310,7 @@ func InitCronContainer() (*CronContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
+		outputApplicationCacheModel.NewUserRepository,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -354,7 +354,7 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
+		outputApplicationCacheModel.NewUserRepository,
 
 		wire.Struct(new(WebsocketContainer), "*"),
 	)
@@ -402,7 +402,7 @@ func InitClientContainer() (*ClientContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputCache.NewUserRepository,
+		outputApplicationCacheModel.NewUserRepository,
 
 		wire.Struct(new(ClientContainer), "*"),
 	)
@@ -440,7 +440,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputMemory.NewUserRepository,
+		outputApplicationMemoryModel.NewUserRepository,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)
