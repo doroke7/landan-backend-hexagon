@@ -22,7 +22,7 @@ tmp_dir = "tmp"
   kill_delay = "500ms"
 
   # 監聽哪些副檔名的變化？（加入 toml / yaml 可以讓設定檔改動時也重啟）
-  include_ext = ["go", "tpl", "html", "toml", "yaml", "yml"]
+  include_ext = ["go", "tpl", "html", "toml", "yaml", "yml", "env"]
   
   # 核心地雷區：一定要忽略這些目錄，否則會陷入「無限循環編譯」！
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules", ".git", ".venv"]

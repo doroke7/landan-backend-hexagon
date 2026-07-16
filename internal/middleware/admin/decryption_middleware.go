@@ -3,7 +3,6 @@ package middleware_admin
 import (
 	"example/internal/bootstrap"
 	"example/internal/utility"
-	"fmt"
 	"net/url"
 	"reflect"
 	"unsafe"
@@ -67,8 +66,6 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 			Key string `json:"key"`
 			Iv  string `json:"iv"`
 		}](sKeys)
-		fmt.Println("oKeys.Key=", oKeys.Key)
-		fmt.Println("oKeys.Iv=", oKeys.Iv)
 
 		oContext.Set("key", oKeys.Key)
 		oContext.Set("iv", oKeys.Iv)
@@ -76,22 +73,17 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 		sOption := oSelf.aesHelper.Decrypt(sQueryO, oKeys.Key, oKeys.Iv)
 
 		sSearch := oSelf.aesHelper.Decrypt(sQueryS, oKeys.Key, oKeys.Iv)
-		fmt.Println("sP=", sP)
 
 		sParam := oSelf.aesHelper.Decrypt(sP, oKeys.Key, oKeys.Iv)
-		fmt.Println("ssParamP=", sParam)
 
 		sAuthorizaion := oSelf.aesHelper.Decrypt(sHeaderA, bootstrap.CONFIG.ADMIN.JWT.KEY, bootstrap.CONFIG.ADMIN.JWT.IV)
 		oContext.Set("Authrization", sAuthorizaion)
-
-		fmt.Println("sOption=", sOption)
 
 		oOption, _ := utility.JsonDecode[struct {
 			Size  string `json:"size"`
 			Page  string `json:"page"`
 			AppId string `json:"app_id"`
 		}](sOption)
-		fmt.Println("oOption=", oOption)
 
 		oSearch, _ := utility.JsonDecode[map[string]interface{}](sSearch)
 		oParam, _ := utility.JsonDecode[map[string]interface{}](sParam)

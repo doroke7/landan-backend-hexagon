@@ -106,9 +106,9 @@ func (oSelf *ErrorMiddleware) Handle() gin.HandlerFunc {
 			aStrings := []string{sKeys, sTime, sC, sM, sR, bootstrap.CONFIG.ADMIN.SIGNATURE.SALT}
 			sHeaderSignature := utility.Md5(strings.Join(aStrings, ","))
 
-			oContext.Writer.Header().Set("Authorization", "")
-			oContext.Writer.Header().Set("Time", sTime)
-			oContext.Writer.Header().Set("Signature", sHeaderSignature)
+			oContext.Set("Authorization", "")
+			oContext.Set("Time", sTime)
+			oContext.Set("Signature", sHeaderSignature)
 
 			oJson := gin.H{
 				"c": sC,

@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	_ "fmt"
+	"strings"
 )
 
 /*
@@ -53,7 +54,7 @@ func (oSelf *AesHelper) Encrypt(sText string, sKey string, sIv string) string {
 	oCipher := cipher.NewCBCEncrypter(mBlock, byIv)
 	oCipher.CryptBlocks(ciphertext, _byText)
 
-	sResult := base64.StdEncoding.EncodeToString(ciphertext)
+	sResult := base64.RawURLEncoding.EncodeToString(ciphertext)
 
 	return sResult
 }
@@ -73,7 +74,7 @@ func (oSelf *AesHelper) Decrypt(sText string, sKey string, sIv string) string {
 		return ""
 	}
 
-	oByteText, _ := base64.URLEncoding.DecodeString(sText)
+	oByteText, _ := base64.RawURLEncoding.DecodeString(strings.TrimRight(sText, "="))
 
 	oByteKey := []byte(sKey)
 	oByteIv := []byte(sIv)
