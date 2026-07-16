@@ -59,9 +59,9 @@
 │   ├── helper/                    # 通用工具（AES、RSA、Cache 讀寫……），跟業務邏輯無關可到處注入
 │   ├── client/                    # 對外部 gRPC stream server 的 client 封裝
 │   │
-│   ├── input/
-│   │   └── application/           # Input Adapter：把外部請求轉換成呼叫 usecase（全部統一收在 application/ 底下）
-│   │       ├── facade/            #   facade gRPC server handler（game / register / table）
+│   ├── input/                     # 協議輸入端的 - 只有實作
+│   │   └── application/           # 實作  
+│   │       ├── facade/            #   
 │   │       ├── resource/          #   resource gRPC server handler（model/admin_user_handler.go）
 │   │       ├── http/
 │   │       │   └── admin/         #   HTTP handler（含 authentication、resource 子路由）
@@ -78,39 +78,42 @@
 │   ├── middleware/
 │   │   └── admin/                 # HTTP 專用 middleware 鏈（logger / signature / decryption / encryption / error ...）
 │   │
-│   ├── usecase/                   # 業務邏輯本體，依「實作」跟「介面（driving port）」拆成兩棵對稱的樹：
-│   │   ├── application/           #   AbstractUsecase / UserUsecase / AdminUserUsecase 具體實作
+│   ├── usecase/                   # 商務案例 ：實作 + 端口介面 （目錄結構命名按照 “路由”區分）
+│   │   ├── application/           # 實作
 │   │   │   ├── facade/
 │   │   │   │   └── model/         #   UserUsecase（facade 跟其他週邊 adapter 共用）
 │   │   │   ├── http/
 │   │   │   │   └── admin/
 │   │   │   │       └── authentication/  #   http 登入專用的 AdminUserUsecase
 │   │   │   └── resource/
-│   │   │       └── model/         #   resource 服務專屬的 AdminUserUsecase
-│   │   └── port/                  #   對應的介面定義，路徑跟 application/ 一一對應
+│   │   │       ├── model/         #   resource 服務專屬的 AdminUserUsecase
+│   │   │       └── logic/         #   AppUserUsecase（第一個真的用到 logic/ 的例子）
+│   │   └── port/                  #  端口介面
 │   │       ├── facade/
-│   │       │   └── model/         #   UserUsecase 介面
+│   │       │   └── model/         #  
 │   │       ├── http/
 │   │       │   └── admin/
 │   │       │       └── authentication/  #   AdminUserUsecase 介面（http 專用）
 │   │       └── resource/
-│   │           └── model/         #   AdminUserUsecase 介面（resource 服務專屬）
+│   │           ├── model/         #   AdminUserUsecase 介面（resource 服務專屬）
+│   │           └── logic/         #   AppUserUsecase 介面
 │   │   （這裡的 model/ 跟 output/ 底下的 model/ 是同一套命名慣例：
 │   │    model/ 代表單一資源的輸出，logic/ 代表多種資源的輸出——
-│   │    目前 usecase 這邊還沒有 logic/ 的需求，所以只看到 model/）
+│   │    resource/logic/ 底下的 AppUserUsecase 是目前唯一真的落地的 logic/ 範例，
+│   │    其他都還是 model/）
 │   │   （facade/model 底下的 UserUsecase 是 facade 跟其他週邊 adapter 共用的；
 │   │    resource/model 底下的 AdminUserUsecase 才是 resource 服務專屬；
 │   │    http/admin/authentication 則是另外獨立、只給 http 登入用的第三份——
 │   │    三者商業邏輯差異大，故意不共用同一個 AbstractUsecase，這是歷史命名，
-│   │    還沒有進一步合併）
+│   │    
 │   │
-│   ├── output/                    # Output Adapter：usecase 依賴的下游資源實作，一樣拆成「實作」跟「介面」：
-│   │   ├── application/           #   每個 adapter 底下統一分成 model/ 跟 logic/ 兩種：
+│   ├── output/                    #  輸出部分：包含「實作」跟「介面」：
+│   │   ├── application/           #  「實作」：
 │   │   │                          #   - model/：代表單一資源的輸出，一次呼叫只對應一個底層資源（如單純寫 DB、單純發一筆訊息）
 │   │   │                          #   - logic/：代表多種資源的輸出，介面上看起來是一次呼叫，實際上內部
 │   │   │                          #     關聯、協調多個資源（如 cache 裝飾器要同時處理 mysql 寫入 + redis 快取失效）
 │   │   │                          #   目前多數 adapter 的 logic/ 還只是預留空資料夾（gitkeep），
-│   │   │                          #   等真的出現組合型需求時才會補檔案進去
+│   │   │                          #   resource/logic/ 已經有真的實作可以參考（見下方）
 │   │   │   ├── mysql/
 │   │   │   │   └── model/         #   MySQL 實作（gorm）
 │   │   │   ├── cache/
@@ -120,12 +123,15 @@
 │   │   │   ├── producer/
 │   │   │   │   └── model/         #   AMQP 訊息生產者實作（UserProducer）
 │   │   │   └── resource/
-│   │   │       └── model/         #   對 resource gRPC 服務的 client 實作（AdminUserRepository）
-│   │   └── port/
+│   │   │       ├── model/         #  單一數據輸出（譬如一個 entity 的修改）
+│   │   │       └── logic/         #  複雜數據輸出（譬如多個 entity 的修改）
+│   │   └── port/                  # 「介面」：
 │   │       └── any/
-│   │           └── model/         #   UserRepository / AdminUserRepository 介面（driven port）
-│   │       （介面本身不分 model/logic——不管底下是單一輸出還是組合型輸出，
-│   │        usecase 依賴的都是同一份介面，所以叫 any；logic/ 目前也只是空的佔位）
+│   │           ├── model/         #   UserRepository / AdminUserRepository 介面（driven port）
+│   │           └── logic/         #   AppUserRepository 介面
+│   │       （介面本身不分 model/logic 的資料夾意義——不管底下是單一輸出還是組合型輸出，
+│   │        usecase 依賴的都是同一份介面規則，所以叫 any；只是實際內容還是分開放，
+│   │        對應各自的 output/application/<adapter>/model 或 logic）
 │   │
 │   ├── register/                  # 組裝層：把 container 生好的 handler 註冊到對應的 server/router
 │   │                                #   （grpc.RegisterXxxServer / gin.Group / cron.AddFunc ...），
