@@ -3,17 +3,17 @@ package controller_admin_authentication
 import (
 	"github.com/gin-gonic/gin"
 
-	HttpAdmin "example/internal/input/http/admin"
+	inputHttpAdmin "example/internal/input/http/admin"
 )
 
 type AuthenticatorHandler struct {
-	*HttpAdmin.AbstractHandler
+	*inputHttpAdmin.AbstractHandler
 }
 
 // NewUserHandler 構造函數 (Go 的慣用法)，
 // 相当 PHP 的 __construct()
 
-func NewAuthenticatorHandler(oAbstractHandler *HttpAdmin.AbstractHandler) *AuthenticatorHandler {
+func NewAuthenticatorHandler(oAbstractHandler *inputHttpAdmin.AbstractHandler) *AuthenticatorHandler {
 	return &AuthenticatorHandler{
 		AbstractHandler: oAbstractHandler,
 	}
