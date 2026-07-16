@@ -19,6 +19,9 @@ import (
 
 	MiddlewareAdmin "example/internal/middleware/admin"
 
+	InterceptorFacadeAdmin "example/internal/interceptor/facade/game"
+	InterceptorResource "example/internal/interceptor/resource"
+
 	inputClient "example/internal/input/application/client"
 	inputCommand "example/internal/input/application/command"
 	inputConsumer "example/internal/input/application/consumer"
@@ -153,6 +156,12 @@ type FacadeContainer struct {
 	FacadeGameUser           *inputFacadeGame.UserHandler
 	FacadeTableScanner       *inputFacadeTable.ScannerHandler
 	FacadeTableAuthenticator *inputFacadeRegister.AuthenticatorHandler
+
+	// gRPC Facade Interceptor
+	FacadeAdminErrorInterceptor          *InterceptorFacadeAdmin.ErrorInterceptor
+	FacadeAdminStatusInterceptor         *InterceptorFacadeAdmin.StatusInterceptor
+	FacadeAdminLoggerInterceptor         *InterceptorFacadeAdmin.LoggerInterceptor
+	FacadeAdminAuthenticationInterceptor *InterceptorFacadeAdmin.AuthenticationInterceptor
 }
 
 func InitFacadeContainer() (*FacadeContainer, error) {
@@ -173,6 +182,13 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		inputFacadeGame.NewUserHandler,
 		inputFacadeTable.NewScannerHandler,
 		inputFacadeRegister.NewAuthenticatorHandler,
+
+		// interceptor-facade
+		InterceptorFacadeAdmin.NewAbstractInterceptor,
+		InterceptorFacadeAdmin.NewErrorInterceptor,
+		InterceptorFacadeAdmin.NewStatusInterceptor,
+		InterceptorFacadeAdmin.NewLoggerInterceptor,
+		InterceptorFacadeAdmin.NewAuthenticationInterceptor,
 
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,
@@ -201,6 +217,9 @@ type ResourceContainer struct {
 	// gRPC Resource server
 	ResourceAbstract       *inputResource.AbstractHandler
 	ResourceModelAdminUser *inputResourceModel.AdminUserHandler
+
+	// gRPC Resource Interceptor
+	ResourceAllInterceptor *InterceptorResource.AllInterceptor
 }
 
 func InitResourceContainer() (*ResourceContainer, error) {
@@ -217,6 +236,10 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		// input-resource
 		inputResource.NewAbstractHandler,
 		inputResourceModel.NewAdminUserHandler,
+
+		// interceptor-resource
+		InterceptorResource.NewAbstractInterceptor,
+		InterceptorResource.NewAllInterceptor,
 
 		// usecase
 		usecaseApplicationResourceModel.NewAbstractUsecase,

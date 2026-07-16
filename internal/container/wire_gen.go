@@ -24,6 +24,8 @@ import (
 	"example/internal/input/application/resource"
 	service2 "example/internal/input/application/resource/model"
 	"example/internal/input/application/websocket"
+	"example/internal/interceptor/facade/game"
+	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
 	"example/internal/output/application/cache/model"
 	"example/internal/output/application/memory/model"
@@ -120,16 +122,25 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	userHandler := facade2.NewUserHandler(userUsecase, abstractHandler)
 	scannerHandler := facade3.NewScannerHandler(abstractHandler)
 	authenticatorHandler := facade4.NewAuthenticatorHandler(abstractHandler)
+	abstractInterceptor := interceptor_facade_admin.NewAbstractInterceptor()
+	errorInterceptor := interceptor_facade_admin.NewErrorInterceptor(abstractInterceptor)
+	statusInterceptor := interceptor_facade_admin.NewStatusInterceptor(abstractInterceptor)
+	loggerInterceptor := interceptor_facade_admin.NewLoggerInterceptor(abstractInterceptor)
+	authenticationInterceptor := interceptor_facade_admin.NewAuthenticationInterceptor(abstractInterceptor)
 	facadeContainer := &FacadeContainer{
-		AbstractHelper:           abstractHelper,
-		AesHelper:                aesHelper,
-		RsaHelper:                rsaHelper,
-		AbstractUsecase:          abstractUsecase,
-		UserUsecase:              userUsecase,
-		FacadeAbstract:           abstractHandler,
-		FacadeGameUser:           userHandler,
-		FacadeTableScanner:       scannerHandler,
-		FacadeTableAuthenticator: authenticatorHandler,
+		AbstractHelper:                       abstractHelper,
+		AesHelper:                            aesHelper,
+		RsaHelper:                            rsaHelper,
+		AbstractUsecase:                      abstractUsecase,
+		UserUsecase:                          userUsecase,
+		FacadeAbstract:                       abstractHandler,
+		FacadeGameUser:                       userHandler,
+		FacadeTableScanner:                   scannerHandler,
+		FacadeTableAuthenticator:             authenticatorHandler,
+		FacadeAdminErrorInterceptor:          errorInterceptor,
+		FacadeAdminStatusInterceptor:         statusInterceptor,
+		FacadeAdminLoggerInterceptor:         loggerInterceptor,
+		FacadeAdminAuthenticationInterceptor: authenticationInterceptor,
 	}
 	return facadeContainer, nil
 }
@@ -147,6 +158,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
+	abstractInterceptor := interceptor_resource.NewAbstractInterceptor()
+	allInterceptor := interceptor_resource.NewAllInterceptor(abstractInterceptor)
 	resourceContainer := &ResourceContainer{
 		AbstractHelper:         abstractHelper,
 		AesHelper:              aesHelper,
@@ -155,6 +168,7 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		AdminUserUsecase:       adminUserUsecase,
 		ResourceAbstract:       abstractHandler,
 		ResourceModelAdminUser: adminUserHandler,
+		ResourceAllInterceptor: allInterceptor,
 	}
 	return resourceContainer, nil
 }
@@ -354,6 +368,12 @@ type FacadeContainer struct {
 	FacadeGameUser           *facade2.UserHandler
 	FacadeTableScanner       *facade3.ScannerHandler
 	FacadeTableAuthenticator *facade4.AuthenticatorHandler
+
+	// gRPC Facade Interceptor
+	FacadeAdminErrorInterceptor          *interceptor_facade_admin.ErrorInterceptor
+	FacadeAdminStatusInterceptor         *interceptor_facade_admin.StatusInterceptor
+	FacadeAdminLoggerInterceptor         *interceptor_facade_admin.LoggerInterceptor
+	FacadeAdminAuthenticationInterceptor *interceptor_facade_admin.AuthenticationInterceptor
 }
 
 type ResourceContainer struct {
@@ -369,6 +389,9 @@ type ResourceContainer struct {
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
 	ResourceModelAdminUser *service2.AdminUserHandler
+
+	// gRPC Resource Interceptor
+	ResourceAllInterceptor *interceptor_resource.AllInterceptor
 }
 
 // ConsumerContainer 只給 `consumer` MQ 消費者服務使用。

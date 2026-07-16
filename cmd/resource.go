@@ -3,11 +3,8 @@ package cmd
 import (
 	"log"
 	"net"
-	"time"
 
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/keepalive"
 
 	pkg "example/pkg"
 
@@ -27,22 +24,7 @@ var oResourceCommand = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		oGrpcServer := grpc.NewServer(
-			grpc.KeepaliveParams(
-				keepalive.ServerParameters{
-					Time:    1 * time.Second,
-					Timeout: 5 * time.Second,
-				},
-			),
-			grpc.KeepaliveEnforcementPolicy(
-				keepalive.EnforcementPolicy{
-					MinTime:             10 * time.Second,
-					PermitWithoutStream: true,
-				},
-			),
-		)
-
-		oResourceServer := register.ResourceInit(oContainer, oGrpcServer)
+		oResourceServer := register.ResourceInit(oContainer)
 
 		oListener, err := net.Listen("tcp", ":"+bootstrap.CONFIG.SERVICES.RESOURCE.PORT)
 		if err != nil {
