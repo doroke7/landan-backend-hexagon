@@ -3,7 +3,7 @@ package mysql
 import (
 	"errors"
 
-	"example/internal/output/port/model"
+	"example/internal/output/port/any/model"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

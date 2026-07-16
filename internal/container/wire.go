@@ -48,10 +48,10 @@ import (
 	usecaseFacadeModelApplication "example/internal/usecase/application/facade/model"
 	usecaseResourceModelApplication "example/internal/usecase/application/resource/model"
 
-	outputCache "example/internal/output/cache/model"
-	outputMemory "example/internal/output/memory/model"
-	outputMysql "example/internal/output/mysql/model"
-	outputResourceModel "example/internal/output/resource/model"
+	outputCache "example/internal/output/application/cache/model"
+	outputMemory "example/internal/output/application/memory/model"
+	outputMysql "example/internal/output/application/mysql/model"
+	outputResourceModel "example/internal/output/application/resource/model"
 )
 
 // HttpContainer 只給 `http` Gin 服務使用。

@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 
 	"example/internal/domain"
-	"example/internal/output/port/model"
+	"example/internal/output/port/any/model"
 )
 
 type AdminUserRepository struct {

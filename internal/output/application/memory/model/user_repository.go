@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"example/internal/domain"
-	"example/internal/output/port/model"
+	"example/internal/output/port/any/model"
 )
 
 type UserRepository struct {

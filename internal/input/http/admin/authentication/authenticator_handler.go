@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	inputHttpAdmin "example/internal/input/http/admin"
-	outputPortModel "example/internal/output/port/model"
+	outputPortModel "example/internal/output/port/any/model"
 )
 
 type AuthenticatorHandler struct {

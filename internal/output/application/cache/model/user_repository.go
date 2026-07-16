@@ -7,8 +7,8 @@ import (
 
 	"example/internal/domain"
 	"example/internal/helper"
-	"example/internal/output/mysql/model"
-	"example/internal/output/port/model"
+	"example/internal/output/application/mysql/model"
+	"example/internal/output/port/any/model"
 )
 
 // UserRepository 是裝飾器（Decorator）：包住 mysql.UserRepository，
