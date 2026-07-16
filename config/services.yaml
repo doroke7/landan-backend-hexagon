@@ -4,5 +4,7 @@ facade:
   port: 4002
 resource:
   port: 5001
+  username: 'resource'
+  password: '!Scg]4"?VYY`mzFOV(Nu247ou6O5E@jB'
 websocket:
   port: 6001
