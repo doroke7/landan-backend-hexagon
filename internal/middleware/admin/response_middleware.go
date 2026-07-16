@@ -2,7 +2,6 @@ package middleware_admin
 
 import (
 	"example/internal/bootstrap"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -53,7 +52,6 @@ func (oSelf *ResponseMiddleware) Handle() gin.HandlerFunc {
 			"m": sM,
 			"r": sR,
 		}
-		fmt.Println("bootstrap.CONFIG.DEFAULT=", bootstrap.CONFIG.DEFAULT)
 
 		if bootstrap.CONFIG.DEFAULT.DEBUG {
 			oJson["code"] = nCode
