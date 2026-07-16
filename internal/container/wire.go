@@ -35,6 +35,7 @@ import (
 	inputFacadeRegister "example/internal/input/facade/register"
 	inputFacadeTable "example/internal/input/facade/table"
 	inputHttpAdmin "example/internal/input/http/admin"
+	inputHttpAdminAuthentication "example/internal/input/http/admin/authentication"
 	inputHttpAdminResource "example/internal/input/http/admin/resource"
 	inputWebsocket "example/internal/input/websocket"
 
@@ -52,9 +53,93 @@ import (
 	outputMysql "example/internal/output/mysql/model"
 )
 
-/*
+// HttpContainer 只給 `http` Gin 服務使用。
+type HttpContainer struct {
 
- */
+	// pkg
+	*pkg.Response
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+	*helper.RsaHelper
+
+	*usecaseFacadeModelApplication.AbstractUsecase
+	usecaseFacadeModelPort.UserUsecase
+
+	// Clients
+	ResourceClient *Client.ResourceClient
+
+	// HTTP server -Controller
+	HttpAdminResourceUser                *inputHttpAdminResource.UserHandler
+	HttpAdminAuthenticationAuthenticator *inputHttpAdminAuthentication.AuthenticatorHandler
+
+	// HTTP server -Middleware
+	// Middleware 部分
+	AdminAbstractMiddleware       *MiddlewareAdmin.AbstractMiddleware
+	AdminAdminMiddleware          *MiddlewareAdmin.AdminMiddleware
+	AdminAuthenticationMiddleware *MiddlewareAdmin.AuthenticationMiddleware
+	AdminDecryptionMiddleware     *MiddlewareAdmin.DecryptionMiddleware
+	AdminEncryptionMiddleware     *MiddlewareAdmin.EncryptionMiddleware
+	AdminErrorMiddleware          *MiddlewareAdmin.ErrorMiddleware
+	AdminLoggerMiddleware         *MiddlewareAdmin.LoggerMiddleware
+	AdminNonexistentMiddleware    *MiddlewareAdmin.NonexistentMiddleware
+	AdminRequestMiddleware        *MiddlewareAdmin.RequestMiddleware
+	AdminResponseMiddleware       *MiddlewareAdmin.ResponseMiddleware
+	AdminSignatureMiddleware      *MiddlewareAdmin.SignatureMiddleware
+}
+
+func InitHttpContainer() (*HttpContainer, error) {
+	wire.Build(
+
+		// pkg
+		pkg.NewResponse,
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+		bootstrap.NewResource,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewRsaHelper,
+		helper.NewCacheHelper,
+
+		// client
+		Client.NewModel,
+		Client.NewResourceClient,
+
+		// input-http
+		inputHttpAdmin.NewAbstractHandler,
+		inputHttpAdminResource.NewUserHandler,
+
+		inputHttpAdminAuthentication.NewAuthenticatorHandler,
+
+		// Middleware 部分
+		MiddlewareAdmin.NewAbstractMiddleware,
+		MiddlewareAdmin.NewAdminMiddleware,
+		MiddlewareAdmin.NewAuthenticationMiddleware,
+		MiddlewareAdmin.NewDecryptionMiddleware,
+		MiddlewareAdmin.NewEncryptionMiddleware,
+		MiddlewareAdmin.NewErrorMiddleware,
+		MiddlewareAdmin.NewLoggerMiddleware,
+		MiddlewareAdmin.NewNonexistentMiddleware,
+		MiddlewareAdmin.NewRequestMiddleware,
+		MiddlewareAdmin.NewResponseMiddleware,
+		MiddlewareAdmin.NewSignatureMiddleware,
+
+		// usecase
+		usecaseFacadeModelApplication.NewAbstractUsecase,
+		usecaseFacadeModelApplication.NewUserUsecase,
+
+		// output
+		outputCache.NewUserRepository,
+
+		wire.Struct(new(HttpContainer), "*"),
+	)
+	return nil, nil
+}
 
 type FacadeContainer struct {
 
@@ -144,91 +229,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		outputMysql.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
-	)
-	return nil, nil
-}
-
-// HttpContainer 只給 `http` Gin 服務使用。
-type HttpContainer struct {
-
-	// pkg
-	*pkg.Response
-
-	// Helper
-	*helper.AbstractHelper
-	*helper.AesHelper
-	*helper.RsaHelper
-
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
-
-	// Clients
-	ResourceClient *Client.ResourceClient
-
-	// HTTP server -Controller
-	HttpAdminResourceUser *inputHttpAdminResource.UserHandler
-
-	// HTTP server -Middleware
-	// Middleware 部分
-	AdminAbstractMiddleware       *MiddlewareAdmin.AbstractMiddleware
-	AdminAdminMiddleware          *MiddlewareAdmin.AdminMiddleware
-	AdminAuthenticationMiddleware *MiddlewareAdmin.AuthenticationMiddleware
-	AdminDecryptionMiddleware     *MiddlewareAdmin.DecryptionMiddleware
-	AdminEncryptionMiddleware     *MiddlewareAdmin.EncryptionMiddleware
-	AdminErrorMiddleware          *MiddlewareAdmin.ErrorMiddleware
-	AdminLoggerMiddleware         *MiddlewareAdmin.LoggerMiddleware
-	AdminNonexistentMiddleware    *MiddlewareAdmin.NonexistentMiddleware
-	AdminRequestMiddleware        *MiddlewareAdmin.RequestMiddleware
-	AdminResponseMiddleware       *MiddlewareAdmin.ResponseMiddleware
-	AdminSignatureMiddleware      *MiddlewareAdmin.SignatureMiddleware
-}
-
-func InitHttpContainer() (*HttpContainer, error) {
-	wire.Build(
-
-		// pkg
-		pkg.NewResponse,
-
-		// bootstrap
-		bootstrap.NewMysql,
-		bootstrap.NewRedis,
-		bootstrap.NewResource,
-
-		// helper
-		helper.NewAbstractHelper,
-		helper.NewAesHelper,
-		helper.NewRsaHelper,
-		helper.NewCacheHelper,
-
-		// client
-		Client.NewModel,
-		Client.NewResourceClient,
-
-		// input-http
-		inputHttpAdmin.NewAbstractHandler,
-		inputHttpAdminResource.NewUserHandler,
-
-		// Middleware 部分
-		MiddlewareAdmin.NewAbstractMiddleware,
-		MiddlewareAdmin.NewAdminMiddleware,
-		MiddlewareAdmin.NewAuthenticationMiddleware,
-		MiddlewareAdmin.NewDecryptionMiddleware,
-		MiddlewareAdmin.NewEncryptionMiddleware,
-		MiddlewareAdmin.NewErrorMiddleware,
-		MiddlewareAdmin.NewLoggerMiddleware,
-		MiddlewareAdmin.NewNonexistentMiddleware,
-		MiddlewareAdmin.NewRequestMiddleware,
-		MiddlewareAdmin.NewResponseMiddleware,
-		MiddlewareAdmin.NewSignatureMiddleware,
-
-		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
-
-		// output
-		outputCache.NewUserRepository,
-
-		wire.Struct(new(HttpContainer), "*"),
 	)
 	return nil, nil
 }

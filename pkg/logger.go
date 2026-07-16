@@ -30,6 +30,7 @@ const (
 	ResourceLogic   Module = "resource-logic"
 	ResourceModel   Module = "resource-model"
 	Repository      Module = "repository"
+	Sdk             Module = "sdk"
 	Publisher       Module = "publisher"
 )
 

@@ -6,20 +6,20 @@ import (
 	HttpAdmin "example/internal/input/http/admin"
 )
 
-type AuthenticatorController struct {
+type AuthenticatorHandler struct {
 	*HttpAdmin.AbstractHandler
 }
 
 // NewUserHandler 構造函數 (Go 的慣用法)，
 // 相当 PHP 的 __construct()
 
-func NewAuthenticatorController(oAbstractHandler *HttpAdmin.AbstractHandler) *AuthenticatorController {
-	return &AuthenticatorController{
+func NewAuthenticatorHandler(oAbstractHandler *HttpAdmin.AbstractHandler) *AuthenticatorHandler {
+	return &AuthenticatorHandler{
 		AbstractHandler: oAbstractHandler,
 	}
 }
 
-func (oSelf *AuthenticatorController) SignIn(oContext *gin.Context) {
+func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 	sParamName := oContext.PostForm("param.name")
 	sParamPassword := oContext.PostForm("param.password")
 
