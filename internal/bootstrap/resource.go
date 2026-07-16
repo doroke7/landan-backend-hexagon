@@ -53,8 +53,13 @@ func NewResource() *grpc.ClientConn {
 			invoker grpc.UnaryInvoker,
 			opts ...grpc.CallOption,
 		) error {
+
+			sUser := CONFIG.CLIENTS.RESOURCE.USER
+			sPassword := CONFIG.CLIENTS.RESOURCE.PASSWORD
+
+			fmt.Println("CONFIG.CLIENTS.RESOURCE=", CONFIG.CLIENTS.RESOURCE)
 			sAuthorization := "Basic " + utility.Base64Encode(
-				CONFIG.CLIENTS.RESOURCE.NAME+":"+CONFIG.CLIENTS.RESOURCE.PASSWORD,
+				sUser+":"+sPassword,
 			)
 			ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", sAuthorization))
 			return invoker(ctx, method, req, reply, cc, opts...)

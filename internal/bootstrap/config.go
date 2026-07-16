@@ -29,7 +29,7 @@ type Config struct {
 		RESOURCE struct {
 			HOST     string `mapstructure:"host"`
 			PORT     string `mapstructure:"port"`
-			NAME     string `mapstructure:"name"`
+			USER     string `mapstructure:"user"`
 			PASSWORD string `mapstructure:"password"`
 		} `mapstructure:"resource"`
 		WEBSOCKET struct {
@@ -45,7 +45,7 @@ type Config struct {
 		RESOURCE struct {
 			HOSTS    []string `mapstructure:"hosts"`
 			PORTS    []string `mapstructure:"ports"`
-			NAME     string   `mapstructure:"name"`
+			USER     string   `mapstructure:"user"`
 			PASSWORD string   `mapstructure:"password"`
 		} `mapstructure:"resource"`
 	} `mapstructure:"clients"`

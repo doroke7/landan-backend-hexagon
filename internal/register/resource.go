@@ -22,7 +22,7 @@ func resourceInterceptors(oContainer *container.ResourceContainer) grpc.UnarySer
 	return pkg.NewRouter(aBase...).
 		// database 群組目前只需要全局驗證；未來個別 resource 服務需要額外攔截器
 		// （例如特定表要多一層權限檢查）時，在這裡加一個更具體的 Group 前綴即可
-		Group("/resource.database.").
+		Group("/resource.").
 		Build()
 }
 

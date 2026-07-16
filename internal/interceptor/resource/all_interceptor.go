@@ -2,6 +2,7 @@ package interceptor_resource
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	bootstrap "example/internal/bootstrap"
@@ -28,16 +29,20 @@ func (oSelf *AllInterceptor) Handle() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		oMetadata, bMetaOb := metadata.FromIncomingContext(ctx)
 
+		fmt.Println(oMetadata)
 		if bMetaOb {
 			aAuthotizations := oMetadata.Get("authorization")
 			sAuthotizations := strings.Join(aAuthotizations, "")
-			sName := bootstrap.CONFIG.SERVICES.RESOURCE.NAME
+
+			fmt.Println("CONFIG.SERVICES.RESOURCE=", bootstrap.CONFIG.SERVICES.RESOURCE)
+
+			sUser := bootstrap.CONFIG.SERVICES.RESOURCE.USER
 			sPassword := bootstrap.CONFIG.SERVICES.RESOURCE.PASSWORD
 
-			sAuthotization := "Basic " + utility.Base64Encode(sName+":"+sPassword)
+			sAuthotization := "Basic " + utility.Base64Encode(sUser+":"+sPassword)
 
 			if sAuthotizations != sAuthotization {
-				return nil, status.Error(codes.PermissionDenied, "帳號密碼錯誤")
+				return nil, status.Error(codes.PermissionDenied, "resource密碼錯誤")
 			}
 		}
 

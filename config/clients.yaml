@@ -5,7 +5,7 @@ facade:        # 面門 服務
 resource:        # 數據服務
   hosts: ["127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"]
   ports: ["4008", "4008", "4008", "4008"]
-  username: 'resource'
+  user: 'resource'
   password: '!Scg]4"?VYY`mzFOV(Nu247ou6O5E@jB'
 
 
