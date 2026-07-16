@@ -39,7 +39,7 @@ import (
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
 	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
-	usecaseResourceModelApplication "example/internal/usecase/application/resource/model"
+	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
 	outputCache "example/internal/output/application/cache/model"
 	outputMemory "example/internal/output/application/memory/model"
@@ -193,7 +193,7 @@ type ResourceContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseResourceModelApplication.AbstractUsecase
+	*usecaseApplicationResourceModel.AbstractUsecase
 	usecasePortResourceModel.AdminUserUsecase
 
 	// gRPC Resource server
@@ -217,8 +217,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		inputResourceModel.NewAdminUserHandler,
 
 		// usecase
-		usecaseResourceModelApplication.NewAbstractUsecase,
-		usecaseResourceModelApplication.NewAdminUserUsecase,
+		usecaseApplicationResourceModel.NewAbstractUsecase,
+		usecaseApplicationResourceModel.NewAdminUserUsecase,
 
 		// output
 		outputMysql.NewAdminUserRepository,
