@@ -95,9 +95,12 @@ func Logger(module Module) *zap.Logger {
 		}),
 	)
 
-	// Console
+	// Console（帶顏色，只影響終端輸出，不影響寫檔的 json log）
+	consoleEncoderConfig := zap.NewDevelopmentEncoderConfig()
+	consoleEncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
 	consoleCore := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+		zapcore.NewConsoleEncoder(consoleEncoderConfig),
 		zapcore.AddSync(os.Stdout),
 		zap.DebugLevel,
 	)

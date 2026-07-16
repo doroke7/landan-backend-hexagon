@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	pkg "example/pkg"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
@@ -18,6 +20,8 @@ import (
 )
 
 func NewResource() *grpc.ClientConn {
+
+	oLogger := pkg.Logger(pkg.Default)
 
 	aHosts := CONFIG.CLIENTS.RESOURCE.HOSTS
 	aPorts := CONFIG.CLIENTS.RESOURCE.PORTS
@@ -81,18 +85,17 @@ func NewResource() *grpc.ClientConn {
 	// 在背景啟動常駐任務，檢查連線
 	go func() {
 		defer ticker.Stop()
-		fmt.Printf("[%s] 🛡️ gRPC 定時重連守護進程已啟動，每 %v 巡邏一次...\n",
-			time.Now().Format("15:04:05"), 4*time.Second)
+		oLogger.Info("🛡️ gRPC 定時重連守護進程已啟動，每 10s 巡邏一次...")
 
 		for range ticker.C {
 			state := conn.GetState()
-			fmt.Printf("[%s] ⚠️ 檢查狀態 : %s\n", time.Now().Format("15:04:05"), state)
+			oLogger.Info("⚠️ 檢查狀態")
 			// 2. 核心判斷邏輯：
 			// - 如果是 TransientFailure：代表剛斷線，Backoff 正在數鬧鐘，我們進來加速它，打破等待窗期。
 			// - 如果是 Idle：代表因為無人點餐，Backoff 已經罷工了！我們必須進來重新點火。
 			if state == connectivity.TransientFailure || state == connectivity.Idle {
-				fmt.Printf("[%s] ⚠️ 偵測到底層連線處於【%s】狀態！強制啟動電擊重連 (conn.Connect)...\n",
-					time.Now().Format("15:04:05"), state)
+
+				oLogger.Info("⚠️ 偵測到底層連線處於 狀態！強制啟動電擊重連")
 
 				// 🔥 執行核心重連動作：打破 IDLE，逼迫底層立刻重新進行 TCP 握手
 				conn.Connect()
