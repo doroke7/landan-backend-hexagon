@@ -89,9 +89,19 @@ func (oSelf *ErrorMiddleware) Handle() gin.HandlerFunc {
 			mCode, _ := oContext.Get("code")
 			mResult, _ := oContext.Get("result")
 			mMessage, _ := oContext.Get("message")
+			mKey, _ := oContext.Get("key")
+			mIv, _ := oContext.Get("iv")
 
-			sKey := utility.RandString(16)
-			sIv := utility.RandString(16)
+			sKey, _ := mKey.(string) // sKey 可能未定義
+			sIv, _ := mIv.(string)
+
+			if sKey == "" {
+				sKey = utility.RandString(16)
+			}
+
+			if sIv == "" {
+				sIv = utility.RandString(16)
+			}
 
 			sCode := fmt.Sprintf("%d", mCode)
 			sMessage := mMessage.(string)
