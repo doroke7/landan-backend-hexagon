@@ -7,7 +7,10 @@ import (
 	"reflect"
 	"unsafe"
 
+	types "example/types"
+
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 
 	"example/pkg"
 )
@@ -25,10 +28,6 @@ func NewDecryptionMiddleware(oAbstractMiddleware *AbstractMiddleware) *Decryptio
 	}
 }
 
-type RequestPayload struct {
-	P string `json:"p" form:"p" binding:"required"`
-}
-
 // 3. 定義一個方法，返回 gin.HandlerFunc
 func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 	return func(oContext *gin.Context) {
@@ -41,13 +40,14 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 		sQueryO := oContext.DefaultQuery("o", "")
 		sP := oContext.PostForm("p")
 
-		var oRequestPayload RequestPayload
+		var oRequestPayload types.RequestPayload
 
 		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
 		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
-		if err := oContext.ShouldBind(&oRequestPayload); err != nil {
+		if err := oContext.ShouldBindBodyWith(&oRequestPayload, binding.JSON); err != nil {
+
 			oContext.Abort()
-			_ = oContext.Error(pkg.NewDefaultError("請求格式錯誤", -1, 400))
+			_ = oContext.Error(pkg.NewDefaultError("請求格式錯誤2", -1, 400))
 
 			return
 		}

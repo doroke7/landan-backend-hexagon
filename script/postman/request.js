@@ -1,13 +1,17 @@
-// 1. 直接從 NPM 載入 node-forge 套件，不需要 eval
+// 1. 直接從 NPM 載入 node-forge 套件
 const forge = pm.require("npm:node-forge");
 const CryptoJS = require('crypto-js');
 
-// 2. 定義允許的自訂字元集
+// =================【設定你的簽章 SALT】=================
+const SIGNATURE_SALT = "~9U7g2R8zgW&dZ_u"; 
+// =====================================================
+
+// 2. 定義允許的自訂字元集與隨機生成函式
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^*()_+-={}|[]";
+const charsetLength = charset.length;
 
 function generateRandomString(length) {
     let result = "";
-    const charsetLength = charset.length;
     for (let i = 0; i < length; i++) {
         const randomValue = CryptoJS.lib.WordArray.random(4).words[0];
         const randomIndex = Math.abs(randomValue) % charsetLength;
@@ -16,13 +20,11 @@ function generateRandomString(length) {
     return result;
 }
 
-// 【新增】將標準 Base64 轉換為 Base64URL 格式的函式
-function toBase64Url(base64Str) {
-    return base64Str
-        .replace(/\+/g, '-') // 把 + 換成 -
-        .replace(/\//g, '_') // 把 / 換成 _
-        .replace(/=/g, '');  // 移除 =
-}
+// 將標準 Base64 轉換為 Base64URL 格式
+const toBase64Url = (base64Str) => base64Str
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
 
 // 3. 隨機產生 16 個字元的 AES Key 與 IV
 const randomKeyPlain = generateRandomString(16);
@@ -33,6 +35,10 @@ let oKeys = {
     "iv": randomIvPlain,
 };
 let sKeys = JSON.stringify(oKeys);
+
+// 保存給 Tests (Post-script) 解密使用
+pm.variables.set("key", randomKeyPlain);
+pm.variables.set("iv", randomIvPlain);
 
 const key = CryptoJS.enc.Utf8.parse(randomKeyPlain);
 const iv = CryptoJS.enc.Utf8.parse(randomIvPlain);
@@ -51,11 +57,9 @@ const encrypted = CryptoJS.AES.encrypt(jsonString, key, {
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
 });
-
-// 這裡將 AES 密文轉為 Base64URL 格式
 const sP = toBase64Url(encrypted.toString());
 
-// =================【RSA 加密 sKeys】=================
+// =================【RSA 加密 sKeys (得到 sK)】=================
 const rsaPublicKeyPem = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqBbztPHxvEsnb5BcMTjv
 693XqRMYte+ORJvrgc0RsdHlC4W4lSqvjnH2JcsTGgtSqmmvsvoPQ9dKGs6+OD3E
@@ -72,17 +76,7 @@ try {
     const bytesToEncrypt = forge.util.encodeUtf8(sKeys);
     const rsaEncryptedBytes = publicKey.encrypt(bytesToEncrypt, 'RSAES-PKCS1-V1_5');
     
-    // 這裡將 RSA 密文轉為 Base64URL 格式
-    // base64 包含 url 特殊字元，不能用一般的 base64編碼
-    // base64 包含 url 特殊字元，不能用一般的 base64編碼
-    // base64 包含 url 特殊字元，不能用一般的 base64編碼
-    // base64 包含 url 特殊字元，不能用一般的 base64編碼
-    // base64 包含 url 特殊字元，不能用一般的 base64編碼
-    // base64 包含 url 特殊字元，不能用一般的 base64編碼
-
-    sK = forge.util.encode64(rsaEncryptedBytes);
-    sK = toBase64Url(sK);
-
+    sK = toBase64Url(forge.util.encode64(rsaEncryptedBytes));
     pm.variables.set("K", sK);
 } catch (e) {
     console.error("RSA 加密失敗：", e.message);
@@ -90,29 +84,48 @@ try {
 
 pm.variables.set("p", sP);
 
-// =================【重寫 Body 只發送 {"p": sP}】=================
-const oBody = {
-    "p": sP
-};
+// =================【產生時間戳記 (sTime)】=================
+const sTime = Date.now().toString(); 
 
+// =================【抓取簽章需要的額外欄位】=================
+// 從 Header 拿 sVer, sVersion (如果沒有設定，給予空字串，避免拼接時出現 undefined)
+const sVer = pm.request.headers.get("ver") || "";
+const sVersion = pm.request.headers.get("version") || "";
+
+// 從 URL Params 拿 sS, sO
+const sS = pm.request.url.query.get("s") || "";
+const sO = pm.request.url.query.get("o") || "";
+
+// =================【計算 Go 原生 MD5 簽章】=================
+// 後端拼接順序: sVer, sVersion, sK, sTime, sS, sO, sP, SALT
+const aStrings = [sVer, sVersion, sK, sTime, sS, sO, sP, SIGNATURE_SALT];
+const sStrings = aStrings.join("|");
+
+// 計算 MD5 雜湊值並轉為小寫 32 位元字串
+const sMd5Signature = CryptoJS.MD5(sStrings).toString(CryptoJS.enc.Hex);
+
+// =================【重寫 Body 只發送 {"p": sP}】=================
+const oBody = { "p": sP };
 pm.request.body.update({
     mode: 'raw',
     raw: JSON.stringify(oBody)
 });
 
-// 強制將 Content-Type 設定為 application/json
-pm.request.headers.upsert({
-    key: "Content-Type",
-    value: "application/json"
-});
+// =================【動態寫入 Headers】=================
+// 1. 強制設定 Content-Type
+pm.request.headers.upsert({ key: "Content-Type", value: "application/json" });
 
-// =================【把 sK 塞進 Header】=================
-pm.request.headers.upsert({
-    key: "K",
-    value: sK
-});
+// 2. 把 sK 塞進 Header K
+pm.request.headers.upsert({ key: "K", value: sK });
+
+// 3. 把 時間戳記 塞進 Header time
+pm.request.headers.upsert({ key: "time", value: sTime });
+
+// 4. 把 簽章 塞進 Header sign (請根據你後端 GetHeader 的 Key 命名調整，例如 "sign" 或 "signature")
+pm.request.headers.upsert({ key: "signature", value: sMd5Signature });
+
 // =====================================================
 
-console.log("--- 【混合加密 (Base64URL 格式) 成功】 ---");
-console.log("已覆蓋發送的 Body (Base64URL)：", JSON.stringify(oBody));
-console.log("已新增 Header [K] (Base64URL)：", sK);
+console.log("--- 【混合加密與簽章成功】 ---");
+console.log("拼接字串原貌:", sStrings);
+console.log("產生的 MD5 簽章 (sign):", sMd5Signature);

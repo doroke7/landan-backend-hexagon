@@ -5,7 +5,10 @@ import (
 	"example/internal/utility"
 	"strings"
 
+	types "example/types"
+
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 
 	"example/pkg"
 )
@@ -36,9 +39,22 @@ func (oSelf *SignatureMiddleware) Handle() gin.HandlerFunc {
 		sO := oContext.DefaultQuery("o", "")
 		sP := oContext.PostForm("p")
 
+		var oRequestPayload types.RequestPayload
+
+		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
+		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
+		if err := oContext.ShouldBindBodyWith(&oRequestPayload, binding.JSON); err != nil {
+			oContext.Abort()
+			_ = oContext.Error(pkg.NewDefaultError("請求格式錯誤1", -1, 400))
+
+			return
+		}
+		sP = oRequestPayload.P
+
 		// NOTE: 不要把 未加密的 search, option, param, 都加下去簽名，多次一舉
 		aStrings := []string{sVer, sVersion, sK, sTime, sS, sO, sP, bootstrap.CONFIG.ADMIN.SIGNATURE.SALT}
-		sStrings := strings.Join(aStrings, ",")
+
+		sStrings := strings.Join(aStrings, "|")
 		sMd5Signature := utility.Md5(sStrings)
 
 		if bootstrap.CONFIG.ADMIN.SIGNATURE.STATUS == true {
