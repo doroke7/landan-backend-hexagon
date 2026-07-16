@@ -19,6 +19,7 @@ import (
 	facade4 "example/internal/input/facade/register"
 	facade3 "example/internal/input/facade/table"
 	"example/internal/input/http/admin"
+	"example/internal/input/http/admin/authentication"
 	handler2 "example/internal/input/http/admin/resource"
 	"example/internal/input/resource"
 	service2 "example/internal/input/resource/model"
@@ -27,6 +28,7 @@ import (
 	"example/internal/output/cache/model"
 	"example/internal/output/memory/model"
 	"example/internal/output/mysql/model"
+	"example/internal/output/resource/model"
 	"example/internal/usecase/facade/model/application"
 	"example/internal/usecase/facade/model/port"
 	usecase2 "example/internal/usecase/resource/model/application"
@@ -35,6 +37,66 @@ import (
 )
 
 // Injectors from wire.go:
+
+func InitHttpContainer() (*HttpContainer, error) {
+	response := pkg.NewResponse()
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	rsaHelper := helper.NewRsaHelper(abstractHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
+	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
+	clientConn := bootstrap.NewResource()
+	model := client.NewModel(clientConn)
+	resourceClient := client.NewResourceClient(clientConn, model)
+	abstractHandler := handler.NewAbstractHandler(response, aesHelper, resourceClient)
+	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
+	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
+	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, adminUserRepository)
+	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
+	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
+	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
+	decryptionMiddleware := middleware_admin.NewDecryptionMiddleware(abstractMiddleware)
+	encryptionMiddleware := middleware_admin.NewEncryptionMiddleware(abstractMiddleware)
+	errorMiddleware := middleware_admin.NewErrorMiddleware(abstractMiddleware)
+	loggerMiddleware := middleware_admin.NewLoggerMiddleware(abstractMiddleware)
+	nonexistentMiddleware := middleware_admin.NewNonexistentMiddleware(abstractMiddleware)
+	requestMiddleware := middleware_admin.NewRequestMiddleware(abstractMiddleware)
+	responseMiddleware := middleware_admin.NewResponseMiddleware(abstractMiddleware)
+	signatureMiddleware := middleware_admin.NewSignatureMiddleware(abstractMiddleware)
+	httpContainer := &HttpContainer{
+		Response:                             response,
+		AbstractHelper:                       abstractHelper,
+		AesHelper:                            aesHelper,
+		RsaHelper:                            rsaHelper,
+		AbstractUsecase:                      abstractUsecase,
+		UserUsecase:                          userUsecase,
+		ResourceClient:                       resourceClient,
+		HttpAdminResourceUser:                userHandler,
+		HttpAdminAuthenticationAuthenticator: authenticatorHandler,
+		AdminAbstractMiddleware:              abstractMiddleware,
+		AdminAdminMiddleware:                 adminMiddleware,
+		AdminAuthenticationMiddleware:        authenticationMiddleware,
+		AdminDecryptionMiddleware:            decryptionMiddleware,
+		AdminEncryptionMiddleware:            encryptionMiddleware,
+		AdminErrorMiddleware:                 errorMiddleware,
+		AdminLoggerMiddleware:                loggerMiddleware,
+		AdminNonexistentMiddleware:           nonexistentMiddleware,
+		AdminRequestMiddleware:               requestMiddleware,
+		AdminResponseMiddleware:              responseMiddleware,
+		AdminSignatureMiddleware:             signatureMiddleware,
+	}
+	return httpContainer, nil
+}
 
 func InitFacadeContainer() (*FacadeContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
@@ -45,11 +107,11 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	client, err := bootstrap.NewRedis()
+	redisClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, client)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := facade.NewAbstractHandler(aesHelper)
@@ -93,63 +155,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		ResourceModelAdminUser: adminUserHandler,
 	}
 	return resourceContainer, nil
-}
-
-func InitHttpContainer() (*HttpContainer, error) {
-	response := pkg.NewResponse()
-	abstractHelper := helper.NewAbstractHelper()
-	aesHelper := helper.NewAesHelper(abstractHelper)
-	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
-	clientConn := bootstrap.NewResource()
-	model := client.NewModel(clientConn)
-	resourceClient := client.NewResourceClient(clientConn, model)
-	abstractHandler := handler.NewAbstractHandler(response, aesHelper, resourceClient)
-	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
-	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
-	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
-	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
-	decryptionMiddleware := middleware_admin.NewDecryptionMiddleware(abstractMiddleware)
-	encryptionMiddleware := middleware_admin.NewEncryptionMiddleware(abstractMiddleware)
-	errorMiddleware := middleware_admin.NewErrorMiddleware(abstractMiddleware)
-	loggerMiddleware := middleware_admin.NewLoggerMiddleware(abstractMiddleware)
-	nonexistentMiddleware := middleware_admin.NewNonexistentMiddleware(abstractMiddleware)
-	requestMiddleware := middleware_admin.NewRequestMiddleware(abstractMiddleware)
-	responseMiddleware := middleware_admin.NewResponseMiddleware(abstractMiddleware)
-	signatureMiddleware := middleware_admin.NewSignatureMiddleware(abstractMiddleware)
-	httpContainer := &HttpContainer{
-		Response:                      response,
-		AbstractHelper:                abstractHelper,
-		AesHelper:                     aesHelper,
-		RsaHelper:                     rsaHelper,
-		AbstractUsecase:               abstractUsecase,
-		UserUsecase:                   userUsecase,
-		ResourceClient:                resourceClient,
-		HttpAdminResourceUser:         userHandler,
-		AdminAbstractMiddleware:       abstractMiddleware,
-		AdminAdminMiddleware:          adminMiddleware,
-		AdminAuthenticationMiddleware: authenticationMiddleware,
-		AdminDecryptionMiddleware:     decryptionMiddleware,
-		AdminEncryptionMiddleware:     encryptionMiddleware,
-		AdminErrorMiddleware:          errorMiddleware,
-		AdminLoggerMiddleware:         loggerMiddleware,
-		AdminNonexistentMiddleware:    nonexistentMiddleware,
-		AdminRequestMiddleware:        requestMiddleware,
-		AdminResponseMiddleware:       responseMiddleware,
-		AdminSignatureMiddleware:      signatureMiddleware,
-	}
-	return httpContainer, nil
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {
@@ -295,6 +300,42 @@ func InitCommandContainer() (*CommandContainer, error) {
 
 // wire.go:
 
+// HttpContainer 只給 `http` Gin 服務使用。
+type HttpContainer struct {
+
+	// pkg
+	*pkg.Response
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+	*helper.RsaHelper
+
+	*usecase.AbstractUsecase
+	port.UserUsecase
+
+	// Clients
+	ResourceClient *client.ResourceClient
+
+	// HTTP server -Controller
+	HttpAdminResourceUser                *handler2.UserHandler
+	HttpAdminAuthenticationAuthenticator *controller_admin_authentication.AuthenticatorHandler
+
+	// HTTP server -Middleware
+	// Middleware 部分
+	AdminAbstractMiddleware       *middleware_admin.AbstractMiddleware
+	AdminAdminMiddleware          *middleware_admin.AdminMiddleware
+	AdminAuthenticationMiddleware *middleware_admin.AuthenticationMiddleware
+	AdminDecryptionMiddleware     *middleware_admin.DecryptionMiddleware
+	AdminEncryptionMiddleware     *middleware_admin.EncryptionMiddleware
+	AdminErrorMiddleware          *middleware_admin.ErrorMiddleware
+	AdminLoggerMiddleware         *middleware_admin.LoggerMiddleware
+	AdminNonexistentMiddleware    *middleware_admin.NonexistentMiddleware
+	AdminRequestMiddleware        *middleware_admin.RequestMiddleware
+	AdminResponseMiddleware       *middleware_admin.ResponseMiddleware
+	AdminSignatureMiddleware      *middleware_admin.SignatureMiddleware
+}
+
 type FacadeContainer struct {
 
 	// Helper
@@ -325,41 +366,6 @@ type ResourceContainer struct {
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
 	ResourceModelAdminUser *service2.AdminUserHandler
-}
-
-// HttpContainer 只給 `http` Gin 服務使用。
-type HttpContainer struct {
-
-	// pkg
-	*pkg.Response
-
-	// Helper
-	*helper.AbstractHelper
-	*helper.AesHelper
-	*helper.RsaHelper
-
-	*usecase.AbstractUsecase
-	port.UserUsecase
-
-	// Clients
-	ResourceClient *client.ResourceClient
-
-	// HTTP server -Controller
-	HttpAdminResourceUser *handler2.UserHandler
-
-	// HTTP server -Middleware
-	// Middleware 部分
-	AdminAbstractMiddleware       *middleware_admin.AbstractMiddleware
-	AdminAdminMiddleware          *middleware_admin.AdminMiddleware
-	AdminAuthenticationMiddleware *middleware_admin.AuthenticationMiddleware
-	AdminDecryptionMiddleware     *middleware_admin.DecryptionMiddleware
-	AdminEncryptionMiddleware     *middleware_admin.EncryptionMiddleware
-	AdminErrorMiddleware          *middleware_admin.ErrorMiddleware
-	AdminLoggerMiddleware         *middleware_admin.LoggerMiddleware
-	AdminNonexistentMiddleware    *middleware_admin.NonexistentMiddleware
-	AdminRequestMiddleware        *middleware_admin.RequestMiddleware
-	AdminResponseMiddleware       *middleware_admin.ResponseMiddleware
-	AdminSignatureMiddleware      *middleware_admin.SignatureMiddleware
 }
 
 // ConsumerContainer 只給 `consumer` MQ 消費者服務使用。

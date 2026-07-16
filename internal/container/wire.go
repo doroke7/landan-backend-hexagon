@@ -51,6 +51,7 @@ import (
 	outputCache "example/internal/output/cache/model"
 	outputMemory "example/internal/output/memory/model"
 	outputMysql "example/internal/output/mysql/model"
+	outputResourceModel "example/internal/output/resource/model"
 )
 
 // HttpContainer 只給 `http` Gin 服務使用。
@@ -106,6 +107,14 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewRsaHelper,
 		helper.NewCacheHelper,
 
+		// usecase
+		usecaseFacadeModelApplication.NewAbstractUsecase,
+		usecaseFacadeModelApplication.NewUserUsecase,
+
+		// output
+		outputCache.NewUserRepository,
+		outputResourceModel.NewAdminUserRepository,
+
 		// client
 		Client.NewModel,
 		Client.NewResourceClient,
@@ -128,13 +137,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 		MiddlewareAdmin.NewRequestMiddleware,
 		MiddlewareAdmin.NewResponseMiddleware,
 		MiddlewareAdmin.NewSignatureMiddleware,
-
-		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
-
-		// output
-		outputCache.NewUserRepository,
 
 		wire.Struct(new(HttpContainer), "*"),
 	)
