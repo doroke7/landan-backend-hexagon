@@ -51,6 +51,12 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 			oSelf.Response.Set(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
 			return
 		}
+
+		if !errors.Is(oErr, gorm.ErrRecordNotFound) {
+			// 這是正確的判斷方式：處理找不到紀錄的情況
+			oSelf.Response.Set(oContext, 200, -2, oErr.Error(), struct{}{}, "")
+			return
+		}
 	}
 
 	if oAdminUser == nil {
@@ -69,6 +75,7 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 
 	if oErr != nil {
 		oSelf.Response.SetWithNext(oContext, 200, -2, "JWT 產生失敗", struct{}{}, "")
+		return
 	}
 
 	oSelf.Response.SetWithNext(oContext, 200, 1, "成功登入", struct{}{}, sAuthorization)
