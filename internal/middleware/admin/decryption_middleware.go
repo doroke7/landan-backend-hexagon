@@ -8,6 +8,8 @@ import (
 	"unsafe"
 
 	"github.com/gin-gonic/gin"
+
+	"example/pkg"
 )
 
 type DecryptionMiddleware struct {
@@ -44,8 +46,8 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
 		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
 		if err := oContext.ShouldBind(&oRequestPayload); err != nil {
-			///oContext.AbortWithStatus(400)
-			_ = oContext.Error(err)
+			oContext.Abort()
+			_ = oContext.Error(pkg.NewDefaultError("請求格式錯誤", -1, 400))
 
 			return
 		}
@@ -53,8 +55,8 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 
 		sKeys, oErr := oSelf.rsaHelper.Decrypt(sHeaderK, bootstrap.CONFIG.ADMIN.RSA.PRIVATE_KEY)
 		if oErr != nil {
-			oContext.AbortWithStatus(400)
-			_ = oContext.Error(oErr)
+			oContext.Abort()
+			_ = oContext.Error(pkg.NewDefaultError("金鑰解密失敗", -1, 400))
 			return
 		}
 

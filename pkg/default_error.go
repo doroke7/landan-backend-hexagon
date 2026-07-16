@@ -13,3 +13,7 @@ func NewDefaultError(sMessage string, iCode int16, iStatus int16) *DefaultError 
 		Message: sMessage,
 	}
 }
+
+func (oSelf *DefaultError) Error() string {
+	return oSelf.Message
+}

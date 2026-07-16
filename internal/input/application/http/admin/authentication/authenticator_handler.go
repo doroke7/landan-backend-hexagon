@@ -1,12 +1,15 @@
 package controller_admin_authentication
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
+	"example/internal/bootstrap"
 	inputHttpAdmin "example/internal/input/application/http/admin"
 	outputPortModel "example/internal/output/port/any/model"
+	"example/internal/utility"
 )
 
 type AuthenticatorHandler struct {
@@ -29,39 +32,37 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 	sParamPassword := oContext.PostForm("param.password")
 
 	if sParamName == "" {
-		oSelf.Response.SetWithNext(oContext, 200, -1, "name 不能為空", struct{}{}, "")
+		oSelf.Response.Set(oContext, 200, -1, "name 不能為空", struct{}{}, "")
+		return
 	}
 
 	if sParamPassword == "" {
-		oSelf.Response.SetWithNext(oContext, 200, -1, "password 不能為空", struct{}{}, "")
+		oSelf.Response.Set(oContext, 200, -1, "password 不能為空", struct{}{}, "")
+		return
 	}
 
-	oAdminUserModel, err := oSelf.AdminUserModelRepository.ShowOneByName(
+	oAdminUser, oErr := oSelf.AdminUserModelRepository.ShowOneByName(
 		sParamName,
 	)
 
-	if err != nil {
-		oSelf.Response.SetWithNext(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
+	if oErr != nil {
+		if errors.Is(oErr, gorm.ErrRecordNotFound) {
+			// 這是正確的判斷方式：處理找不到紀錄的情況
+			oSelf.Response.Set(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
+			return
+		}
 	}
 
-	fmt.Println(oAdminUserModel)
+	if oAdminUser == nil {
+		oSelf.Response.Set(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
+		return
+	}
 
-	// if oErr != nil {
-	// 	if errors.Is(err, gorm.ErrRecordNotFound) {
-	// 		// 這是正確的判斷方式：處理找不到紀錄的情況
-	// 		oSelf.Response.SetWithNext(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
-	// 	}
-	// }
+	sMd5 := utility.Md5(sParamPassword + bootstrap.CONFIG.TABLE.ADMIN_USER.PASSWORD)
 
-	// if oAdminUser == nil {
-	// 	oSelf.Response.SetWithNext(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
-	// }
-
-	// sMd5 := utility.Md5(sParamPassword + bootstrap.CONFIG.TABLE.ADMIN_USER.PASSWORD)
-
-	// if oAdminUser.Password != sMd5 {
-	// 	oSelf.Response.SetWithNext(oContext, 200, -2, "密碼錯誤", struct{}{}, "")
-	// }
+	if oAdminUser.Password != sMd5 {
+		oSelf.Response.SetWithNext(oContext, 200, -2, "密碼錯誤", struct{}{}, "")
+	}
 
 	// sAuthorization, oErrJwt := oSelf.JwtHelper.Generate(oAdminUser.Id, 0, map[string]any{})
 

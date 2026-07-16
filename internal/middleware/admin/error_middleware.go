@@ -48,7 +48,7 @@ func (oSelf *ErrorMiddleware) Handle() gin.HandlerFunc {
 				case *pkg.DefaultError: // 需要用 *指標， 因為 controller 是用 指標
 					fmt.Printf("[ERROR] %v", oErrorType)
 
-					oSelf.Response.Set(oContext, 200, int(oErrorType.Code), oErrorType.Message, struct{}{}, "")
+					oSelf.Response.Set(oContext, int(oErrorType.Status), int(oErrorType.Code), oErrorType.Message, struct{}{}, "")
 
 				default:
 					iLen := runtime.Stack(oByteStack, false)
@@ -69,7 +69,14 @@ func (oSelf *ErrorMiddleware) Handle() gin.HandlerFunc {
 				iLen := runtime.Stack(byStack, false)
 				fmt.Printf("[ERROR] %s\n%s\n", oLastErr.Error(), byStack[:iLen])
 
-				oSelf.Response.Set(oContext, 200, -4, "系統錯誤", struct{}{}, "")
+				switch oErrorType := oLastErr.Err.(type) {
+				case *pkg.DefaultError:
+					oSelf.Response.Set(oContext, int(oErrorType.Status), int(oErrorType.Code), oErrorType.Message, struct{}{}, "")
+
+				default:
+					oSelf.Response.Set(oContext, 200, -4, "系統錯誤", struct{}{}, "")
+
+				}
 
 				bHasError = true
 			}

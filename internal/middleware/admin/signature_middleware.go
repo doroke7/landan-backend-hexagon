@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
+	"example/pkg"
 )
 
 type SignatureMiddleware struct {
@@ -41,8 +43,10 @@ func (oSelf *SignatureMiddleware) Handle() gin.HandlerFunc {
 
 		if bootstrap.CONFIG.ADMIN.SIGNATURE.STATUS == true {
 			if sMd5Signature != sHeaderSignature {
-				oSelf.Response.Set(oContext, 406, -3, "簽名失敗", struct{}{}, "")
+				oContext.Abort()
+				_ = oContext.Error(pkg.NewDefaultError("簽名失敗", -3, 406))
 
+				return
 			}
 		}
 
