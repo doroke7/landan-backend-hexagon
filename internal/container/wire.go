@@ -36,7 +36,7 @@ import (
 	inputResourceModel "example/internal/input/application/resource/model"
 
 	usecasePortFacadeModel "example/internal/usecase/port/facade/model"
-	usecaseResourceModelPort "example/internal/usecase/port/resource/model"
+	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
 	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
 	usecaseResourceModelApplication "example/internal/usecase/application/resource/model"
@@ -194,7 +194,7 @@ type ResourceContainer struct {
 	*helper.RsaHelper
 
 	*usecaseResourceModelApplication.AbstractUsecase
-	usecaseResourceModelPort.AdminUserUsecase
+	usecasePortResourceModel.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *inputResource.AbstractHandler
