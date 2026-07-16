@@ -85,7 +85,7 @@ func NewResource() *grpc.ClientConn {
 	// 在背景啟動常駐任務，檢查連線
 	go func() {
 		defer ticker.Stop()
-		oLogger.Info("🛡️ gRPC 定時重連守護進程已啟動，每 10s 巡邏一次...")
+		// oLogger.Info("🛡️ gRPC 定時重連守護進程已啟動，每 10s 巡邏一次...")
 
 		for range ticker.C {
 			state := conn.GetState()
