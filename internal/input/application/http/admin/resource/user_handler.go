@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	HttpAdmin "example/internal/input/http/admin"
+	HttpAdmin "example/internal/input/application/http/admin"
 	"example/internal/usecase/port/facade/model"
 	pkg "example/pkg"
 

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	inputResource "example/internal/input/resource"
+	inputResource "example/internal/input/application/resource"
 	port "example/internal/usecase/port/resource/model"
 	pb "example/pb/resource/model"
 )

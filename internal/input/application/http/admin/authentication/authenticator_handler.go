@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	inputHttpAdmin "example/internal/input/http/admin"
+	inputHttpAdmin "example/internal/input/application/http/admin"
 	outputPortModel "example/internal/output/port/any/model"
 )
 

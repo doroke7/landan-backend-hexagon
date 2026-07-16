@@ -3,7 +3,7 @@ package facade
 import (
 	"context"
 
-	inputFacade "example/internal/input/facade"
+	inputFacade "example/internal/input/application/facade"
 	pb "example/pb/facade/register"
 )
 
