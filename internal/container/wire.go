@@ -4,15 +4,8 @@
 package container
 
 /*
-	usecaseFacadeModelApplication.NewUserUsecase的簽名是： func NewUserUsecase(oAbstractUsecase *AbstractUsecase) usecaseFacadeModelPort.UserUsecase
-	回傳型別宣告的是介面 usecaseFacadeModelPort.UserUsecase，不是具體型別 *usecaseFacadeModelApplication.UserUsecase。
 
-	wire 是純靜態分析工具，它只看 provider 函式簽名上寫的型別去做「型別對型別」的精確匹配，不會去看函式內部實際 return &UserUsecase{...} 塞的是什麼具體型別。所以 wire 註冊到的 provider 是「能生產 usecaseFacadeModelPort.UserUsecase」，而不是「能生產 *usecaseFacadeModelApplication.UserUsecase」——即使後者在執行期其實是同一個值。
-
-	AdminUserUsecase（resource 服務專屬）走的是 usecaseResourceModelApplication / usecaseResourceModelPort，
-	跟 facade 以及其他週邊 adapter 共用的 UserUsecase 是完全獨立的兩個 package，
-	因為兩邊的商業邏輯差異太大，故意不共用同一個 AbstractUsecase。
-*/
+ */
 
 import (
 	"github.com/google/wire"
@@ -42,10 +35,10 @@ import (
 	inputResource "example/internal/input/application/resource"
 	inputResourceModel "example/internal/input/application/resource/model"
 
-	usecaseFacadeModelPort "example/internal/usecase/port/facade/model"
+	usecasePortFacadeModel "example/internal/usecase/port/facade/model"
 	usecaseResourceModelPort "example/internal/usecase/port/resource/model"
 
-	usecaseFacadeModelApplication "example/internal/usecase/application/facade/model"
+	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
 	usecaseResourceModelApplication "example/internal/usecase/application/resource/model"
 
 	outputCache "example/internal/output/application/cache/model"
@@ -65,8 +58,8 @@ type HttpContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	usecasePortFacadeModel.UserUsecase
 
 	// Clients
 	ResourceClient *Client.ResourceClient
@@ -108,8 +101,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewCacheHelper,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -150,8 +143,8 @@ type FacadeContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	usecasePortFacadeModel.UserUsecase
 
 	// gRPC Facade server
 	FacadeAbstract           *inputFacade.AbstractHandler
@@ -180,8 +173,8 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		inputFacadeRegister.NewAuthenticatorHandler,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -244,8 +237,8 @@ type ConsumerContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	usecasePortFacadeModel.UserUsecase
 
 	// MQ 消費者
 	ConsumerUser *inputConsumer.UserConsumer
@@ -269,8 +262,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		inputConsumer.NewUserConsumer,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -289,8 +282,8 @@ type CronContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	usecasePortFacadeModel.UserUsecase
 
 	// 排程 server
 	CronUser *inputCron.UserCron
@@ -313,8 +306,8 @@ func InitCronContainer() (*CronContainer, error) {
 		inputCron.NewUserCron,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -333,8 +326,8 @@ type WebsocketContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	usecasePortFacadeModel.UserUsecase
 
 	// websocket server
 	WebsocketUser *inputWebsocket.UserHandler
@@ -357,8 +350,8 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		inputWebsocket.NewUserHandler,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -377,8 +370,8 @@ type ClientContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	usecasePortFacadeModel.UserUsecase
 
 	// gRPC client stream 訂閱
 	ClientUser *inputClient.UserHandler
@@ -405,8 +398,8 @@ func InitClientContainer() (*ClientContainer, error) {
 		inputClient.NewUserHandler,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputCache.NewUserRepository,
@@ -427,8 +420,8 @@ type CommandContainer struct {
 	*inputCommand.AbstractHandler
 	*inputCommand.UserHandler
 
-	*usecaseFacadeModelApplication.AbstractUsecase
-	// usecaseFacadeModelPort.UserUsecase
+	*usecaseApplicationFacadeModel.AbstractUsecase
+	// usecasePortFacadeModel.UserUsecase
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -443,8 +436,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 		inputCommand.NewUserHandler,
 
 		// usecase
-		usecaseFacadeModelApplication.NewAbstractUsecase,
-		usecaseFacadeModelApplication.NewUserUsecase,
+		usecaseApplicationFacadeModel.NewAbstractUsecase,
+		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
 		outputMemory.NewUserRepository,
