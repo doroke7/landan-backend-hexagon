@@ -45,7 +45,7 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
 		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
 		if err := oContext.ShouldBind(&oRequestPayload); err != nil {
-			oContext.AbortWithStatus(400)
+			///oContext.AbortWithStatus(400)
 			_ = oContext.Error(err)
 
 			return
@@ -58,9 +58,6 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 			_ = oContext.Error(oErr)
 			return
 		}
-
-		fmt.Println("46....")
-		fmt.Println("sKeys=", sKeys)
 
 		// Go 的 encoding/json 只能反序列化到 exported（大写开头） 的字段。
 		// 小写字段是 unexported 的，json.Unmarshal 无法访问，
@@ -75,22 +72,26 @@ func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
 
 		oContext.Set("key", oKeys.Key)
 		oContext.Set("iv", oKeys.Iv)
-		fmt.Println("sP=", sP)
 
 		sOption := oSelf.aesHelper.Decrypt(sQueryO, oKeys.Key, oKeys.Iv)
 
 		sSearch := oSelf.aesHelper.Decrypt(sQueryS, oKeys.Key, oKeys.Iv)
+		fmt.Println("sP=", sP)
 
 		sParam := oSelf.aesHelper.Decrypt(sP, oKeys.Key, oKeys.Iv)
+		fmt.Println("ssParamP=", sParam)
 
 		sAuthorizaion := oSelf.aesHelper.Decrypt(sHeaderA, bootstrap.CONFIG.ADMIN.JWT.KEY, bootstrap.CONFIG.ADMIN.JWT.IV)
 		oContext.Set("Authrization", sAuthorizaion)
+
+		fmt.Println("sOption=", sOption)
 
 		oOption, _ := utility.JsonDecode[struct {
 			Size  string `json:"size"`
 			Page  string `json:"page"`
 			AppId string `json:"app_id"`
 		}](sOption)
+		fmt.Println("oOption=", oOption)
 
 		oSearch, _ := utility.JsonDecode[map[string]interface{}](sSearch)
 		oParam, _ := utility.JsonDecode[map[string]interface{}](sParam)
