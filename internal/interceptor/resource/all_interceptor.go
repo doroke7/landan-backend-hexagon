@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	bootstrap "example/internal/bootstrap"
+	bootstrap "example/bootstrap"
 	utility "example/internal/utility"
 
 	"google.golang.org/grpc"

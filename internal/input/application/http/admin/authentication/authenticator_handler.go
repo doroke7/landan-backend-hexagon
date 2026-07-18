@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"example/internal/bootstrap"
+	"example/bootstrap"
 	inputHttpAdmin "example/internal/input/application/http/admin"
 	outputPortModel "example/internal/output/port/any/model"
 	"example/internal/utility"

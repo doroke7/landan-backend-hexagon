@@ -7,7 +7,7 @@
 package container
 
 import (
-	"example/internal/bootstrap"
+	"example/bootstrap"
 	"example/internal/client"
 	"example/internal/helper"
 	client2 "example/internal/input/application/client"

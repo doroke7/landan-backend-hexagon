@@ -12,7 +12,7 @@ import (
 
 	pkg "example/pkg"
 
-	bootstrap "example/internal/bootstrap"
+	bootstrap "example/bootstrap"
 	Client "example/internal/client"
 
 	helper "example/internal/helper"

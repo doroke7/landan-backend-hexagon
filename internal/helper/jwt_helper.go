@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	bootstrap "example/internal/bootstrap"
+	bootstrap "example/bootstrap"
 )
 
 type JwtHelper struct {

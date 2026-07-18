@@ -9,7 +9,7 @@ import (
 
 	"example/pkg"
 
-	"example/internal/bootstrap"
+	"example/bootstrap"
 	"example/internal/utility"
 )
 

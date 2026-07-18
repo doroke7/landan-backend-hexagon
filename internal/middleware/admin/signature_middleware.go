@@ -1,7 +1,7 @@
 package middleware_admin
 
 import (
-	"example/internal/bootstrap"
+	"example/bootstrap"
 	"example/internal/utility"
 	"strings"
 

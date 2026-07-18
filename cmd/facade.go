@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"example/internal/bootstrap"
+	"example/bootstrap"
 	"example/internal/container"
 	"example/internal/register"
 	"log"

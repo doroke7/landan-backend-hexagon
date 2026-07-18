@@ -4,7 +4,7 @@ import (
 	"example/pkg"
 	"net/http"
 
-	bootstrap "example/internal/bootstrap"
+	bootstrap "example/bootstrap"
 	container "example/internal/container"
 )
 
