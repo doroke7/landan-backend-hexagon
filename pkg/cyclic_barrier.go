@@ -1,19 +1,16 @@
-package main
+package pkg
 
 import (
-	"fmt"
 	"sync"
-	"time"
 )
 
 /*
 
 CyclicBarrier 就是把原本 水平切分 N 分的 任務
-然後各自任務 再切為 m 段 step， 
+然後各自任務 再切為 m 段 step，
 每個協程 1段 step 完成才能往下一step
 
 */
-
 
 // CyclicBarrier 結構體
 type CyclicBarrier struct {
@@ -43,17 +40,17 @@ func (oSelf *CyclicBarrier) Await() {
 	// 因為最後一個人到的時候會替換掉 cb.barrier，我們必須保留舊通道的引用來進行 close 廣播。
 	currentBarrier := oSelf.barrier
 
-	if cb.count == oSelf.parties {
+	if oSelf.count == oSelf.parties {
 		// 【情況 A】最後一個人到了！
-		
+
 		oSelf.count = 0                     // 1. 重置計數器
 		oSelf.barrier = make(chan struct{}) // 2. 建立全新的通道（這就是 Cyclic 循環重複使用的關鍵）
-		
-		close(currentBarrier)            // 3. 一個 close 會喚醒所有 取通道的人。
+
+		close(currentBarrier) // 3. 一個 close 會喚醒所有 取通道的人。
 		oSelf.mu.Unlock()
 	} else {
 		// 【情況 B】人還沒到齊
-		oSelf.mu.Unlock()      // 先解鎖，讓其他隊友也能進來 Await()
-		<-currentBarrier    // 卡在舊通道這裡，死等最後一個人來 close 它
+		oSelf.mu.Unlock() // 先解鎖，讓其他隊友也能進來 Await()
+		<-currentBarrier  // 卡在舊通道這裡，死等最後一個人來 close 它
 	}
 }

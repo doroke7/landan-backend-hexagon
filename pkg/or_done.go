@@ -1,25 +1,19 @@
 package pkg
 
-import (
-	"fmt"
-	"time"
-)
 /*
-    思維： Or-Done 是為了解決「用 只用 for-range 思維解決取消 」的結束問題；
+	    思維： Or-Done 是為了解決「用 只用 for-range 思維解決取消 」的結束問題；
 
-	用法：
+		用法：
 
-   	done := make(chan struct{})
-	oChannel := make(chan int)
+	   	done := make(chan struct{})
+		oChannel := make(chan int)
 
-	。。。
-
-
-	for iVal := range OrDone(done, oChannel) {
-		fmt.Printf("👉 成功處理資料: %d\n", iVal)
-	}
+		。。。
 
 
+		for iVal := range OrDone(done, oChannel) {
+			fmt.Printf("👉 成功處理資料: %d\n", iVal)
+		}
 */
 func OrDone[T any](done <-chan struct{}, ch <-chan T) <-chan T {
 	valChan := make(chan T)

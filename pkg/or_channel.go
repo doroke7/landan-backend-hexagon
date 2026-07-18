@@ -1,11 +1,7 @@
 package pkg
 
-import (
-	"fmt"
-	"time"
-)
-
-// 	1. Or-channel 的例子提醒我們，
+//  1. Or-channel 的例子提醒我們，
+//
 // 在go的世界裡面，
 // 我們提供另外一種以 channel 的角度，
 // 去看 race 併發行為。
@@ -35,7 +31,7 @@ func OrChannel(channels ...<-chan struct{}) <-chan struct{} {
 		select {
 		case <-channels[0]:
 		case <-channels[1]:
-		case <-Or(channels[2:]...):
+		case <-OrChannel(channels[2:]...):
 		}
 	}()
 
