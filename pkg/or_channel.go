@@ -5,7 +5,7 @@ package pkg
 // 在go的世界裡面，
 // 我們提供另外一種以 channel 的角度，
 // 去看 race 併發行為。
-// Or 函數：只要傳入的任何一個 channel 關閉，回傳的 channel 就會立刻關閉
+
 func OrChannel(channels ...<-chan struct{}) <-chan struct{} {
 	if len(channels) == 0 {
 		return nil
