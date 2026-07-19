@@ -167,39 +167,25 @@
 
 ## DI 依賴注入樹狀圖（ResourceContainer）
 
-說明：`A --> B` 代表 A 被注入到 B（A 是 B 的建構依賴），HttpContainer 為最底層、最終組裝出來的容器。
+說明：`A --> B` 代表 A 被注入到 B（A 是 B 的建構依賴），ResourceContainer 為最底層、最終組裝出來的容器。
 
 ```mermaid
 graph TD
     subgraph bootstrap
     end
 
-    subgraph pkg
+    subgraph internal/resource
+        Helpers --> Repositories
+        Repositories --> Usecases
+        Usecases --> GrpcHandlers
+
+        Interceptors
+
+        GrpcHandlers --> ResourceContainer
+        Interceptors --> ResourceContainer
     end
 
-    subgraph internal
-        Helpers --> Models
-        Helpers --> Logics
-        Helpers --> Sdks
-        Models --> Logics
-
-        Helpers --> Controllers
-        Models --> Controllers
-        Logics --> Controllers
-        Sdks --> Controllers
-
-        Helpers --> Middlewares
-        Models --> Middlewares
-        Logics --> Middlewares
-        Sdks --> Middlewares
-
-        Controllers --> HttpContainer
-        Middlewares --> HttpContainer
-    end
-
-    bootstrap --> pkg
-    bootstrap --> internal
-    pkg --> internal
+    bootstrap --> internal/resource
 ```
 
 文字版（由下往上）：
