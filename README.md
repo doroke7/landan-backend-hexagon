@@ -164,6 +164,97 @@
 └── pb/                             # protoc 產生的程式碼，對應 proto/ 底下的定義
 ```
 
+
+## DI 依賴注入樹狀圖（HttpContainer）
+
+說明：`A --> B` 代表 A 被注入到 B（A 是 B 的建構依賴），HttpContainer 為最底層、最終組裝出來的容器。
+
+```mermaid
+graph TD
+    subgraph bootstrap
+    end
+
+    subgraph pkg
+    end
+
+    subgraph internal
+        Helpers --> Models
+        Helpers --> Logics
+        Helpers --> Sdks
+        Models --> Logics
+
+        Helpers --> Controllers
+        Models --> Controllers
+        Logics --> Controllers
+        Sdks --> Controllers
+
+        Helpers --> Middlewares
+        Models --> Middlewares
+        Logics --> Middlewares
+        Sdks --> Middlewares
+
+        Controllers --> HttpContainer
+        Middlewares --> HttpContainer
+    end
+
+    bootstrap --> pkg
+    bootstrap --> internal
+    pkg --> internal
+```
+
+文字版（由下往上）：
+```
+┌ bootstrap ──┐
+│             ├─────┐
+└──────┬──────┘     │
+       ▼            │
+┌ pkg ────────┐     │
+│             │     │
+└──────┬──────┘     │
+       │            │
+       │            │
+       │            │
+       ▼            ▼
+┌ internal/resource ────────────────────────────────────────────────────┐
+│                                ┌─────────┐                            │
+│                                │ Helpers │                            │
+│                                └────┬────┘                            │
+│                                     │                                 │
+│                                     │                                 │
+│                                     │                                 │                 
+│                                     ▼                                 │
+│                             ┌────────────────┐                        │
+│                             │ Mysql/Reposity │                        │
+│                             └───────┬────────┘                        │
+│                                     │                                 │
+│                                     ▼                                 │
+│                                ┌─────────┐                            │
+│                                │ Usecase │                            │
+│                                └────┬────┘                            │
+│                                     ▼                                 │
+│                                     │                                 │
+│                                     │                                 │
+│                            ┌────────┴────────┐                        │
+│                            │                 │                        │
+│                            ▼                 ▼                        │
+│                   ┌─────────────────┐  ┌──────────────────┐           │
+│                   │   GrpcHandlers  │  │   Interceptors   │           │
+│                   └────────┬────────┘  └─────┬────────────┘           │
+│                            │                 │                        │
+│                            └────────┬────────┘                        │
+│                                     ▼                                 │
+│                          ┌─────────────────────┐                      │
+│                          │  ResourceContainer  │                      │
+│                          └─────────────────────┘                      │
+└───────────────────────────────────────────────────────────────────────┘
+
+
+
+
+```
+
+
+
 ## 服務拓樸
 
 - **facade**：對外 gRPC 入口（game / register / table），驗證身份後呼叫 usecase。
@@ -181,3 +272,5 @@
 ```zsh
 go install github.com/air-verse/air@latest
 ```
+
+
