@@ -66,3 +66,26 @@ func (oSelf *Aop) Cacheable(oCtx context.Context, sKey string, oTtl time.Duratio
 
 	return nil
 }
+
+// CacheEvict 先執行核心業務 (Join Point：例如更新/刪除 DB)，成功後把對應的快取踢掉
+func (oSelf *Aop) CacheEvict(oCtx context.Context, sKey string, cFn func(oCtx context.Context) error) error {
+
+	// 1. 前置安全檢查
+	if oErr := oCtx.Err(); oErr != nil {
+		return oErr
+	}
+
+	// 2. 執行核心業務 (Join Point：例如更新 MySQL)
+	if oErr := cFn(oCtx); oErr != nil {
+		return oErr
+	}
+
+	// 3. 後置切面 (After Returning)：把快取踢出去
+	if oErr := oSelf.oCache.Del(oCtx, sKey).Err(); oErr != nil && !errors.Is(oErr, redis.Nil) {
+		fmt.Printf("⚠️ [Aop] 快取清除失敗: %v，Key: '%s'\n", oErr, sKey)
+		return oErr
+	}
+
+	fmt.Printf("🗑️ [Aop] 快取已清除。Key: '%s'\n", sKey)
+	return nil
+}
