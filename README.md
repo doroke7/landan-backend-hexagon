@@ -165,7 +165,7 @@
 ```
 
 
-## DI 依賴注入樹狀圖（HttpContainer）
+## DI 依賴注入樹狀圖（ResourceContainer）
 
 說明：`A --> B` 代表 A 被注入到 B（A 是 B 的建構依賴），HttpContainer 為最底層、最終組裝出來的容器。
 
