@@ -175,9 +175,16 @@ graph TD
     end
 
     subgraph internal/resource
-        Helpers --> Repositories
+        Helpers --> MysqlRepositories
+
+        subgraph internal/output
+            MysqlRepositories
+            MemoryRepositories
+            ProducerRepositories
+        end
+
         Helpers --> Usecases
-        Repositories --> Usecases
+        MysqlRepositories --> Usecases
         Usecases --> GrpcHandlers
 
         Interceptors
@@ -210,9 +217,14 @@ graph TD
 │                                                                 │                                                              │   │
 │                                                                 │                                                              │   │
 │                                                                 ▼                                                              │   │
-│                                                       ┌──────────────────┐                                                     │   │
-│                                                       │ Mysql/Reposities │                                                     │   │
-│                                                       └─────────┬────────┘                                                     │   │
+│                           ┌ internal/output ──────────────────────────────────────────────────────────┐                        │   │
+│                           │ ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐ │                        │   │
+│                           │ │  Mysql/Reposities   │  │  Memory/Reposities  │  │ Producer/Reposities │ │                        │   │
+│                           │ └──────────┬──────────┘  └──────────┬──────────┘  └──────────┬──────────┘ │                        │   │
+│                           │            │                        │                        │            │                        │   │
+│                           │            └────────────────────────┴────────────────────────┘            │                        │   │
+│                           │                                     │                                     │                        │   │
+│                           └───────────────────────────────────────────────────────────────────────────┘                        │   │
 │                                                                 │                                                              │   │
 │                                                                 ▼                                                              │   │
 │                                                           ┌───────────┐                                                        │   │
