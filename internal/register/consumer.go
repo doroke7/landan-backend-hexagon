@@ -6,8 +6,7 @@ import (
 )
 
 func ConsumerInit(oContainer *container.ConsumerContainer) *pkg.ConsumerRouter {
-	oRouter := pkg.NewConsumerRouter(oContainer.ConsumerUser.Conn)
-	oRouter.HandleFunc("User.Add", oContainer.ConsumerUser.AddUser)
+	oRouter := pkg.NewConsumerRouter(oContainer.Conn)
 
 	return oRouter
 }

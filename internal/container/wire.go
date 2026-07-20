@@ -261,7 +261,7 @@ type ConsumerContainer struct {
 	usecasePortFacadeModel.UserUsecase
 
 	// MQ 消費者
-	ConsumerUser *inputConsumer.UserConsumer
+	*inputConsumer.AbstractHandler
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {
@@ -279,7 +279,6 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 
 		// input-consumer
 		inputConsumer.NewAbstractHandler,
-		inputConsumer.NewUserConsumer,
 
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,

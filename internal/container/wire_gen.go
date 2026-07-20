@@ -188,16 +188,12 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		return nil, err
 	}
 	abstractHandler := consumer.NewAbstractHandler(aesHelper, connection)
-	userConsumer, err := consumer.NewUserConsumer(userUsecase, abstractHandler)
-	if err != nil {
-		return nil, err
-	}
 	consumerContainer := &ConsumerContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
 		AbstractUsecase: abstractUsecase,
 		UserUsecase:     userUsecase,
-		ConsumerUser:    userConsumer,
+		AbstractHandler: abstractHandler,
 	}
 	return consumerContainer, nil
 }
@@ -387,7 +383,7 @@ type ConsumerContainer struct {
 	port.UserUsecase
 
 	// MQ 消費者
-	ConsumerUser *consumer.UserConsumer
+	*consumer.AbstractHandler
 }
 
 // CronContainer 只給 `cron` 排程服務使用。
