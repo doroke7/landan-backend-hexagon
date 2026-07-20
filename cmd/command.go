@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	container "example/internal/container"
+
 	"github.com/spf13/cobra"
 )
 
@@ -15,5 +17,11 @@ var CommandCommand = &cobra.Command{
 }
 
 func init() {
+	oContainer, err := container.InitCommandContainer()
+	if err != nil {
+		panic(err)
+	}
+
+	CommandCommand.AddCommand(oContainer.CommandAppUser.IncreaseBalance())
 	oRootCommand.AddCommand(CommandCommand)
 }

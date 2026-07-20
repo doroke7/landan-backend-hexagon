@@ -25,6 +25,7 @@ import (
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
+	command2 "example/internal/usecase/application/command"
 	consumer2 "example/internal/usecase/application/consumer"
 	"example/internal/usecase/application/cron"
 	"example/internal/usecase/application/http/admin/authentication"
@@ -208,10 +209,19 @@ func InitCommandContainer() (*CommandContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := command.NewAbstractHandler(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	abstractRepository := mysql.NewAbstractRepository(db)
+	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
+	appUserUsecase := command2.NewAppUserUsecase(appUserRepository)
+	appUserHandler := command.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
 		AbstractHandler: abstractHandler,
+		CommandAppUser:  appUserHandler,
 	}
 	return commandContainer, nil
 }
@@ -336,4 +346,5 @@ type CommandContainer struct {
 
 	// command
 	*command.AbstractHandler
+	CommandAppUser *command.AppUserHandler
 }

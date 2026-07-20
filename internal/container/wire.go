@@ -36,6 +36,7 @@ import (
 
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
+	usecaseApplicationCommand "example/internal/usecase/application/command"
 	usecaseApplicationConsumer "example/internal/usecase/application/consumer"
 	usecaseApplicationCron "example/internal/usecase/application/cron"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
@@ -356,10 +357,14 @@ type CommandContainer struct {
 
 	// command
 	*inputCommand.AbstractHandler
+	CommandAppUser *inputCommand.AppUserHandler
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
 	wire.Build(
+
+		// bootstrap
+		bootstrap.NewMysql,
 
 		// helper
 		helper.NewAbstractHelper,
@@ -367,6 +372,14 @@ func InitCommandContainer() (*CommandContainer, error) {
 
 		// command
 		inputCommand.NewAbstractHandler,
+		inputCommand.NewAppUserHandler,
+
+		// usecase
+		usecaseApplicationCommand.NewAppUserUsecase,
+
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAppUserRepository,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)
