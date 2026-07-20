@@ -3,8 +3,9 @@ package consumer
 import (
 	"encoding/json"
 
-	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 
 	pkg "example/pkg"
 

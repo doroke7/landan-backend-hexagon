@@ -1,7 +1,7 @@
 package client
 
 import (
-	Client "example/internal/client"
+	client "example/internal/client"
 	helper "example/internal/helper"
 )
 
@@ -9,10 +9,10 @@ import (
 // 跟其他 input adapter（grpc / http / consumer）的抽象類各自獨立，互不共用。
 type AbstractHandler struct {
 	*helper.AesHelper
-	Client *Client.Client
+	Client *client.Client
 }
 
-func NewAbstractHandler(oAesHelper *helper.AesHelper, oClient *Client.Client) *AbstractHandler {
+func NewAbstractHandler(oAesHelper *helper.AesHelper, oClient *client.Client) *AbstractHandler {
 	return &AbstractHandler{
 		AesHelper: oAesHelper,
 		Client:    oClient,

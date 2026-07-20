@@ -1,9 +1,9 @@
 package usecase
 
 import (
-	"example/internal/domain"
+	domain "example/internal/domain"
 	outputPortAnyLogic "example/internal/output/port/any/logic"
-	usecasePortResourceLogic "example/internal/usecase/port/any/logic"
+	usecasePortAnyLogic "example/internal/usecase/port/any/logic"
 )
 
 type AppUserUsecase struct {
@@ -11,7 +11,7 @@ type AppUserUsecase struct {
 	outputPortAnyLogic.AppUserRepository
 }
 
-func NewAppUserUsecase(oAppUserRepository outputPortAnyLogic.AppUserRepository, oAbstractUsecase *AbstractUsecase) usecasePortResourceLogic.AppUserUsecase {
+func NewAppUserUsecase(oAppUserRepository outputPortAnyLogic.AppUserRepository, oAbstractUsecase *AbstractUsecase) usecasePortAnyLogic.AppUserUsecase {
 	return &AppUserUsecase{
 		AbstractUsecase:   oAbstractUsecase,
 		AppUserRepository: oAppUserRepository,

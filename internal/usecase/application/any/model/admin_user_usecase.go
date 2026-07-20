@@ -3,17 +3,17 @@ package usecase
 import (
 	"errors"
 
-	"example/internal/domain"
-	inputPort "example/internal/usecase/port/any/model"
-	outputPort "example/internal/output/port/any/model"
+	domain "example/internal/domain"
+	usecasePortAnyModel "example/internal/usecase/port/any/model"
+	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type AdminUserUsecase struct {
 	*AbstractUsecase
-	outputPort.AdminUserRepository
+	outputPortAnyModel.AdminUserRepository
 }
 
-func NewAdminUserUsecase(oAminUserRepository outputPort.AdminUserRepository, oAbstractUsecase *AbstractUsecase) inputPort.AdminUserUsecase {
+func NewAdminUserUsecase(oAminUserRepository outputPortAnyModel.AdminUserRepository, oAbstractUsecase *AbstractUsecase) usecasePortAnyModel.AdminUserUsecase {
 	return &AdminUserUsecase{
 		AbstractUsecase:     oAbstractUsecase,
 		AdminUserRepository: oAminUserRepository,

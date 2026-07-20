@@ -7,19 +7,19 @@ import (
 
 	bootstrap "example/bootstrap"
 
-	inputApplicationHttpAdmin "example/internal/input/application/http"
+	inputApplicationHttp "example/internal/input/application/http"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
 )
 
 type AuthenticatorHandler struct {
-	*inputApplicationHttpAdmin.AbstractHandler
+	*inputApplicationHttp.AbstractHandler
 	AuthenticatorUsecase usecasePortAnyAdminAuthentication.AuthenticatorUsecase
 }
 
 // NewUserHandler 構造函數 (Go 的慣用法)，
 // 相当 PHP 的 __construct()
 
-func NewAuthenticatorHandler(oAbstractHandler *inputApplicationHttpAdmin.AbstractHandler, oAuthenticatorUsecase usecasePortAnyAdminAuthentication.AuthenticatorUsecase) *AuthenticatorHandler {
+func NewAuthenticatorHandler(oAbstractHandler *inputApplicationHttp.AbstractHandler, oAuthenticatorUsecase usecasePortAnyAdminAuthentication.AuthenticatorUsecase) *AuthenticatorHandler {
 	return &AuthenticatorHandler{
 		AbstractHandler:      oAbstractHandler,
 		AuthenticatorUsecase: oAuthenticatorUsecase,

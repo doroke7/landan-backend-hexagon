@@ -2,18 +2,18 @@ package interceptor_facade_admin
 
 import (
 	"context"
-	Helper "example/internal/helper"
+	helper "example/internal/helper"
 
 	"google.golang.org/grpc"
 )
 
 type AbstractInterceptor struct {
-	JwtHelper *Helper.JwtHelper
+	JwtHelper *helper.JwtHelper
 }
 
 func NewAbstractInterceptor() *AbstractInterceptor {
 	return &AbstractInterceptor{
-		JwtHelper: Helper.NewJwtHelper(Helper.NewAbstractHelper()),
+		JwtHelper: helper.NewJwtHelper(helper.NewAbstractHelper()),
 	}
 }
 

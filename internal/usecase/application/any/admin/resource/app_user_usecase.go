@@ -1,16 +1,16 @@
 package any
 
 import (
-	"example/internal/domain"
-	outputPort "example/internal/output/port/any/model"
-	port "example/internal/usecase/port/any/admin/resource"
+	domain "example/internal/domain"
+	outputPortAnyModel "example/internal/output/port/any/model"
+	usecasePortAnyAdminResource "example/internal/usecase/port/any/admin/resource"
 )
 
 type AppUserUsecase struct {
-	outputPort.AppUserRepository
+	outputPortAnyModel.AppUserRepository
 }
 
-func NewAppUserUsecase(oAppUserRepository outputPort.AppUserRepository) port.AppUserUsecase {
+func NewAppUserUsecase(oAppUserRepository outputPortAnyModel.AppUserRepository) usecasePortAnyAdminResource.AppUserUsecase {
 	return &AppUserUsecase{
 		AppUserRepository: oAppUserRepository,
 	}
