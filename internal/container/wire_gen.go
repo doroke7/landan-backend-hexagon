@@ -158,10 +158,10 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := input_application_consumer2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
-		AbstractHelper:  abstractHelper,
-		AesHelper:       aesHelper,
-		AbstractHandler: abstractHandler,
-		ConsumerAppUser: appUserHandler,
+		AbstractHelper:               abstractHelper,
+		AesHelper:                    aesHelper,
+		AbstractHandler:              abstractHandler,
+		ConsumerAdminResourceAppUser: appUserHandler,
 	}
 	return consumerContainer, nil
 }
@@ -308,7 +308,7 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*input_application_consumer.AbstractHandler
-	ConsumerAppUser *input_application_consumer2.AppUserHandler
+	ConsumerAdminResourceAppUser *input_application_consumer2.AppUserHandler
 }
 
 // CronContainer 只給 `cron` 排程服務使用。

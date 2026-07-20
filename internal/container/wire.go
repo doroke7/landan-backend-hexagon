@@ -236,7 +236,7 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*inputApplicationConsumer.AbstractHandler
-	ConsumerAppUser *inputApplicationConsumerAdminResource.AppUserHandler
+	ConsumerAdminResourceAppUser *inputApplicationConsumerAdminResource.AppUserHandler
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {

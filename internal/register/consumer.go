@@ -8,7 +8,7 @@ import (
 
 func ConsumerInit(oContainer *container.ConsumerContainer) *pkg.ConsumerRouter {
 	oRouter := pkg.NewConsumerRouter(oContainer.Conn)
-	oRouter.HandleFunc("AppUser.IncreaseBalance", oContainer.ConsumerAppUser.IncreaseBalance)
+	oRouter.HandleFunc("Admin.Resource.AppUser.IncreaseBalance", oContainer.ConsumerAdminResourceAppUser.IncreaseBalance)
 
 	return oRouter
 }
