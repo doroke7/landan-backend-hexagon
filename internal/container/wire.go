@@ -36,6 +36,7 @@ import (
 
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
+	usecaseApplicationConsumer "example/internal/usecase/application/consumer"
 	usecaseApplicationCron "example/internal/usecase/application/cron"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
@@ -233,12 +234,14 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*inputConsumer.AbstractHandler
+	ConsumerAppUser *inputConsumer.AppUserHandler
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {
 	wire.Build(
 
 		// bootstrap
+		bootstrap.NewMysql,
 		bootstrap.NewAmqp,
 
 		// helper
@@ -247,6 +250,14 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 
 		// input-consumer
 		inputConsumer.NewAbstractHandler,
+		inputConsumer.NewAppUserHandler,
+
+		// usecase
+		usecaseApplicationConsumer.NewAppUserUsecase,
+
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAppUserRepository,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)

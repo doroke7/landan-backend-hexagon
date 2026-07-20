@@ -24,8 +24,8 @@ import (
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
-	resource2 "example/internal/output/application/resource/logic"
 	"example/internal/output/application/resource/model"
+	consumer2 "example/internal/usecase/application/consumer"
 	"example/internal/usecase/application/cron"
 	"example/internal/usecase/application/http/admin/authentication"
 	usecase2 "example/internal/usecase/application/resource/model"
@@ -147,10 +147,19 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		return nil, err
 	}
 	abstractHandler := consumer.NewAbstractHandler(aesHelper, connection)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	abstractRepository := mysql.NewAbstractRepository(db)
+	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
+	appUserUsecase := consumer2.NewAppUserUsecase(appUserRepository)
+	appUserHandler := consumer.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
 		AbstractHandler: abstractHandler,
+		ConsumerAppUser: appUserHandler,
 	}
 	return consumerContainer, nil
 }
@@ -158,7 +167,12 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	appUserRepository := resource2.NewAppUserRepository()
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	abstractRepository := mysql.NewAbstractRepository(db)
+	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
 	appUserUsecase := cron.NewAppUserUsecase(appUserRepository)
 	abstractHandler := cron2.NewAbstractHandler(aesHelper)
 	appUserHandler := cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
@@ -283,6 +297,7 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*consumer.AbstractHandler
+	ConsumerAppUser *consumer.AppUserHandler
 }
 
 // CronContainer 只給 `cron` 排程服務使用。
