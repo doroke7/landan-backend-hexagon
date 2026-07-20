@@ -39,9 +39,6 @@
 
 ## 目錄結構
 
-> 下面標「（孤兒）」的檔案／資料夾是目前 `wire.go` 完全沒有組裝到的死代碼——保留著方便參考寫法，
-> 但不代表正在被任何服務使用；清不清、何時清由你決定，這份文件只負責如實反映現狀。
-
 ```
 .
 ├── main.go                        # 進入點，只呼叫 cmd.Execute()
@@ -51,92 +48,74 @@
 │   ├── resource.go                #   啟動 resource gRPC 服務（資料服務，僅供 facade / http 呼叫）
 │   ├── http.go                    #   啟動 HTTP（Gin）服務
 │   ├── consumer.go                #   啟動 AMQP consumer
-│   ├── client.go / socket.go      #   啟動 gRPC client-side stream 訂閱（目前容器是空殼，見下方）
+│   ├── client.go / socket.go      #   啟動 gRPC client-side stream 訂閱
 │   ├── cron.go                    #   啟動排程服務
-│   ├── websocket.go               #   啟動 websocket 服務（目前容器是空殼，見下方）
+│   ├── websocket.go               #   啟動 websocket 服務
 │   └── command.go                 #   啟動一次性 CLI 指令
 │
 ├── internal/
 │   ├── bootstrap/                 # 讀 CONFIG、建立各種基礎設施連線（mysql / redis / amqp / mongo / grpc client）
-│   ├── domain/                    # 領域物件（entity），跟任何框架、資料庫無關
-│   │   ├── admin_user.go          #   後台管理者，resource 服務 + http 登入在用
-│   │   ├── app_user.go            #   一般使用者（含 Balance 餘額），cron/consumer/command 在用
-│   │   └── user.go                #  （孤兒）舊的 User 垂直切面已整條拔掉，只剩這個型別沒人 import
+│   ├── domain/                    # 領域物件（entity）：AdminUser、AppUser、User，跟框架、資料庫無關
 │   ├── helper/                    # 通用工具（AES、RSA、JWT、Cache 讀寫……），跟業務邏輯無關可到處注入
 │   ├── client/                    # 對外部 gRPC stream server / resource 服務的 client 封裝
 │   │
-│   ├── input/                     # 協議輸入端（driving adapter），只有實作，沒有介面
-│   │   └── application/
+│   ├── input/                     #   協議輸入端（driving adapter），只有實作，沒有介面
+│   │   └── application/           #   不同協議輸入端，不同的端且相同的相對目錄 代表同一個業務輸入。
 │   │       ├── facade/            #   對外 gRPC 入口
-│   │       │   ├── abstract_handler.go
-│   │       │   ├── register/authenticator_handler.go  #  stub，還沒接 usecase
-│   │       │   └── table/scanner_handler.go            #  stub，還沒接 usecase
 │   │       ├── resource/          #   resource 內部 gRPC 服務（僅供 facade / http 呼叫）
-│   │       │   ├── abstract_handler.go
-│   │       │   └── model/admin_user_handler.go
-│   │       ├── http/
-│   │       │   ├── abstract_handler.go
-│   │       │   └── admin/
-│   │       │       ├── authentication/authenticator_handler.go  #  登入，唯一有接 usecase 的 http handler
-│   │       │       └── resource/order_handler.go                #  空殼，預留
-│   │       ├── client/            #   gRPC client（訂閱外部 stream）—— ClientContainer 目前沒有任何
-│   │       │                      #   handler 掛上去，`client` 指令啟動後是空跑
-│   │       │   ├── abstract_handler.go
-│   │       │   └── admin/resource/app_user_handler.go  #（孤兒）沒被 wire 組裝
-│   │       ├── consumer/          #   AMQP consumer handler
-│   │       │   ├── abstract_handler.go     #   帶 amqp.Connection，ConsumerContainer 直接內嵌它
-│   │       │   └── admin/resource/
-│   │       │       ├── app_user_handler.go #   訂閱 queue "AppUser.IncreaseBalance"
-│   │       │       └── order_handler.go    #   空殼，預留
-│   │       ├── cron/              #   排程任務 handler
-│   │       │   ├── abstract_handler.go
-│   │       │   └── admin/resource/app_user_handler.go  # 每分鐘觸發一次 IncreaseBalance(id=1, amount=10)
-│   │       ├── websocket/         #   websocket handler —— WebsocketContainer 目前沒有任何 handler，
-│   │       │   └── abstract_handler.go                  #   `websocket` 指令啟動後只開 port，不處理任何連線
-│   │       └── command/           #   CLI 指令 handler
-│   │           ├── abstract_handler.go
-│   │           └── admin/resource/app_user_handler.go   # `command AppUser-IncreaseBalance --id --amount`
+│   │       ├── http/              #   對外 Http 入口
+│   │       ├── client/            #   gRPC client（訂閱外部 stream）
+│   │       ├── consumer/          #   AMQP consumer
+│   │       ├── cron/              #   排程任務
+│   │       ├── websocket/         #   websocket 入口
+│   │       └── command/           #   CLI 指令
 │   │       （每個 adapter 底下都有自己獨立的 abstract_handler.go，彼此不共用；
 │   │        adapter 內部依 leaf 功能再分 admin/resource、admin/authentication 這種子資料夾，
 │   │        單純是模仿 http 那條路徑的分法，跟權限、後台與否無關）
 │   │
 │   ├── middleware/
-│   │   └── admin/                 # HTTP 專用 middleware 鏈（logger / signature / decryption / encryption / error ...）
+│   │   └── admin/                    # HTTP 專用 middleware 鏈
 │   │
-│   ├── interceptor/                # gRPC 專用攔截器鏈，對應 facade / resource 兩種 server
-│   │   ├── facade/game/
+│   ├── interceptor/                  # gRPC 專用攔截器鏈
+│   │   ├── facade/
+│   │   │   └── game/
 │   │   └── resource/
 │   │
 │   ├── usecase/                   # 商務案例：實作 + 端口介面
 │   │   ├── application/
-│   │   │   └── any/               #  「any」表示這份 usecase 不綁定特定 adapter，可以被多個 driving
-│   │   │                          #   adapter 共用（同一份業務規則、不同觸發管道）；子資料夾用「功能」
-│   │   │                          #   命名，不是用 adapter 命名
-│   │   │       ├── admin/authentication/  #  AuthenticatorUsecase：目前只有 http 登入在用
-│   │   │       ├── admin/resource/        #  AppUserUsecase.IncreaseBalance：cron / consumer / command
-│   │   │       │                          #  三個 adapter 共用同一份實作
-│   │   │       ├── model/                 #  AdminUserUsecase：resource 服務內部專用（直接讀 mysql）
-│   │   │       ├── logic/                 #  （孤兒）AppUserUsecase.AddAppUser，簽名還有型別抄錯的舊 bug
-│   │   │       └── game/ register/ table/ #  （孤兒）只有空的 abstract_usecase.go，預留骨架
+│   │   │   └── any/                       #  「any」表示這份 usecase 不綁定特定 adapter，可以被多個 driving
+│   │   │       │                          # usecase端一種命名結構對應不同input 但是多種輸入
+│   │   │       ├── admin/                 #  後台服務
+│   │   │       │   ├── authentication/    #  登入在用
+│   │   │       │   └── resource/          #  資源
+│   │   │       ├── model/                 #  單一數據服務
+│   │   │       ├── logic/                 #  複雜數據服務
+│   │   │       ├── game/                  #  遊戲邏輯服務
+│   │   │       ├── register/              #  認證服務
+│   │   │       └── table/                 #  地端上報服務
 │   │   └── port/
-│   │       └── any/               #  對應上面每一組的 interface，同樣用「功能」命名
-│   │           ├── admin/authentication/
-│   │           ├── admin/resource/
+│   │       └── any/                       #  對應上面每一組的 interface，同樣用「功能」命名
+│   │           ├── admin/
+│   │           │   ├── authentication/
+│   │           │   └── resource/
 │   │           ├── model/
-│   │           └── logic/         #  （孤兒）
+│   │           └── logic/
 │   │
 │   ├── output/                    # 輸出端（driven adapter）：實作 + 端口介面
 │   │   ├── application/
-│   │   │   ├── mysql/model/       #   AbstractRepository（*gorm.DB） / AdminUserRepository /
-│   │   │   │                      #   AppUserRepository，resource、consumer、cron、command 都在用
-│   │   │   ├── resource/model/    #   AdminUserRepository，透過 gRPC ResourceClient 呼叫 resource 服務
-│   │   │   │                      #   （http 登入用這份，不直接連 DB）
-│   │   │   ├── resource/logic/    #  （孤兒）AppUserRepository，內容是寫死的假資料，沒有真的打 gRPC
-│   │   │   └── producer/model/    #  （孤兒）AMQP UserProducer，舊 User 切面拔掉後沒人呼叫
+│   │   │   ├── mysql/
+│   │   │   │   └── model/         #   
+│   │   │   │                      #   
+│   │   │   ├── resource/
+│   │   │   │   ├── model/         #   AdminUserRepository，透過 gRPC ResourceClient 呼叫 resource 服務
+│   │   │   │   │                  #   （http 登入用這份，不直接連 DB）
+│   │   │   │   └── logic/         #   AppUserRepository
+│   │   │   └── producer/
+│   │   │       └── model/         #   AMQP UserProducer
 │   │   └── port/
 │   │       └── any/               #  跟 usecase/port/any 一樣的命名邏輯：這裡的「介面」不分誰在用，
-│   │           ├── model/         #   UserRepository（孤兒）/ AdminUserRepository / AppUserRepository
-│   │           └── logic/         #  （孤兒）AppUserRepository
+│   │           ├── model/         #   UserRepository / AdminUserRepository / AppUserRepository
+│   │           └── logic/         #   AppUserRepository
 │   │
 │   ├── register/                  # 組裝層：把 container 生好的 handler 註冊到對應的 server/router
 │   │                                #   （grpc.RegisterXxxServer / gin.Group / cron.AddFunc ...），
@@ -145,26 +124,11 @@
 │   └── container/                 # wire 組裝根：wire.go 手寫、wire_gen.go 自動產生，別手改後者
 │       （每個服務各自一個 Container + InitXxxContainer：FacadeContainer / ResourceContainer /
 │        HttpContainer / ConsumerContainer / CronContainer / WebsocketContainer /
-│        ClientContainer / CommandContainer；Websocket、Client 目前是空殼容器，
-│        只裝了 Helper，沒有任何業務 handler）
+│        ClientContainer / CommandContainer）
 │
-├── pkg/                            # 跟 domain 無關、可重用的通用元件
-│   ├── logger.go                    #   pkg.Logger(pkg.Controller / .Middleware / .Cron / .Consumer ...)
-│   │                                 #   依業務模組分類、依 level 拆檔案（runtime/log/<module>/）+ console 輸出
-│   ├── consumer_router.go           #   queue name -> handler 的路由表（AMQP 沒有內建路由機制）
-│   ├── client_router.go             #   多個 client-side 訂閱方法的並行啟動器
-│   ├── websocket_router.go          #   websocket 路由的路徑前綴分組（模仿 gin Group）
-│   ├── cache.go                     #   Redis 快取讀寫封裝
-│   ├── response.go                  #   統一 HTTP 回應格式
-│   ├── default_error.go             #   統一錯誤結構
-│   └── aop.go                       #   泛型 Cacheable / CachePut / CacheEvict，AOP 風格的快取包裝
+├── pkg/                            # 跟 domain 無關、可重用的通用元件（logger / router / cache / response / aop 等泛用工具）
 │
-├── config/                         # viper 讀取的 yaml 設定檔，一個檔案對應一個頂層命名空間
-│   ├── services.yaml                #   各服務監聽 port（http / facade / resource / websocket）
-│   ├── clients.yaml                 #   對外部服務的 client 連線設定
-│   ├── database.yaml / mongodb.yaml / redis.yaml / amqp.yaml
-│   ├── loggers.yaml                 #   pkg.Logger 各分類（default/controller/middleware/...）的目錄與輪替設定
-│   └── ...                          #   admin / app / third / table / partitions / default
+├── config/                         # viper 讀取的 yaml 設定檔，一個檔案對應一個頂層命名空間（services / clients / database / redis / amqp / loggers ...）
 │
 ├── proto/                          # protobuf 原始定義（facade/ 對外、resource/ 資料服務、client/ 外部訂閱）
 └── pb/                             # protoc 產生的程式碼，對應 proto/ 底下的定義
