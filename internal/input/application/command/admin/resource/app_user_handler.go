@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	port "example/internal/usecase/port/command"
+	port "example/internal/usecase/port/command/admin/resource"
 )
 
 type AppUserHandler struct {
@@ -26,7 +26,7 @@ func (oSelf *AppUserHandler) IncreaseBalance() *cobra.Command {
 	var iAmount uint
 
 	var oAppUserIncreaseBalanceCommand = &cobra.Command{
-		Use:   "AppUser-IncreaseBalance",
+		Use:   "Admin-Resource-AppUser-IncreaseBalance",
 		Short: "AppUser-IncreaseBalance 相關命令",
 		Run: func(oCmd *cobra.Command, args []string) {
 			if _, err := oSelf.appUserUsecase.IncreaseBalance(iId, iAmount); err != nil {

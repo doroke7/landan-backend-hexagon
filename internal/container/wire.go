@@ -22,8 +22,8 @@ import (
 	InterceptorFacadeAdmin "example/internal/interceptor/facade/game"
 	InterceptorResource "example/internal/interceptor/resource"
 
-	inputCommand "example/internal/input/application/command"
-	inputConsumer "example/internal/input/application/consumer"
+	inputCommand "example/internal/input/application/command/admin/resource"
+	inputConsumer "example/internal/input/application/consumer/admin/resource"
 	inputCron "example/internal/input/application/cron"
 	inputFacade "example/internal/input/application/facade"
 	inputFacadeRegister "example/internal/input/application/facade/register"
@@ -36,8 +36,8 @@ import (
 
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
-	usecaseApplicationCommand "example/internal/usecase/application/command"
-	usecaseApplicationConsumer "example/internal/usecase/application/consumer"
+	usecaseApplicationCommand "example/internal/usecase/application/command/admin/resource"
+	usecaseApplicationConsumer "example/internal/usecase/application/consumer/admin/resource"
 	usecaseApplicationCron "example/internal/usecase/application/cron"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"

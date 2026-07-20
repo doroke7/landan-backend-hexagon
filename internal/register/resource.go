@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 
 	container "example/internal/container"
-	"example/pkg"
+	pkg "example/pkg"
 
 	pbResourceModel "example/pb/resource/model"
 )

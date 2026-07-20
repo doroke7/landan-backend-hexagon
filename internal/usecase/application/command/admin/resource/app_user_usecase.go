@@ -1,9 +1,9 @@
-package consumer
+package command
 
 import (
 	"example/internal/domain"
 	outputPort "example/internal/output/port/any/model"
-	port "example/internal/usecase/port/consumer"
+	port "example/internal/usecase/port/command/admin/resource"
 )
 
 type AppUserUsecase struct {

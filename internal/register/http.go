@@ -1,9 +1,9 @@
 package register
 
 import (
-	"example/internal/container"
-
 	"github.com/gin-gonic/gin"
+
+	container "example/internal/container"
 )
 
 func adminMiddlewares(oContainer *container.HttpContainer) []gin.HandlerFunc {
