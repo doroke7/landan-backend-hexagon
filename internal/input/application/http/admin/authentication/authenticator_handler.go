@@ -6,7 +6,7 @@ import (
 	bootstrap "example/bootstrap"
 	utility "example/internal/utility"
 
-	inputHttpAdmin "example/internal/input/application/http/admin"
+	inputHttpAdmin "example/internal/input/application/http"
 	port "example/internal/usecase/port/http/admin/authentication"
 )
 

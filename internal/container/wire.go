@@ -26,11 +26,12 @@ import (
 	inputCommandAdminResource "example/internal/input/application/command/admin/resource"
 	inputConsumer "example/internal/input/application/consumer"
 	inputConsumerAdminResource "example/internal/input/application/consumer/admin/resource"
-	inputCron "example/internal/input/application/cron/admin/resource"
+	inputCron "example/internal/input/application/cron"
+	inputCronAdminResource "example/internal/input/application/cron/admin/resource"
 	inputFacade "example/internal/input/application/facade"
 	inputFacadeRegister "example/internal/input/application/facade/register"
 	inputFacadeTable "example/internal/input/application/facade/table"
-	inputHttpAdmin "example/internal/input/application/http/admin"
+	inputHttpAdmin "example/internal/input/application/http"
 	inputHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
 
 	inputResource "example/internal/input/application/resource"
@@ -277,7 +278,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *inputCron.AppUserHandler
+	CronAppUser *inputCronAdminResource.AppUserHandler
 }
 
 func InitCronContainer() (*CronContainer, error) {
@@ -299,7 +300,7 @@ func InitCronContainer() (*CronContainer, error) {
 
 		// input-cron
 		inputCron.NewAbstractHandler,
-		inputCron.NewAppUserHandler,
+		inputCronAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(CronContainer), "*"),
 	)

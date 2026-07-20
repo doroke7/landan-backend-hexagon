@@ -1,6 +1,7 @@
 package cron
 
 import (
+	inputCron "example/internal/input/application/cron"
 	port "example/internal/usecase/port/cron/admin/resource"
 	pkg "example/pkg"
 
@@ -8,11 +9,11 @@ import (
 )
 
 type AppUserHandler struct {
-	*AbstractHandler
+	*inputCron.AbstractHandler
 	appUserUsecase port.AppUserUsecase
 }
 
-func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *AbstractHandler) *AppUserHandler {
+func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *inputCron.AbstractHandler) *AppUserHandler {
 	return &AppUserHandler{
 		AbstractHandler: oAbstractHandler,
 		appUserUsecase:  oAppUserUsecase,
