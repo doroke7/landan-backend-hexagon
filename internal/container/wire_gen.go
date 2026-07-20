@@ -10,8 +10,10 @@ import (
 	"example/bootstrap"
 	"example/internal/client"
 	"example/internal/helper"
-	"example/internal/input/application/command/admin/resource"
-	"example/internal/input/application/consumer/admin/resource"
+	"example/internal/input/application/command"
+	command3 "example/internal/input/application/command/admin/resource"
+	"example/internal/input/application/consumer"
+	consumer3 "example/internal/input/application/consumer/admin/resource"
 	cron2 "example/internal/input/application/cron/admin/resource"
 	"example/internal/input/application/facade"
 	facade3 "example/internal/input/application/facade/register"
@@ -155,7 +157,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	abstractRepository := mysql.NewAbstractRepository(db)
 	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
 	appUserUsecase := consumer2.NewAppUserUsecase(appUserRepository)
-	appUserHandler := consumer.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserHandler := consumer3.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
@@ -216,7 +218,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 	abstractRepository := mysql.NewAbstractRepository(db)
 	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
 	appUserUsecase := command2.NewAppUserUsecase(appUserRepository)
-	appUserHandler := command.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserHandler := command3.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
@@ -307,7 +309,7 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*consumer.AbstractHandler
-	ConsumerAppUser *consumer.AppUserHandler
+	ConsumerAppUser *consumer3.AppUserHandler
 }
 
 // CronContainer 只給 `cron` 排程服務使用。
@@ -346,5 +348,5 @@ type CommandContainer struct {
 
 	// command
 	*command.AbstractHandler
-	CommandAppUser *command.AppUserHandler
+	CommandAppUser *command3.AppUserHandler
 }

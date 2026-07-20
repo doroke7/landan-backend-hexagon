@@ -5,15 +5,16 @@ import (
 
 	"github.com/spf13/cobra"
 
+	inputCommand "example/internal/input/application/command"
 	port "example/internal/usecase/port/command/admin/resource"
 )
 
 type AppUserHandler struct {
-	*AbstractHandler
+	*inputCommand.AbstractHandler
 	appUserUsecase port.AppUserUsecase
 }
 
-func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *AbstractHandler) *AppUserHandler {
+func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *inputCommand.AbstractHandler) *AppUserHandler {
 	return &AppUserHandler{
 		AbstractHandler: oAbstractHandler,
 		appUserUsecase:  oAppUserUsecase,

@@ -22,8 +22,10 @@ import (
 	InterceptorFacadeAdmin "example/internal/interceptor/facade/game"
 	InterceptorResource "example/internal/interceptor/resource"
 
-	inputCommand "example/internal/input/application/command/admin/resource"
-	inputConsumer "example/internal/input/application/consumer/admin/resource"
+	inputCommand "example/internal/input/application/command"
+	inputCommandAdminResource "example/internal/input/application/command/admin/resource"
+	inputConsumer "example/internal/input/application/consumer"
+	inputConsumerAdminResource "example/internal/input/application/consumer/admin/resource"
 	inputCron "example/internal/input/application/cron/admin/resource"
 	inputFacade "example/internal/input/application/facade"
 	inputFacadeRegister "example/internal/input/application/facade/register"
@@ -235,7 +237,7 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*inputConsumer.AbstractHandler
-	ConsumerAppUser *inputConsumer.AppUserHandler
+	ConsumerAppUser *inputConsumerAdminResource.AppUserHandler
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {
@@ -258,7 +260,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 
 		// input-consumer
 		inputConsumer.NewAbstractHandler,
-		inputConsumer.NewAppUserHandler,
+		inputConsumerAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -357,7 +359,7 @@ type CommandContainer struct {
 
 	// command
 	*inputCommand.AbstractHandler
-	CommandAppUser *inputCommand.AppUserHandler
+	CommandAppUser *inputCommandAdminResource.AppUserHandler
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -379,7 +381,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 
 		// command
 		inputCommand.NewAbstractHandler,
-		inputCommand.NewAppUserHandler,
+		inputCommandAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)

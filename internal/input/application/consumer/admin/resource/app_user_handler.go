@@ -5,6 +5,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
+	inputConsumer "example/internal/input/application/consumer"
 	port "example/internal/usecase/port/consumer/admin/resource"
 	pkg "example/pkg"
 
@@ -17,11 +18,11 @@ type increaseBalanceMessage struct {
 }
 
 type AppUserHandler struct {
-	*AbstractHandler
+	*inputConsumer.AbstractHandler
 	appUserUsecase port.AppUserUsecase
 }
 
-func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *AbstractHandler) *AppUserHandler {
+func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *inputConsumer.AbstractHandler) *AppUserHandler {
 	return &AppUserHandler{
 		AbstractHandler: oAbstractHandler,
 		appUserUsecase:  oAppUserUsecase,
