@@ -27,11 +27,11 @@ DROP TABLE IF EXISTS `tx-admin_users`;
 
 CREATE TABLE `tx-admin_users` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `password` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `tx-admin_users` WRITE;
 /*!40000 ALTER TABLE `tx-admin_users` DISABLE KEYS */;
@@ -41,6 +41,18 @@ VALUES
 	(1,'admin','55b764578f3e645474b770f25ed9eab0');
 
 /*!40000 ALTER TABLE `tx-admin_users` ENABLE KEYS */;
+
+
+CREATE TABLE `tx-app_users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `password` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+   `balance` int unsigned CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 UNLOCK TABLES;
 
 
