@@ -8,40 +8,41 @@ package container
  */
 
 import (
+	bootstrap "example/bootstrap"
+
 	"github.com/google/wire"
 
 	pkg "example/pkg"
 
-	bootstrap "example/bootstrap"
-	Client "example/internal/client"
+	client "example/internal/client"
 
 	helper "example/internal/helper"
 
-	MiddlewareAdmin "example/internal/middleware/admin"
+	middlewareAdmin "example/internal/middleware/admin"
 
-	InterceptorFacadeAdmin "example/internal/interceptor/facade/game"
-	InterceptorResource "example/internal/interceptor/resource"
+	interceptorFacadeGame "example/internal/interceptor/facade/game"
+	interceptorResource "example/internal/interceptor/resource"
 
-	inputCommand "example/internal/input/application/command"
-	inputCommandAdminResource "example/internal/input/application/command/admin/resource"
-	inputConsumer "example/internal/input/application/consumer"
-	inputConsumerAdminResource "example/internal/input/application/consumer/admin/resource"
-	inputCron "example/internal/input/application/cron"
-	inputCronAdminResource "example/internal/input/application/cron/admin/resource"
-	inputFacade "example/internal/input/application/facade"
-	inputFacadeRegister "example/internal/input/application/facade/register"
-	inputFacadeTable "example/internal/input/application/facade/table"
-	inputHttpAdmin "example/internal/input/application/http"
-	inputHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
+	inputApplicationCommand "example/internal/input/application/command"
+	inputApplicationCommandAdminResource "example/internal/input/application/command/admin/resource"
+	inputApplicationConsumer "example/internal/input/application/consumer"
+	inputApplicationConsumerAdminResource "example/internal/input/application/consumer/admin/resource"
+	inputApplicationCron "example/internal/input/application/cron"
+	inputApplicationCronAdminResource "example/internal/input/application/cron/admin/resource"
+	inputApplicationFacade "example/internal/input/application/facade"
+	inputApplicationFacadeRegister "example/internal/input/application/facade/register"
+	inputApplicationFacadeTable "example/internal/input/application/facade/table"
+	inputApplicationHttp "example/internal/input/application/http"
+	inputApplicationHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
 
-	inputResource "example/internal/input/application/resource"
-	inputResourceModel "example/internal/input/application/resource/model"
+	inputApplicationResource "example/internal/input/application/resource"
+	inputApplicationResourceModel "example/internal/input/application/resource/model"
 
-	usecasePortResourceModel "example/internal/usecase/port/any/model"
+	usecasePortAnyModel "example/internal/usecase/port/any/model"
 
-	usecaseApplicationAny "example/internal/usecase/application/any/admin/resource"
-	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
-	usecaseApplicationResourceModel "example/internal/usecase/application/any/model"
+	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
+	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
+	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
 
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
@@ -60,24 +61,24 @@ type HttpContainer struct {
 	*helper.JwtHelper
 
 	// Clients
-	ResourceClient *Client.ResourceClient
+	ResourceClient *client.ResourceClient
 
 	// HTTP server -Controller
-	HttpAdminAuthenticationAuthenticator *inputHttpAdminAuthentication.AuthenticatorHandler
+	HttpAdminAuthenticationAuthenticator *inputApplicationHttpAdminAuthentication.AuthenticatorHandler
 
 	// HTTP server -Middleware
 	// Middleware 部分
-	AdminAbstractMiddleware       *MiddlewareAdmin.AbstractMiddleware
-	AdminAdminMiddleware          *MiddlewareAdmin.AdminMiddleware
-	AdminAuthenticationMiddleware *MiddlewareAdmin.AuthenticationMiddleware
-	AdminDecryptionMiddleware     *MiddlewareAdmin.DecryptionMiddleware
-	AdminEncryptionMiddleware     *MiddlewareAdmin.EncryptionMiddleware
-	AdminErrorMiddleware          *MiddlewareAdmin.ErrorMiddleware
-	AdminLoggerMiddleware         *MiddlewareAdmin.LoggerMiddleware
-	AdminNonexistentMiddleware    *MiddlewareAdmin.NonexistentMiddleware
-	AdminRequestMiddleware        *MiddlewareAdmin.RequestMiddleware
-	AdminResponseMiddleware       *MiddlewareAdmin.ResponseMiddleware
-	AdminSignatureMiddleware      *MiddlewareAdmin.SignatureMiddleware
+	AdminAbstractMiddleware       *middlewareAdmin.AbstractMiddleware
+	AdminAdminMiddleware          *middlewareAdmin.AdminMiddleware
+	AdminAuthenticationMiddleware *middlewareAdmin.AuthenticationMiddleware
+	AdminDecryptionMiddleware     *middlewareAdmin.DecryptionMiddleware
+	AdminEncryptionMiddleware     *middlewareAdmin.EncryptionMiddleware
+	AdminErrorMiddleware          *middlewareAdmin.ErrorMiddleware
+	AdminLoggerMiddleware         *middlewareAdmin.LoggerMiddleware
+	AdminNonexistentMiddleware    *middlewareAdmin.NonexistentMiddleware
+	AdminRequestMiddleware        *middlewareAdmin.RequestMiddleware
+	AdminResponseMiddleware       *middlewareAdmin.ResponseMiddleware
+	AdminSignatureMiddleware      *middlewareAdmin.SignatureMiddleware
 }
 
 func InitHttpContainer() (*HttpContainer, error) {
@@ -99,30 +100,30 @@ func InitHttpContainer() (*HttpContainer, error) {
 		outputApplicationResourceModel.NewAdminUserRepository,
 
 		// usecase
-		usecaseApplicationHttpAdminAuthentication.NewAbstractUsecase,
-		usecaseApplicationHttpAdminAuthentication.NewAuthenticatorUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAbstractUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAuthenticatorUsecase,
 
 		// client
-		Client.NewModel,
-		Client.NewResourceClient,
+		client.NewModel,
+		client.NewResourceClient,
 
 		// input-http
-		inputHttpAdmin.NewAbstractHandler,
+		inputApplicationHttp.NewAbstractHandler,
 
-		inputHttpAdminAuthentication.NewAuthenticatorHandler,
+		inputApplicationHttpAdminAuthentication.NewAuthenticatorHandler,
 
 		// Middleware 部分
-		MiddlewareAdmin.NewAbstractMiddleware,
-		MiddlewareAdmin.NewAdminMiddleware,
-		MiddlewareAdmin.NewAuthenticationMiddleware,
-		MiddlewareAdmin.NewDecryptionMiddleware,
-		MiddlewareAdmin.NewEncryptionMiddleware,
-		MiddlewareAdmin.NewErrorMiddleware,
-		MiddlewareAdmin.NewLoggerMiddleware,
-		MiddlewareAdmin.NewNonexistentMiddleware,
-		MiddlewareAdmin.NewRequestMiddleware,
-		MiddlewareAdmin.NewResponseMiddleware,
-		MiddlewareAdmin.NewSignatureMiddleware,
+		middlewareAdmin.NewAbstractMiddleware,
+		middlewareAdmin.NewAdminMiddleware,
+		middlewareAdmin.NewAuthenticationMiddleware,
+		middlewareAdmin.NewDecryptionMiddleware,
+		middlewareAdmin.NewEncryptionMiddleware,
+		middlewareAdmin.NewErrorMiddleware,
+		middlewareAdmin.NewLoggerMiddleware,
+		middlewareAdmin.NewNonexistentMiddleware,
+		middlewareAdmin.NewRequestMiddleware,
+		middlewareAdmin.NewResponseMiddleware,
+		middlewareAdmin.NewSignatureMiddleware,
 
 		wire.Struct(new(HttpContainer), "*"),
 	)
@@ -137,15 +138,15 @@ type FacadeContainer struct {
 	*helper.RsaHelper
 
 	// gRPC Facade server
-	FacadeAbstract           *inputFacade.AbstractHandler
-	FacadeTableScanner       *inputFacadeTable.ScannerHandler
-	FacadeTableAuthenticator *inputFacadeRegister.AuthenticatorHandler
+	FacadeAbstract           *inputApplicationFacade.AbstractHandler
+	FacadeTableScanner       *inputApplicationFacadeTable.ScannerHandler
+	FacadeTableAuthenticator *inputApplicationFacadeRegister.AuthenticatorHandler
 
 	// gRPC Facade Interceptor
-	FacadeAdminErrorInterceptor          *InterceptorFacadeAdmin.ErrorInterceptor
-	FacadeAdminStatusInterceptor         *InterceptorFacadeAdmin.StatusInterceptor
-	FacadeAdminLoggerInterceptor         *InterceptorFacadeAdmin.LoggerInterceptor
-	FacadeAdminAuthenticationInterceptor *InterceptorFacadeAdmin.AuthenticationInterceptor
+	FacadeAdminErrorInterceptor          *interceptorFacadeGame.ErrorInterceptor
+	FacadeAdminStatusInterceptor         *interceptorFacadeGame.StatusInterceptor
+	FacadeAdminLoggerInterceptor         *interceptorFacadeGame.LoggerInterceptor
+	FacadeAdminAuthenticationInterceptor *interceptorFacadeGame.AuthenticationInterceptor
 }
 
 func InitFacadeContainer() (*FacadeContainer, error) {
@@ -157,16 +158,16 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		helper.NewRsaHelper,
 
 		// input-facade
-		inputFacade.NewAbstractHandler,
-		inputFacadeTable.NewScannerHandler,
-		inputFacadeRegister.NewAuthenticatorHandler,
+		inputApplicationFacade.NewAbstractHandler,
+		inputApplicationFacadeTable.NewScannerHandler,
+		inputApplicationFacadeRegister.NewAuthenticatorHandler,
 
 		// interceptor-facade
-		InterceptorFacadeAdmin.NewAbstractInterceptor,
-		InterceptorFacadeAdmin.NewErrorInterceptor,
-		InterceptorFacadeAdmin.NewStatusInterceptor,
-		InterceptorFacadeAdmin.NewLoggerInterceptor,
-		InterceptorFacadeAdmin.NewAuthenticationInterceptor,
+		interceptorFacadeGame.NewAbstractInterceptor,
+		interceptorFacadeGame.NewErrorInterceptor,
+		interceptorFacadeGame.NewStatusInterceptor,
+		interceptorFacadeGame.NewLoggerInterceptor,
+		interceptorFacadeGame.NewAuthenticationInterceptor,
 
 		wire.Struct(new(FacadeContainer), "*"),
 	)
@@ -182,15 +183,15 @@ type ResourceContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseApplicationResourceModel.AbstractUsecase
-	usecasePortResourceModel.AdminUserUsecase
+	*usecaseApplicationAnyModel.AbstractUsecase
+	usecasePortAnyModel.AdminUserUsecase
 
 	// gRPC Resource server
-	ResourceAbstract       *inputResource.AbstractHandler
-	ResourceModelAdminUser *inputResourceModel.AdminUserHandler
+	ResourceAbstract       *inputApplicationResource.AbstractHandler
+	ResourceModelAdminUser *inputApplicationResourceModel.AdminUserHandler
 
 	// gRPC Resource Interceptor
-	ResourceAllInterceptor *InterceptorResource.AllInterceptor
+	ResourceAllInterceptor *interceptorResource.AllInterceptor
 }
 
 func InitResourceContainer() (*ResourceContainer, error) {
@@ -209,16 +210,16 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		// usecase
-		usecaseApplicationResourceModel.NewAbstractUsecase,
-		usecaseApplicationResourceModel.NewAdminUserUsecase,
+		usecaseApplicationAnyModel.NewAbstractUsecase,
+		usecaseApplicationAnyModel.NewAdminUserUsecase,
 
 		// input-resource
-		inputResource.NewAbstractHandler,
-		inputResourceModel.NewAdminUserHandler,
+		inputApplicationResource.NewAbstractHandler,
+		inputApplicationResourceModel.NewAdminUserHandler,
 
 		// interceptor-resource
-		InterceptorResource.NewAbstractInterceptor,
-		InterceptorResource.NewAllInterceptor,
+		interceptorResource.NewAbstractInterceptor,
+		interceptorResource.NewAllInterceptor,
 
 		wire.Struct(new(ResourceContainer), "*"),
 	)
@@ -235,8 +236,8 @@ type ConsumerContainer struct {
 	*helper.AesHelper
 
 	// MQ 消費者
-	*inputConsumer.AbstractHandler
-	ConsumerAppUser *inputConsumerAdminResource.AppUserHandler
+	*inputApplicationConsumer.AbstractHandler
+	ConsumerAppUser *inputApplicationConsumerAdminResource.AppUserHandler
 }
 
 func InitConsumerContainer() (*ConsumerContainer, error) {
@@ -255,11 +256,11 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
-		usecaseApplicationAny.NewAppUserUsecase,
+		usecaseApplicationAnyAdminResource.NewAppUserUsecase,
 
 		// input-consumer
-		inputConsumer.NewAbstractHandler,
-		inputConsumerAdminResource.NewAppUserHandler,
+		inputApplicationConsumer.NewAbstractHandler,
+		inputApplicationConsumerAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -276,7 +277,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *inputCronAdminResource.AppUserHandler
+	CronAppUser *inputApplicationCronAdminResource.AppUserHandler
 }
 
 func InitCronContainer() (*CronContainer, error) {
@@ -294,11 +295,11 @@ func InitCronContainer() (*CronContainer, error) {
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
-		usecaseApplicationAny.NewAppUserUsecase,
+		usecaseApplicationAnyAdminResource.NewAppUserUsecase,
 
 		// input-cron
-		inputCron.NewAbstractHandler,
-		inputCronAdminResource.NewAppUserHandler,
+		inputApplicationCron.NewAbstractHandler,
+		inputApplicationCronAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -357,8 +358,8 @@ type CommandContainer struct {
 	*helper.AesHelper
 
 	// command
-	*inputCommand.AbstractHandler
-	CommandAppUser *inputCommandAdminResource.AppUserHandler
+	*inputApplicationCommand.AbstractHandler
+	CommandAppUser *inputApplicationCommandAdminResource.AppUserHandler
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -376,11 +377,11 @@ func InitCommandContainer() (*CommandContainer, error) {
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
-		usecaseApplicationAny.NewAppUserUsecase,
+		usecaseApplicationAnyAdminResource.NewAppUserUsecase,
 
 		// command
-		inputCommand.NewAbstractHandler,
-		inputCommandAdminResource.NewAppUserHandler,
+		inputApplicationCommand.NewAbstractHandler,
+		inputApplicationCommandAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)
