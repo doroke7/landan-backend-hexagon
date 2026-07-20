@@ -1,4 +1,4 @@
-package input_application_cron
+package cron
 
 import (
 	"go.uber.org/zap"

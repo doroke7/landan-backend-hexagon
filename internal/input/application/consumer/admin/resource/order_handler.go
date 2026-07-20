@@ -1,1 +1,1 @@
-package input_application_consumer
+package consumer

@@ -1,4 +1,4 @@
-package input_application_resource
+package service
 
 import (
 	"context"

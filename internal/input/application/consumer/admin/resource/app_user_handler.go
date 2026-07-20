@@ -1,4 +1,4 @@
-package input_application_consumer
+package consumer
 
 import (
 	"encoding/json"

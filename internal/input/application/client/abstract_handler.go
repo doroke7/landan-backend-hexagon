@@ -1,4 +1,4 @@
-package input_application_client
+package client
 
 import (
 	Client "example/internal/client"

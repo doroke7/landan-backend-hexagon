@@ -1,4 +1,4 @@
-package output_application_resource
+package resource
 
 import (
 	domain "example/internal/domain"

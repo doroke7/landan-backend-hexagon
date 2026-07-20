@@ -1,4 +1,4 @@
-package output_port_any
+package logic
 
 import (
 	domain "example/internal/domain"

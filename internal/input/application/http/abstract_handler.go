@@ -1,4 +1,4 @@
-package input_application_http
+package handler
 
 import (
 	pkg "example/pkg"

@@ -1,4 +1,4 @@
-package output_port_any
+package port
 
 import (
 	domain "example/internal/domain"

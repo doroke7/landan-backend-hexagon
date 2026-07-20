@@ -1,4 +1,4 @@
-package output_application_producer
+package producer
 
 import (
 	"encoding/json"
