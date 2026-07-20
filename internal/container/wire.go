@@ -214,6 +214,7 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		usecaseApplicationResourceModel.NewAdminUserUsecase,
 
 		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
@@ -268,6 +269,9 @@ type CronContainer struct {
 func InitCronContainer() (*CronContainer, error) {
 	wire.Build(
 
+		// bootstrap
+		bootstrap.NewMysql,
+
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
@@ -278,6 +282,10 @@ func InitCronContainer() (*CronContainer, error) {
 
 		// usecase
 		usecaseApplicationCron.NewAppUserUsecase,
+
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAppUserRepository,
 
 		wire.Struct(new(CronContainer), "*"),
 	)

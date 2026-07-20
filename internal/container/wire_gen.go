@@ -24,6 +24,7 @@ import (
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
+	resource2 "example/internal/output/application/resource/logic"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/cron"
 	"example/internal/usecase/application/http/admin/authentication"
@@ -118,7 +119,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	adminUserRepository := mysql.NewAdminUserRepository(db)
+	abstractRepository := mysql.NewAbstractRepository(db)
+	adminUserRepository := mysql.NewAdminUserRepository(abstractRepository)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
@@ -156,7 +158,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	appUserUsecase := cron.NewAppUserUsecase()
+	appUserRepository := resource2.NewAppUserRepository()
+	appUserUsecase := cron.NewAppUserUsecase(appUserRepository)
 	abstractHandler := cron2.NewAbstractHandler(aesHelper)
 	appUserHandler := cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	cronContainer := &CronContainer{

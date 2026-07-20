@@ -6,15 +6,17 @@ import (
 	"gorm.io/gorm"
 
 	"example/internal/domain"
-	"example/internal/output/port/any/model"
+	port "example/internal/output/port/any/model"
 )
 
 type AdminUserRepository struct {
-	db *gorm.DB
+	*AbstractRepository
 }
 
-func NewAdminUserRepository(db *gorm.DB) port.AdminUserRepository {
-	return &AdminUserRepository{db: db}
+func NewAdminUserRepository(oAbstractRepository *AbstractRepository) port.AdminUserRepository {
+	return &AdminUserRepository{
+		AbstractRepository: oAbstractRepository,
+	}
 }
 
 func (oSelf *AdminUserRepository) ShowOneByName(sName string) (*domain.AdminUser, error) {

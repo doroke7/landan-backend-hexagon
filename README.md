@@ -273,6 +273,6 @@ go install github.com/air-verse/air@latest
 
 
 ## 代碼開發流程(以 Http 為例子)
-1. 建立新的 Http handlers， 註冊到 container， container 再註冊到 路由上
-2. 建立新的 usecase/application/http + usecase/port/http ，把 實作註冊到 container， 修改   Http handlers 讓 usecase（port） 注入
-3. 建立新的 output/application/mysql/model +  output/port/mysql/model，把實作註冊到 container， 修改 usecase 讓 repo-port 注入
+1. input：建立新的 Http handlers， 註冊到 container， container 再註冊到 路由上
+2. usecase：建立新的 usecase/application/http + usecase/port/http ，把 實作註冊到 container， 修改   Http handlers 讓 usecase（port） 注入
+3. output：建立新的 output/application/mysql/model +  output/port/any/model，把實作註冊到 container， 修改 usecase 讓 repo-port 注入
