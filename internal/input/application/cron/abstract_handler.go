@@ -1,4 +1,4 @@
-package input_application
+package input_application_cron
 
 import (
 	helper "example/internal/helper"

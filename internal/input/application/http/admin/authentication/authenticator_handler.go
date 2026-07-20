@@ -1,4 +1,4 @@
-package input_application
+package input_application_http
 
 import (
 	"github.com/gin-gonic/gin"

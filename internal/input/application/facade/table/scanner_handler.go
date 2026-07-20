@@ -1,4 +1,4 @@
-package input_application
+package input_application_facade
 
 import (
 	"context"

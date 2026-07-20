@@ -10,19 +10,19 @@ import (
 	"example/bootstrap"
 	"example/internal/client"
 	"example/internal/helper"
-	input_application11 "example/internal/input/application/command"
-	input_application12 "example/internal/input/application/command/admin/resource"
-	input_application7 "example/internal/input/application/consumer"
-	input_application8 "example/internal/input/application/consumer/admin/resource"
-	input_application9 "example/internal/input/application/cron"
-	input_application10 "example/internal/input/application/cron/admin/resource"
+	"example/internal/input/application/command"
+	input_application_command2 "example/internal/input/application/command/admin/resource"
+	"example/internal/input/application/consumer"
+	input_application_consumer2 "example/internal/input/application/consumer/admin/resource"
+	"example/internal/input/application/cron"
+	input_application_cron2 "example/internal/input/application/cron/admin/resource"
 	"example/internal/input/application/facade"
-	input_application4 "example/internal/input/application/facade/register"
-	input_application3 "example/internal/input/application/facade/table"
+	input_application_facade3 "example/internal/input/application/facade/register"
+	input_application_facade2 "example/internal/input/application/facade/table"
 	"example/internal/input/application/http"
-	input_application2 "example/internal/input/application/http/admin/authentication"
-	input_application5 "example/internal/input/application/resource"
-	input_application6 "example/internal/input/application/resource/model"
+	input_application_http2 "example/internal/input/application/http/admin/authentication"
+	"example/internal/input/application/resource"
+	input_application_resource2 "example/internal/input/application/resource/model"
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
@@ -46,11 +46,11 @@ func InitHttpContainer() (*HttpContainer, error) {
 	clientConn := bootstrap.NewResource()
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
-	abstractHandler := input_application.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
+	abstractHandler := input_application_http.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
 	adminUserRepository := output_application.NewAdminUserRepository(resourceClient)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
-	authenticatorHandler := input_application2.NewAuthenticatorHandler(abstractHandler, authenticatorUsecase)
+	authenticatorHandler := input_application_http2.NewAuthenticatorHandler(abstractHandler, authenticatorUsecase)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
 	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
 	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
@@ -89,9 +89,9 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	abstractHandler := fainput_applicationcade.NewAbstractHandler(aesHelper)
-	scannerHandler := input_application3.NewScannerHandler(abstractHandler)
-	authenticatorHandler := input_application4.NewAuthenticatorHandler(abstractHandler)
+	abstractHandler := input_application_facade.NewAbstractHandler(aesHelper)
+	scannerHandler := input_application_facade2.NewScannerHandler(abstractHandler)
+	authenticatorHandler := input_application_facade3.NewAuthenticatorHandler(abstractHandler)
 	abstractInterceptor := interceptor_facade_admin.NewAbstractInterceptor()
 	errorInterceptor := interceptor_facade_admin.NewErrorInterceptor(abstractInterceptor)
 	statusInterceptor := interceptor_facade_admin.NewStatusInterceptor(abstractInterceptor)
@@ -124,8 +124,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	abstractRepository := output_application2.NewAbstractRepository(db)
 	adminUserRepository := output_application2.NewAdminUserRepository(abstractRepository)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
-	abstractHandler := input_application5.NewAbstractHandler()
-	adminUserHandler := input_application6.NewAdminUserHandler(abstractHandler, adminUserUsecase)
+	abstractHandler := input_application_resource.NewAbstractHandler()
+	adminUserHandler := input_application_resource2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
 	abstractInterceptor := interceptor_resource.NewAbstractInterceptor()
 	allInterceptor := interceptor_resource.NewAllInterceptor(abstractInterceptor)
 	resourceContainer := &ResourceContainer{
@@ -148,7 +148,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractHandler := input_application7.NewAbstractHandler(aesHelper, connection)
+	abstractHandler := input_application_consumer.NewAbstractHandler(aesHelper, connection)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	abstractRepository := output_application2.NewAbstractRepository(db)
 	appUserRepository := output_application2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
-	appUserHandler := input_application8.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserHandler := input_application_consumer2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
@@ -176,8 +176,8 @@ func InitCronContainer() (*CronContainer, error) {
 	abstractRepository := output_application2.NewAbstractRepository(db)
 	appUserRepository := output_application2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
-	abstractHandler := input_application9.NewAbstractHandler(aesHelper)
-	appUserHandler := input_application10.NewAppUserHandler(appUserUsecase, abstractHandler)
+	abstractHandler := input_application_cron.NewAbstractHandler(aesHelper)
+	appUserHandler := input_application_cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	cronContainer := &CronContainer{
 		AbstractHelper: abstractHelper,
 		AesHelper:      aesHelper,
@@ -209,7 +209,7 @@ func InitClientContainer() (*ClientContainer, error) {
 func InitCommandContainer() (*CommandContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractHandler := input_application11.NewAbstractHandler(aesHelper)
+	abstractHandler := input_application_command.NewAbstractHandler(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -217,7 +217,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 	abstractRepository := output_application2.NewAbstractRepository(db)
 	appUserRepository := output_application2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
-	appUserHandler := input_application12.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserHandler := input_application_command2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
@@ -245,7 +245,7 @@ type HttpContainer struct {
 	ResourceClient *client.ResourceClient
 
 	// HTTP server -Controller
-	HttpAdminAuthenticationAuthenticator *input_application2.AuthenticatorHandler
+	HttpAdminAuthenticationAuthenticator *input_application_http2.AuthenticatorHandler
 
 	// HTTP server -Middleware
 	// Middleware 部分
@@ -270,9 +270,9 @@ type FacadeContainer struct {
 	*helper.RsaHelper
 
 	// gRPC Facade server
-	FacadeAbstract           *fainput_applicationcade.AbstractHandler
-	FacadeTableScanner       *input_application3.ScannerHandler
-	FacadeTableAuthenticator *input_application4.AuthenticatorHandler
+	FacadeAbstract           *input_application_facade.AbstractHandler
+	FacadeTableScanner       *input_application_facade2.ScannerHandler
+	FacadeTableAuthenticator *input_application_facade3.AuthenticatorHandler
 
 	// gRPC Facade Interceptor
 	FacadeAdminErrorInterceptor          *interceptor_facade_admin.ErrorInterceptor
@@ -292,8 +292,8 @@ type ResourceContainer struct {
 	any3.AdminUserUsecase
 
 	// gRPC Resource server
-	ResourceAbstract       *input_application5.AbstractHandler
-	ResourceModelAdminUser *input_application6.AdminUserHandler
+	ResourceAbstract       *input_application_resource.AbstractHandler
+	ResourceModelAdminUser *input_application_resource2.AdminUserHandler
 
 	// gRPC Resource Interceptor
 	ResourceAllInterceptor *interceptor_resource.AllInterceptor
@@ -307,8 +307,8 @@ type ConsumerContainer struct {
 	*helper.AesHelper
 
 	// MQ 消費者
-	*input_application7.AbstractHandler
-	ConsumerAppUser *input_application8.AppUserHandler
+	*input_application_consumer.AbstractHandler
+	ConsumerAppUser *input_application_consumer2.AppUserHandler
 }
 
 // CronContainer 只給 `cron` 排程服務使用。
@@ -319,7 +319,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *input_application10.AppUserHandler
+	CronAppUser *input_application_cron2.AppUserHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。
@@ -346,6 +346,6 @@ type CommandContainer struct {
 	*helper.AesHelper
 
 	// command
-	*input_application11.AbstractHandler
-	CommandAppUser *input_application12.AppUserHandler
+	*input_application_command.AbstractHandler
+	CommandAppUser *input_application_command2.AppUserHandler
 }

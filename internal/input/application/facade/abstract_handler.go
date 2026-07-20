@@ -1,4 +1,4 @@
-package fainput_applicationcade
+package input_application_facade
 
 import (
 	helper "example/internal/helper"
