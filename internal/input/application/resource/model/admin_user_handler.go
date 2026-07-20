@@ -3,32 +3,33 @@ package service
 import (
 	"context"
 
-	inputResource "example/internal/input/application/resource"
-	port "example/internal/usecase/port/any/model"
-	pb "example/pb/resource/model"
+	pbResourceModel "example/pb/resource/model"
+
+	inputApplicationResource "example/internal/input/application/resource"
+	usecasePortAnyModel "example/internal/usecase/port/any/model"
 )
 
 type AdminUserHandler struct {
-	pb.UnimplementedAdminUserServer
-	*inputResource.AbstractHandler
-	port.AdminUserUsecase
+	pbResourceModel.UnimplementedAdminUserServer
+	*inputApplicationResource.AbstractHandler
+	usecasePortAnyModel.AdminUserUsecase
 }
 
-func NewAdminUserHandler(oAbstractHandler *inputResource.AbstractHandler, oAdminUserUsecase port.AdminUserUsecase) *AdminUserHandler {
+func NewAdminUserHandler(oAbstractHandler *inputApplicationResource.AbstractHandler, oAdminUserUsecase usecasePortAnyModel.AdminUserUsecase) *AdminUserHandler {
 	return &AdminUserHandler{
 		AbstractHandler:  oAbstractHandler,
 		AdminUserUsecase: oAdminUserUsecase,
 	}
 }
 
-func (oSelf *AdminUserHandler) ShowOneByName(oContext context.Context, oReq *pb.OneAdminUserRequest) (*pb.OneAdminUerResponse, error) {
+func (oSelf *AdminUserHandler) ShowOneByName(oContext context.Context, oReq *pbResourceModel.OneAdminUserRequest) (*pbResourceModel.OneAdminUerResponse, error) {
 
 	oAdminUser, err := oSelf.AdminUserUsecase.ShowOneByName(oReq.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.OneAdminUerResponse{
+	return &pbResourceModel.OneAdminUerResponse{
 		Id:       int32(oAdminUser.Id),
 		Name:     oAdminUser.Name,
 		Password: oAdminUser.Password,
