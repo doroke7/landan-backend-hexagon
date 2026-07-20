@@ -6,8 +6,8 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"example/internal/domain"
-	"example/internal/output/port/any/model"
+	domain "example/internal/domain"
+	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type UserProducer struct {
@@ -15,7 +15,7 @@ type UserProducer struct {
 	channel *amqp.Channel
 }
 
-func NewUserProducer(dsn string) (port.UserRepository, error) {
+func NewUserProducer(dsn string) (outputPortAnyModel.UserRepository, error) {
 	conn, err := amqp.Dial(dsn)
 	if err != nil {
 		return nil, err

@@ -4,14 +4,14 @@ import (
 	"gorm.io/gorm"
 
 	"example/internal/domain"
-	port "example/internal/output/port/any/model"
+	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type AppUserRepository struct {
 	*AbstractRepository
 }
 
-func NewAppUserRepository(oAbstractRepository *AbstractRepository) port.AppUserRepository {
+func NewAppUserRepository(oAbstractRepository *AbstractRepository) outputPortAnyModel.AppUserRepository {
 	return &AppUserRepository{
 		AbstractRepository: oAbstractRepository,
 	}

@@ -5,15 +5,15 @@ import (
 
 	"gorm.io/gorm"
 
-	"example/internal/domain"
-	port "example/internal/output/port/any/model"
+	domain "example/internal/domain"
+	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type AdminUserRepository struct {
 	*AbstractRepository
 }
 
-func NewAdminUserRepository(oAbstractRepository *AbstractRepository) port.AdminUserRepository {
+func NewAdminUserRepository(oAbstractRepository *AbstractRepository) outputPortAnyModel.AdminUserRepository {
 	return &AdminUserRepository{
 		AbstractRepository: oAbstractRepository,
 	}
