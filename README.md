@@ -70,8 +70,10 @@
 │   │       ├── websocket/         #   websocket 入口
 │   │       └── command/           #   CLI 指令
 │   │       （每個 adapter 底下都有自己獨立的 abstract_handler.go，彼此不共用；
-│   │        adapter 內部依 leaf 功能再分 admin/resource、admin/authentication 這種子資料夾，
-│   │        單純是模仿 http 那條路徑的分法，跟權限、後台與否無關）
+│   │        adapter 內部依 leaf 功能再分 admin/resource、admin/authentication 這種子資料夾——
+│   │        這是跨層的對應 key，不是字面語意：input/<adapter>/admin/resource、
+│   │        usecase/application/any/admin/resource、usecase/port/any/admin/resource
+│   │        三者相對路徑相同，代表同一條 usecase 邏輯，不代表跟 HTTP 後台路由有關）
 │   │
 │   ├── middleware/
 │   │   └── admin/                    # HTTP 專用 middleware 鏈
@@ -128,7 +130,7 @@
 │
 ├── pkg/                            # 跟 domain 無關、可重用的通用元件（logger / router / cache / response / aop 等泛用工具）
 │
-├── config/                         # viper 讀取的 yaml 設定檔，一個檔案對應一個頂層命名空間（services / clients / database / redis / amqp / loggers ...）
+├── config/                         # viper 讀取的 yaml 設定檔，
 │
 ├── proto/                          # protobuf 原始定義（facade/ 對外、resource/ 資料服務、client/ 外部訂閱）
 └── pb/                             # protoc 產生的程式碼，對應 proto/ 底下的定義

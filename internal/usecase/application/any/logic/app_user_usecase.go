@@ -18,7 +18,7 @@ func NewAppUserUsecase(oAppUserRepository outputPortAnyLogic.AppUserRepository, 
 	}
 }
 
-func (oSelf *AppUserUsecase) AddAppUser(oAdminUser *domain.AdminUser) (*domain.AdminUser, error) {
+func (oSelf *AppUserUsecase) AddAppUser(oAppUser *domain.AppUser) (*domain.AppUser, error) {
 
-	return oAdminUser, nil
+	return oAppUser, nil
 }
