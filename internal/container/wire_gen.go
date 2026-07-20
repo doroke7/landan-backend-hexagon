@@ -26,7 +26,7 @@ import (
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
-	output_application2 "example/internal/output/application/mysql/model"
+	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/any/admin/authentication"
 	any2 "example/internal/usecase/application/any/admin/resource"
@@ -47,7 +47,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := input_application_http.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
-	adminUserRepository := output_application.NewAdminUserRepository(resourceClient)
+	adminUserRepository := output_application_resource.NewAdminUserRepository(resourceClient)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
 	authenticatorHandler := input_application_http2.NewAuthenticatorHandler(abstractHandler, authenticatorUsecase)
@@ -121,8 +121,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := output_application2.NewAbstractRepository(db)
-	adminUserRepository := output_application2.NewAdminUserRepository(abstractRepository)
+	abstractRepository := output_application_mysql.NewAbstractRepository(db)
+	adminUserRepository := output_application_mysql.NewAdminUserRepository(abstractRepository)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := input_application_resource.NewAbstractHandler()
 	adminUserHandler := input_application_resource2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
@@ -153,8 +153,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := output_application2.NewAbstractRepository(db)
-	appUserRepository := output_application2.NewAppUserRepository(abstractRepository)
+	abstractRepository := output_application_mysql.NewAbstractRepository(db)
+	appUserRepository := output_application_mysql.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := input_application_consumer2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
@@ -173,8 +173,8 @@ func InitCronContainer() (*CronContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := output_application2.NewAbstractRepository(db)
-	appUserRepository := output_application2.NewAppUserRepository(abstractRepository)
+	abstractRepository := output_application_mysql.NewAbstractRepository(db)
+	appUserRepository := output_application_mysql.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	abstractHandler := input_application_cron.NewAbstractHandler(aesHelper)
 	appUserHandler := input_application_cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
@@ -214,8 +214,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := output_application2.NewAbstractRepository(db)
-	appUserRepository := output_application2.NewAppUserRepository(abstractRepository)
+	abstractRepository := output_application_mysql.NewAbstractRepository(db)
+	appUserRepository := output_application_mysql.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := input_application_command2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
