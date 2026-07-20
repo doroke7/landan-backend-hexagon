@@ -5,7 +5,7 @@ import (
 
 	"example/internal/domain"
 	outputPortAnyModel "example/internal/output/port/any/model"
-	usecasePortReouseceModel "example/internal/usecase/port/resource/model"
+	usecasePortHttpAdminAuthentication "example/internal/usecase/port/http/admin/authentication"
 )
 
 type AuthenticatorUsecase struct {
@@ -13,7 +13,7 @@ type AuthenticatorUsecase struct {
 	outputPortAnyModel.AdminUserRepository
 }
 
-func NewAuthenticatorUsecase(oAminUserRepository outputPortAnyModel.AdminUserRepository, oAbstractUsecase *AbstractUsecase) usecasePortReouseceModel.AdminUserUsecase {
+func NewAuthenticatorUsecase(oAminUserRepository outputPortAnyModel.AdminUserRepository, oAbstractUsecase *AbstractUsecase) usecasePortHttpAdminAuthentication.AuthenticatorUsecase {
 	return &AuthenticatorUsecase{
 		AbstractUsecase:     oAbstractUsecase,
 		AdminUserRepository: oAminUserRepository,

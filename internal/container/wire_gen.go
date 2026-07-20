@@ -28,7 +28,8 @@ import (
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/facade/model"
-	usecase2 "example/internal/usecase/application/resource/model"
+	usecase2 "example/internal/usecase/application/http/admin/authentication"
+	usecase3 "example/internal/usecase/application/resource/model"
 	"example/internal/usecase/port/facade/model"
 	port2 "example/internal/usecase/port/resource/model"
 	"example/pkg"
@@ -54,7 +55,9 @@ func InitHttpContainer() (*HttpContainer, error) {
 	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
 	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
-	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, adminUserRepository)
+	usecaseAbstractUsecase := usecase2.NewAbstractUsecase(aesHelper)
+	authenticatorUsecase := usecase2.NewAuthenticatorUsecase(adminUserRepository, usecaseAbstractUsecase)
+	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, authenticatorUsecase)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
 	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
 	authenticationMiddleware := middleware_admin.NewAuthenticationMiddleware(abstractMiddleware)
@@ -133,13 +136,13 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	abstractUsecase := usecase2.NewAbstractUsecase(aesHelper)
+	abstractUsecase := usecase3.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
 	}
 	adminUserRepository := mysql.NewAdminUserRepository(db)
-	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
+	adminUserUsecase := usecase3.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
 	abstractInterceptor := interceptor_resource.NewAbstractInterceptor()
@@ -330,7 +333,7 @@ type ResourceContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecase2.AbstractUsecase
+	*usecase3.AbstractUsecase
 	port2.AdminUserUsecase
 
 	// gRPC Resource server

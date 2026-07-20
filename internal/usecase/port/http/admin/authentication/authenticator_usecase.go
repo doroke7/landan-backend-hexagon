@@ -4,6 +4,6 @@ import (
 	"example/internal/domain"
 )
 
-type AdminUserUsecase interface {
+type AuthenticatorUsecase interface {
 	ShowOneByName(name string) (*domain.AdminUser, error)
 }

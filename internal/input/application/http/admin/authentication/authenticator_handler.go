@@ -1,29 +1,26 @@
 package controller_admin_authentication
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
 	"example/bootstrap"
 	inputHttpAdmin "example/internal/input/application/http/admin"
-	outputPortModel "example/internal/output/port/any/model"
 	"example/internal/utility"
+	port "example/internal/usecase/port/http/admin/authentication"
 )
 
 type AuthenticatorHandler struct {
 	*inputHttpAdmin.AbstractHandler
-	AdminUserModelRepository outputPortModel.AdminUserRepository
+	AuthenticatorUsecase port.AuthenticatorUsecase
 }
 
 // NewUserHandler 構造函數 (Go 的慣用法)，
 // 相当 PHP 的 __construct()
 
-func NewAuthenticatorHandler(oAbstractHandler *inputHttpAdmin.AbstractHandler, oAdminUserModelRepository outputPortModel.AdminUserRepository) *AuthenticatorHandler {
+func NewAuthenticatorHandler(oAbstractHandler *inputHttpAdmin.AbstractHandler, oAuthenticatorUsecase port.AuthenticatorUsecase) *AuthenticatorHandler {
 	return &AuthenticatorHandler{
-		AbstractHandler:          oAbstractHandler,
-		AdminUserModelRepository: oAdminUserModelRepository,
+		AbstractHandler:      oAbstractHandler,
+		AuthenticatorUsecase: oAuthenticatorUsecase,
 	}
 }
 
@@ -41,26 +38,12 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 		return
 	}
 
-	oAdminUser, oErr := oSelf.AdminUserModelRepository.ShowOneByName(
+	oAdminUser, oErr := oSelf.AuthenticatorUsecase.ShowOneByName(
 		sParamName,
 	)
 
 	if oErr != nil {
-		if errors.Is(oErr, gorm.ErrRecordNotFound) {
-			// 這是正確的判斷方式：處理找不到紀錄的情況
-			oSelf.Response.Set(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
-			return
-		}
-
-		if !errors.Is(oErr, gorm.ErrRecordNotFound) {
-			// 這是正確的判斷方式：處理找不到紀錄的情況
-			oSelf.Response.Set(oContext, 200, -2, oErr.Error(), struct{}{}, "")
-			return
-		}
-	}
-
-	if oAdminUser == nil {
-		oSelf.Response.Set(oContext, 200, -2, "AdminUser 不存在", struct{}{}, "")
+		oSelf.Response.Set(oContext, 200, -2, oErr.Error(), struct{}{}, "")
 		return
 	}
 

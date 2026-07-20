@@ -40,6 +40,7 @@ import (
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
 	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
+	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
@@ -101,6 +102,8 @@ func InitHttpContainer() (*HttpContainer, error) {
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,
 		usecaseApplicationFacadeModel.NewUserUsecase,
+		usecaseApplicationHttpAdminAuthentication.NewAbstractUsecase,
+		usecaseApplicationHttpAdminAuthentication.NewAuthenticatorUsecase,
 
 		// output
 		outputApplicationMysqlModel.NewUserRepository,
