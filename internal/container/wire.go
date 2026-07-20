@@ -22,7 +22,6 @@ import (
 	InterceptorFacadeAdmin "example/internal/interceptor/facade/game"
 	InterceptorResource "example/internal/interceptor/resource"
 
-	inputClient "example/internal/input/application/client"
 	inputCommand "example/internal/input/application/command"
 	inputConsumer "example/internal/input/application/consumer"
 	inputCron "example/internal/input/application/cron"
@@ -394,9 +393,6 @@ type ClientContainer struct {
 
 	*usecaseApplicationFacadeModel.AbstractUsecase
 	usecasePortFacadeModel.UserUsecase
-
-	// gRPC client stream 訂閱
-	ClientUser *inputClient.UserHandler
 }
 
 func InitClientContainer() (*ClientContainer, error) {
@@ -404,20 +400,12 @@ func InitClientContainer() (*ClientContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewClient,
 		bootstrap.NewRedis,
-
-		//
-		Client.NewClient,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewCacheHelper,
-
-		// input-client
-		inputClient.NewAbstractHandler,
-		inputClient.NewUserHandler,
 
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,

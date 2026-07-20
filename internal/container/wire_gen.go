@@ -10,7 +10,6 @@ import (
 	"example/bootstrap"
 	"example/internal/client"
 	"example/internal/helper"
-	client2 "example/internal/input/application/client"
 	"example/internal/input/application/command"
 	"example/internal/input/application/consumer"
 	"example/internal/input/application/cron"
@@ -276,19 +275,11 @@ func InitClientContainer() (*ClientContainer, error) {
 	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
 	userRepository := cache.NewUserRepository(db, cacheHelper)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
-	clientConn, err := bootstrap.NewClient()
-	if err != nil {
-		return nil, err
-	}
-	clientClient := client.NewClient(clientConn)
-	abstractHandler := client2.NewAbstractHandler(aesHelper, clientClient)
-	userHandler := client2.NewUserHandler(userUsecase, abstractHandler)
 	clientContainer := &ClientContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
 		AbstractUsecase: abstractUsecase,
 		UserUsecase:     userUsecase,
-		ClientUser:      userHandler,
 	}
 	return clientContainer, nil
 }
@@ -441,9 +432,6 @@ type ClientContainer struct {
 
 	*usecase.AbstractUsecase
 	port.UserUsecase
-
-	// gRPC client stream 訂閱
-	ClientUser *client2.UserHandler
 }
 
 // 、
