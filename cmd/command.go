@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	container "example/internal/container"
-
 	"github.com/spf13/cobra"
+
+	container "example/internal/container"
 )
 
 var CommandCommand = &cobra.Command{

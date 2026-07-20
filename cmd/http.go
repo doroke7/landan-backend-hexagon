@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"example/bootstrap"
-	"example/internal/container"
-	"example/internal/register"
 	"log"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/spf13/cobra"
+
+	bootstrap "example/bootstrap"
+	container "example/internal/container"
+	register "example/internal/register"
 )
 
 var oHttpCommand = &cobra.Command{

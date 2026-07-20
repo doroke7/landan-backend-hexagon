@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"example/internal/container"
-	"example/internal/register"
-
 	"github.com/spf13/cobra"
+
+	container "example/internal/container"
+	register "example/internal/register"
 )
 
 var oCronCommand = &cobra.Command{
