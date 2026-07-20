@@ -8,15 +8,23 @@ package container
  */
 
 import (
-	bootstrap "example/bootstrap"
-
 	"github.com/google/wire"
 
+	bootstrap "example/bootstrap"
 	pkg "example/pkg"
 
 	client "example/internal/client"
 
 	helper "example/internal/helper"
+
+	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
+	outputApplicationResourceModel "example/internal/output/application/resource/model"
+
+	usecasePortAnyModel "example/internal/usecase/port/any/model"
+
+	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
+	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
+	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
 
 	middlewareAdmin "example/internal/middleware/admin"
 
@@ -37,15 +45,6 @@ import (
 
 	inputApplicationResource "example/internal/input/application/resource"
 	inputApplicationResourceModel "example/internal/input/application/resource/model"
-
-	usecasePortAnyModel "example/internal/usecase/port/any/model"
-
-	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
-	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
-	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
-
-	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
-	outputApplicationResourceModel "example/internal/output/application/resource/model"
 )
 
 // HttpContainer 只給 `http` Gin 服務使用。
