@@ -26,7 +26,6 @@ import (
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
 	"example/internal/output/application/cache/model"
-	"example/internal/output/application/memory/model"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/facade/model"
@@ -288,15 +287,11 @@ func InitCommandContainer() (*CommandContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := command.NewAbstractHandler(aesHelper)
-	userRepository := memory.NewUserRepository()
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
-	userHandler := command.NewUserHandler(userUsecase)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
 		AbstractHandler: abstractHandler,
-		UserHandler:     userHandler,
 		AbstractUsecase: abstractUsecase,
 	}
 	return commandContainer, nil
@@ -443,7 +438,6 @@ type CommandContainer struct {
 
 	// command
 	*command.AbstractHandler
-	*command.UserHandler
 
 	*usecase.AbstractUsecase
 }

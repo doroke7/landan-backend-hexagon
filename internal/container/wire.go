@@ -43,7 +43,6 @@ import (
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
 	outputApplicationCacheModel "example/internal/output/application/cache/model"
-	outputApplicationMemoryModel "example/internal/output/application/memory/model"
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
 )
@@ -428,10 +427,8 @@ type CommandContainer struct {
 
 	// command
 	*inputCommand.AbstractHandler
-	*inputCommand.UserHandler
 
 	*usecaseApplicationFacadeModel.AbstractUsecase
-	// usecasePortFacadeModel.UserUsecase
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -443,14 +440,9 @@ func InitCommandContainer() (*CommandContainer, error) {
 
 		// command
 		inputCommand.NewAbstractHandler,
-		inputCommand.NewUserHandler,
 
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
-
-		// output
-		outputApplicationMemoryModel.NewUserRepository,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)
