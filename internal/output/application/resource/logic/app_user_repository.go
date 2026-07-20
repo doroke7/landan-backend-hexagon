@@ -1,14 +1,14 @@
 package resource
 
 import (
-	"example/internal/domain"
-	port "example/internal/output/port/any/model"
+	domain "example/internal/domain"
+	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type AppUserRepository struct {
 }
 
-func NewAppUserRepository() port.AppUserRepository {
+func NewAppUserRepository() outputPortAnyModel.AppUserRepository {
 	return &AppUserRepository{}
 }
 
