@@ -24,6 +24,7 @@ import (
 
 	inputCommand "example/internal/input/application/command"
 	inputConsumer "example/internal/input/application/consumer"
+	inputCron "example/internal/input/application/cron"
 	inputFacade "example/internal/input/application/facade"
 	inputFacadeRegister "example/internal/input/application/facade/register"
 	inputFacadeTable "example/internal/input/application/facade/table"
@@ -258,6 +259,9 @@ type CronContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+
+	// 排程 server
+	CronAppUser *inputCron.AppUserHandler
 }
 
 func InitCronContainer() (*CronContainer, error) {
@@ -266,6 +270,10 @@ func InitCronContainer() (*CronContainer, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
+
+		// input-cron
+		inputCron.NewAbstractHandler,
+		inputCron.NewAppUserHandler,
 
 		wire.Struct(new(CronContainer), "*"),
 	)

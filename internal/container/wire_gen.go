@@ -12,6 +12,7 @@ import (
 	"example/internal/helper"
 	"example/internal/input/application/command"
 	"example/internal/input/application/consumer"
+	"example/internal/input/application/cron"
 	"example/internal/input/application/facade"
 	facade3 "example/internal/input/application/facade/register"
 	facade2 "example/internal/input/application/facade/table"
@@ -154,9 +155,12 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
+	abstractHandler := cron.NewAbstractHandler(aesHelper)
+	appUserHandler := cron.NewAppUserHandler(abstractHandler)
 	cronContainer := &CronContainer{
 		AbstractHelper: abstractHelper,
 		AesHelper:      aesHelper,
+		CronAppUser:    appUserHandler,
 	}
 	return cronContainer, nil
 }
@@ -282,6 +286,9 @@ type CronContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+
+	// 排程 server
+	CronAppUser *cron.AppUserHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。
