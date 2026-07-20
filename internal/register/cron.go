@@ -5,7 +5,7 @@ import (
 
 	"github.com/robfig/cron/v3"
 
-	"example/internal/container"
+	container "example/internal/container"
 )
 
 func CronInit(oContainer *container.CronContainer) *cron.Cron {

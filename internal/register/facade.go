@@ -1,11 +1,12 @@
 package register
 
 import (
-	pkg "example/pkg"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
+
+	pkg "example/pkg"
 
 	container "example/internal/container"
 

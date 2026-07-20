@@ -1,8 +1,9 @@
 package register
 
 import (
-	"example/internal/container"
-	"example/pkg"
+	pkg "example/pkg"
+
+	container "example/internal/container"
 )
 
 func ClientInit(oContainer *container.ClientContainer) *pkg.ClientRouter {
