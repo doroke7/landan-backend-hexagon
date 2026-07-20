@@ -24,7 +24,7 @@ import (
 
 	inputCommand "example/internal/input/application/command/admin/resource"
 	inputConsumer "example/internal/input/application/consumer/admin/resource"
-	inputCron "example/internal/input/application/cron"
+	inputCron "example/internal/input/application/cron/admin/resource"
 	inputFacade "example/internal/input/application/facade"
 	inputFacadeRegister "example/internal/input/application/facade/register"
 	inputFacadeTable "example/internal/input/application/facade/table"
@@ -38,7 +38,7 @@ import (
 
 	usecaseApplicationCommand "example/internal/usecase/application/command/admin/resource"
 	usecaseApplicationConsumer "example/internal/usecase/application/consumer/admin/resource"
-	usecaseApplicationCron "example/internal/usecase/application/cron"
+	usecaseApplicationCron "example/internal/usecase/application/cron/admin/resource"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
