@@ -1,9 +1,9 @@
 package middleware_admin
 
 import (
-	"example/bootstrap"
-
 	"github.com/gin-gonic/gin"
+
+	bootstrap "example/bootstrap"
 )
 
 type ResponseMiddleware struct {

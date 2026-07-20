@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"reflect"
 
-	pkg "example/pkg"
-
 	"github.com/gin-gonic/gin"
+
+	pkg "example/pkg"
 
 	helper "example/internal/helper"
 )

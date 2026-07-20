@@ -1,18 +1,17 @@
 package middleware_admin
 
 import (
-	"example/bootstrap"
-	"example/internal/utility"
 	"net/url"
 	"reflect"
 	"unsafe"
 
-	types "example/types"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"example/pkg"
+	bootstrap "example/bootstrap"
+	utility "example/internal/utility"
+	pkg "example/pkg"
+	types "example/types"
 )
 
 type DecryptionMiddleware struct {

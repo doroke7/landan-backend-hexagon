@@ -7,10 +7,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"example/pkg"
+	bootstrap "example/bootstrap"
 
-	"example/bootstrap"
-	"example/internal/utility"
+	pkg "example/pkg"
+
+	utility "example/internal/utility"
 )
 
 type ErrorMiddleware struct {

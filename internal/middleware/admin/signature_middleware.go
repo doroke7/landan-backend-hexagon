@@ -1,16 +1,18 @@
 package middleware_admin
 
 import (
-	"example/bootstrap"
-	"example/internal/utility"
 	"strings"
-
-	types "example/types"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"example/pkg"
+	types "example/types"
+
+	bootstrap "example/bootstrap"
+
+	pkg "example/pkg"
+
+	utility "example/internal/utility"
 )
 
 type SignatureMiddleware struct {

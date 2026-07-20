@@ -1,11 +1,12 @@
 package middleware_admin
 
 import (
-	"example/internal/utility"
-	pkg "example/pkg"
-
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+
+	pkg "example/pkg"
+
+	utility "example/internal/utility"
 )
 
 type LoggerMiddleware struct {

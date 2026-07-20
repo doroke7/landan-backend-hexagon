@@ -1,12 +1,13 @@
 package middleware_admin
 
 import (
-	"example/bootstrap"
-	"example/internal/utility"
 	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
+	bootstrap "example/bootstrap"
+	utility "example/internal/utility"
 )
 
 type EncryptionMiddleware struct {

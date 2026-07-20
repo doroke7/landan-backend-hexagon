@@ -1,13 +1,14 @@
 package middleware_admin
 
 import (
-	"example/bootstrap"
-	"example/internal/utility"
 	"net/url"
 	"reflect"
 	"unsafe"
 
 	"github.com/gin-gonic/gin"
+
+	bootstrap "example/bootstrap"
+	utility "example/internal/utility"
 )
 
 type RequestMiddleware struct {
