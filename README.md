@@ -33,6 +33,12 @@
 |      MySQL / Redis / Kafka / S3 / MQ / Third-party API         |
 +----------------------------------------------------------------+
 
+## 這套框架使用重點
+1. input 不同輸入driver 相同的路徑應該是相同的設備方法。譬如 cron/admin/resource/app_user 與 http/admin/resource/app_user 是相同業務但是不同協議
+2. usecase/application/any 底下的代表所有 二級服務的聯集。
+3. 
+
+
 ## 六角架構核心優點
 1. 可以同時輸入 http / grpc / cron / consumer / websocket / client-stream / command，但共用同一套 usecase 業務邏輯。
 2. 每種輸入各自只組裝自己需要的依賴（見下方「每個服務獨立 container」），不會因為要跑 `cron` 就順便把 gRPC client、AMQP 都連上。
