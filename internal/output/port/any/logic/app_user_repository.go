@@ -1,6 +1,6 @@
 package logic
 
-import "example/internal/domain"
+import domain "example/internal/domain"
 
 type AppUserRepository interface {
 	AddAppUser(oAppUser *domain.AppUser) (*domain.AppUser, error)

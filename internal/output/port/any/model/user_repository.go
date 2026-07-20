@@ -1,6 +1,6 @@
 package port
 
-import "example/internal/domain"
+import domain "example/internal/domain"
 
 type UserRepository interface {
 	AddOne(user *domain.User) error

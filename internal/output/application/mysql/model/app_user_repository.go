@@ -3,7 +3,7 @@ package mysql
 import (
 	"gorm.io/gorm"
 
-	"example/internal/domain"
+	domain "example/internal/domain"
 	outputPortAnyModel "example/internal/output/port/any/model"
 )
 

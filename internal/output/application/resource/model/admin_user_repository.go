@@ -4,8 +4,8 @@ import (
 	"context"
 
 	client "example/internal/client"
-	"example/internal/domain"
-	"example/internal/output/port/any/model"
+	domain "example/internal/domain"
+	outputPortAnyModel "example/internal/output/port/any/model"
 	pbResourceModel "example/pb/resource/model"
 )
 
@@ -13,7 +13,7 @@ type AdminUserRepository struct {
 	AdminUserModelClient pbResourceModel.AdminUserClient
 }
 
-func NewAdminUserRepository(oResourceClient *client.ResourceClient) port.AdminUserRepository {
+func NewAdminUserRepository(oResourceClient *client.ResourceClient) outputPortAnyModel.AdminUserRepository {
 	return &AdminUserRepository{
 		AdminUserModelClient: oResourceClient.Model.AdminUser,
 	}

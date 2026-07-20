@@ -1,7 +1,7 @@
 package port
 
 import (
-	"example/internal/domain"
+	domain "example/internal/domain"
 )
 
 type AdminUserRepository interface {
