@@ -14,8 +14,8 @@ import (
 	command2 "example/internal/input/application/command/admin/resource"
 	"example/internal/input/application/consumer"
 	consumer2 "example/internal/input/application/consumer/admin/resource"
-	cron2 "example/internal/input/application/cron"
-	cron3 "example/internal/input/application/cron/admin/resource"
+	"example/internal/input/application/cron"
+	cron2 "example/internal/input/application/cron/admin/resource"
 	"example/internal/input/application/facade"
 	facade3 "example/internal/input/application/facade/register"
 	facade2 "example/internal/input/application/facade/table"
@@ -28,10 +28,9 @@ import (
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
+	"example/internal/usecase/application/any/admin/authentication"
 	any2 "example/internal/usecase/application/any/admin/resource"
-	"example/internal/usecase/application/cron/admin/resource"
-	"example/internal/usecase/application/http/admin/authentication"
-	usecase2 "example/internal/usecase/application/resource/model"
+	usecase2 "example/internal/usecase/application/any/model"
 	any3 "example/internal/usecase/port/any/model"
 	"example/pkg"
 )
@@ -176,9 +175,9 @@ func InitCronContainer() (*CronContainer, error) {
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
 	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
-	appUserUsecase := cron.NewAppUserUsecase(appUserRepository)
-	abstractHandler := cron2.NewAbstractHandler(aesHelper)
-	appUserHandler := cron3.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
+	abstractHandler := cron.NewAbstractHandler(aesHelper)
+	appUserHandler := cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	cronContainer := &CronContainer{
 		AbstractHelper: abstractHelper,
 		AesHelper:      aesHelper,
@@ -320,7 +319,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *cron3.AppUserHandler
+	CronAppUser *cron2.AppUserHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。

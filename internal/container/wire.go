@@ -40,9 +40,8 @@ import (
 	usecasePortResourceModel "example/internal/usecase/port/any/model"
 
 	usecaseApplicationAny "example/internal/usecase/application/any/admin/resource"
-	usecaseApplicationCron "example/internal/usecase/application/cron/admin/resource"
-	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
-	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
+	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
+	usecaseApplicationResourceModel "example/internal/usecase/application/any/model"
 
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
@@ -295,7 +294,7 @@ func InitCronContainer() (*CronContainer, error) {
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
-		usecaseApplicationCron.NewAppUserUsecase,
+		usecaseApplicationAny.NewAppUserUsecase,
 
 		// input-cron
 		inputCron.NewAbstractHandler,
