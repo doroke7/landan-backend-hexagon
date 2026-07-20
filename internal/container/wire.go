@@ -24,22 +24,17 @@ import (
 
 	inputCommand "example/internal/input/application/command"
 	inputConsumer "example/internal/input/application/consumer"
-	inputCron "example/internal/input/application/cron"
 	inputFacade "example/internal/input/application/facade"
-	inputFacadeGame "example/internal/input/application/facade/game"
 	inputFacadeRegister "example/internal/input/application/facade/register"
 	inputFacadeTable "example/internal/input/application/facade/table"
 	inputHttpAdmin "example/internal/input/application/http/admin"
 	inputHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
-	inputWebsocket "example/internal/input/application/websocket"
 
 	inputResource "example/internal/input/application/resource"
 	inputResourceModel "example/internal/input/application/resource/model"
 
-	usecasePortFacadeModel "example/internal/usecase/port/facade/model"
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
-	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
@@ -58,9 +53,6 @@ type HttpContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 	*helper.JwtHelper
-
-	*usecaseApplicationFacadeModel.AbstractUsecase
-	usecasePortFacadeModel.UserUsecase
 
 	// Clients
 	ResourceClient *Client.ResourceClient
@@ -90,7 +82,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 		pkg.NewResponse,
 
 		// bootstrap
-		bootstrap.NewMysql,
 		bootstrap.NewResource,
 
 		// helper
@@ -100,13 +91,10 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewJwtHelper,
 
 		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
 		usecaseApplicationHttpAdminAuthentication.NewAbstractUsecase,
 		usecaseApplicationHttpAdminAuthentication.NewAuthenticatorUsecase,
 
 		// output
-		outputApplicationMysqlModel.NewUserRepository,
 		outputApplicationResourceModel.NewAdminUserRepository,
 
 		// client
@@ -143,12 +131,8 @@ type FacadeContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecaseApplicationFacadeModel.AbstractUsecase
-	usecasePortFacadeModel.UserUsecase
-
 	// gRPC Facade server
 	FacadeAbstract           *inputFacade.AbstractHandler
-	FacadeGameUser           *inputFacadeGame.UserHandler
 	FacadeTableScanner       *inputFacadeTable.ScannerHandler
 	FacadeTableAuthenticator *inputFacadeRegister.AuthenticatorHandler
 
@@ -162,9 +146,6 @@ type FacadeContainer struct {
 func InitFacadeContainer() (*FacadeContainer, error) {
 	wire.Build(
 
-		// bootstrap
-		bootstrap.NewMysql,
-
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
@@ -172,7 +153,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 
 		// input-facade
 		inputFacade.NewAbstractHandler,
-		inputFacadeGame.NewUserHandler,
 		inputFacadeTable.NewScannerHandler,
 		inputFacadeRegister.NewAuthenticatorHandler,
 
@@ -182,13 +162,6 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		InterceptorFacadeAdmin.NewStatusInterceptor,
 		InterceptorFacadeAdmin.NewLoggerInterceptor,
 		InterceptorFacadeAdmin.NewAuthenticationInterceptor,
-
-		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
-
-		// output
-		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(FacadeContainer), "*"),
 	)
@@ -255,9 +228,6 @@ type ConsumerContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecaseApplicationFacadeModel.AbstractUsecase
-	usecasePortFacadeModel.UserUsecase
-
 	// MQ 消費者
 	*inputConsumer.AbstractHandler
 }
@@ -266,7 +236,6 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	wire.Build(
 
 		// bootstrap
-		bootstrap.NewMysql,
 		bootstrap.NewAmqp,
 
 		// helper
@@ -275,13 +244,6 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 
 		// input-consumer
 		inputConsumer.NewAbstractHandler,
-
-		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
-
-		// output
-		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -296,34 +258,14 @@ type CronContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-
-	*usecaseApplicationFacadeModel.AbstractUsecase
-	usecasePortFacadeModel.UserUsecase
-
-	// 排程 server
-	CronUser *inputCron.UserCron
 }
 
 func InitCronContainer() (*CronContainer, error) {
 	wire.Build(
 
-		// bootstrap
-		bootstrap.NewMysql,
-
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-
-		// input-cron
-		inputCron.NewAbstractHandler,
-		inputCron.NewUserCron,
-
-		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
-
-		// output
-		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -338,34 +280,14 @@ type WebsocketContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-
-	*usecaseApplicationFacadeModel.AbstractUsecase
-	usecasePortFacadeModel.UserUsecase
-
-	// websocket server
-	WebsocketUser *inputWebsocket.UserHandler
 }
 
 func InitWebsocketContainer() (*WebsocketContainer, error) {
 	wire.Build(
 
-		// bootstrap
-		bootstrap.NewMysql,
-
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-
-		// input-websocket
-		inputWebsocket.NewAbstractHandler,
-		inputWebsocket.NewUserHandler,
-
-		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
-
-		// output
-		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(WebsocketContainer), "*"),
 	)
@@ -380,27 +302,14 @@ type ClientContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-
-	*usecaseApplicationFacadeModel.AbstractUsecase
-	usecasePortFacadeModel.UserUsecase
 }
 
 func InitClientContainer() (*ClientContainer, error) {
 	wire.Build(
 
-		// bootstrap
-		bootstrap.NewMysql,
-
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-
-		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
-		usecaseApplicationFacadeModel.NewUserUsecase,
-
-		// output
-		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(ClientContainer), "*"),
 	)
@@ -416,8 +325,6 @@ type CommandContainer struct {
 
 	// command
 	*inputCommand.AbstractHandler
-
-	*usecaseApplicationFacadeModel.AbstractUsecase
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -429,9 +336,6 @@ func InitCommandContainer() (*CommandContainer, error) {
 
 		// command
 		inputCommand.NewAbstractHandler,
-
-		// usecase
-		usecaseApplicationFacadeModel.NewAbstractUsecase,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)

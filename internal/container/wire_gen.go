@@ -12,26 +12,21 @@ import (
 	"example/internal/helper"
 	"example/internal/input/application/command"
 	"example/internal/input/application/consumer"
-	"example/internal/input/application/cron"
 	"example/internal/input/application/facade"
-	facade2 "example/internal/input/application/facade/game"
-	facade4 "example/internal/input/application/facade/register"
-	facade3 "example/internal/input/application/facade/table"
+	facade3 "example/internal/input/application/facade/register"
+	facade2 "example/internal/input/application/facade/table"
 	"example/internal/input/application/http/admin"
 	"example/internal/input/application/http/admin/authentication"
 	"example/internal/input/application/resource"
 	service2 "example/internal/input/application/resource/model"
-	"example/internal/input/application/websocket"
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
-	"example/internal/usecase/application/facade/model"
-	usecase2 "example/internal/usecase/application/http/admin/authentication"
-	usecase3 "example/internal/usecase/application/resource/model"
-	"example/internal/usecase/port/facade/model"
-	port2 "example/internal/usecase/port/resource/model"
+	"example/internal/usecase/application/http/admin/authentication"
+	usecase2 "example/internal/usecase/application/resource/model"
+	"example/internal/usecase/port/resource/model"
 	"example/pkg"
 )
 
@@ -43,20 +38,13 @@ func InitHttpContainer() (*HttpContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
 	jwtHelper := helper.NewJwtHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	userRepository := mysql.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	clientConn := bootstrap.NewResource()
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
 	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
-	usecaseAbstractUsecase := usecase2.NewAbstractUsecase(aesHelper)
-	authenticatorUsecase := usecase2.NewAuthenticatorUsecase(adminUserRepository, usecaseAbstractUsecase)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
 	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, authenticatorUsecase)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
 	adminMiddleware := middleware_admin.NewAdminMiddleware(abstractMiddleware)
@@ -75,8 +63,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 		AesHelper:                            aesHelper,
 		RsaHelper:                            rsaHelper,
 		JwtHelper:                            jwtHelper,
-		AbstractUsecase:                      abstractUsecase,
-		UserUsecase:                          userUsecase,
 		ResourceClient:                       resourceClient,
 		HttpAdminAuthenticationAuthenticator: authenticatorHandler,
 		AdminAbstractMiddleware:              abstractMiddleware,
@@ -98,17 +84,9 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	userRepository := mysql.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := facade.NewAbstractHandler(aesHelper)
-	userHandler := facade2.NewUserHandler(userUsecase, abstractHandler)
-	scannerHandler := facade3.NewScannerHandler(abstractHandler)
-	authenticatorHandler := facade4.NewAuthenticatorHandler(abstractHandler)
+	scannerHandler := facade2.NewScannerHandler(abstractHandler)
+	authenticatorHandler := facade3.NewAuthenticatorHandler(abstractHandler)
 	abstractInterceptor := interceptor_facade_admin.NewAbstractInterceptor()
 	errorInterceptor := interceptor_facade_admin.NewErrorInterceptor(abstractInterceptor)
 	statusInterceptor := interceptor_facade_admin.NewStatusInterceptor(abstractInterceptor)
@@ -118,10 +96,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		AbstractHelper:                       abstractHelper,
 		AesHelper:                            aesHelper,
 		RsaHelper:                            rsaHelper,
-		AbstractUsecase:                      abstractUsecase,
-		UserUsecase:                          userUsecase,
 		FacadeAbstract:                       abstractHandler,
-		FacadeGameUser:                       userHandler,
 		FacadeTableScanner:                   scannerHandler,
 		FacadeTableAuthenticator:             authenticatorHandler,
 		FacadeAdminErrorInterceptor:          errorInterceptor,
@@ -136,13 +111,13 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
-	abstractUsecase := usecase3.NewAbstractUsecase(aesHelper)
+	abstractUsecase := usecase2.NewAbstractUsecase(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
 	}
 	adminUserRepository := mysql.NewAdminUserRepository(db)
-	adminUserUsecase := usecase3.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
+	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := service.NewAbstractHandler()
 	adminUserHandler := service2.NewAdminUserHandler(abstractHandler, adminUserUsecase)
 	abstractInterceptor := interceptor_resource.NewAbstractInterceptor()
@@ -163,13 +138,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 func InitConsumerContainer() (*ConsumerContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	userRepository := mysql.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
 		return nil, err
@@ -178,8 +146,6 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	consumerContainer := &ConsumerContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
-		AbstractUsecase: abstractUsecase,
-		UserUsecase:     userUsecase,
 		AbstractHandler: abstractHandler,
 	}
 	return consumerContainer, nil
@@ -188,24 +154,9 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	userRepository := mysql.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
-	abstractHandler := cron.NewAbstractHandler(aesHelper)
-	userCron, err := cron.NewUserCron(userUsecase, abstractHandler)
-	if err != nil {
-		return nil, err
-	}
 	cronContainer := &CronContainer{
-		AbstractHelper:  abstractHelper,
-		AesHelper:       aesHelper,
-		AbstractUsecase: abstractUsecase,
-		UserUsecase:     userUsecase,
-		CronUser:        userCron,
+		AbstractHelper: abstractHelper,
+		AesHelper:      aesHelper,
 	}
 	return cronContainer, nil
 }
@@ -213,21 +164,9 @@ func InitCronContainer() (*CronContainer, error) {
 func InitWebsocketContainer() (*WebsocketContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	userRepository := mysql.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
-	abstractHandler := websocket.NewAbstractHandler(aesHelper)
-	userHandler := websocket.NewUserHandler(userUsecase, abstractHandler)
 	websocketContainer := &WebsocketContainer{
-		AbstractHelper:  abstractHelper,
-		AesHelper:       aesHelper,
-		AbstractUsecase: abstractUsecase,
-		UserUsecase:     userUsecase,
-		WebsocketUser:   userHandler,
+		AbstractHelper: abstractHelper,
+		AesHelper:      aesHelper,
 	}
 	return websocketContainer, nil
 }
@@ -235,18 +174,9 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 func InitClientContainer() (*ClientContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	userRepository := mysql.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	clientContainer := &ClientContainer{
-		AbstractHelper:  abstractHelper,
-		AesHelper:       aesHelper,
-		AbstractUsecase: abstractUsecase,
-		UserUsecase:     userUsecase,
+		AbstractHelper: abstractHelper,
+		AesHelper:      aesHelper,
 	}
 	return clientContainer, nil
 }
@@ -255,12 +185,10 @@ func InitCommandContainer() (*CommandContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := command.NewAbstractHandler(aesHelper)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
 		AbstractHandler: abstractHandler,
-		AbstractUsecase: abstractUsecase,
 	}
 	return commandContainer, nil
 }
@@ -278,9 +206,6 @@ type HttpContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 	*helper.JwtHelper
-
-	*usecase.AbstractUsecase
-	port.UserUsecase
 
 	// Clients
 	ResourceClient *client.ResourceClient
@@ -310,14 +235,10 @@ type FacadeContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecase.AbstractUsecase
-	port.UserUsecase
-
 	// gRPC Facade server
 	FacadeAbstract           *facade.AbstractHandler
-	FacadeGameUser           *facade2.UserHandler
-	FacadeTableScanner       *facade3.ScannerHandler
-	FacadeTableAuthenticator *facade4.AuthenticatorHandler
+	FacadeTableScanner       *facade2.ScannerHandler
+	FacadeTableAuthenticator *facade3.AuthenticatorHandler
 
 	// gRPC Facade Interceptor
 	FacadeAdminErrorInterceptor          *interceptor_facade_admin.ErrorInterceptor
@@ -333,8 +254,8 @@ type ResourceContainer struct {
 	*helper.AesHelper
 	*helper.RsaHelper
 
-	*usecase3.AbstractUsecase
-	port2.AdminUserUsecase
+	*usecase2.AbstractUsecase
+	port.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
@@ -351,9 +272,6 @@ type ConsumerContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 
-	*usecase.AbstractUsecase
-	port.UserUsecase
-
 	// MQ 消費者
 	*consumer.AbstractHandler
 }
@@ -364,12 +282,6 @@ type CronContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-
-	*usecase.AbstractUsecase
-	port.UserUsecase
-
-	// 排程 server
-	CronUser *cron.UserCron
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。
@@ -378,12 +290,6 @@ type WebsocketContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-
-	*usecase.AbstractUsecase
-	port.UserUsecase
-
-	// websocket server
-	WebsocketUser *websocket.UserHandler
 }
 
 // ClientContainer 只給 `client` （訂閱外部 gRPC stream）服務使用。
@@ -392,9 +298,6 @@ type ClientContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
-
-	*usecase.AbstractUsecase
-	port.UserUsecase
 }
 
 // 、
@@ -406,6 +309,4 @@ type CommandContainer struct {
 
 	// command
 	*command.AbstractHandler
-
-	*usecase.AbstractUsecase
 }
