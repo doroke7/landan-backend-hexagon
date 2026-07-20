@@ -7,7 +7,7 @@ import (
 	utility "example/internal/utility"
 
 	inputHttpAdmin "example/internal/input/application/http"
-	port "example/internal/usecase/port/http/admin/authentication"
+	port "example/internal/usecase/port/any/admin/authentication"
 )
 
 type AuthenticatorHandler struct {

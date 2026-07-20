@@ -39,7 +39,7 @@ import (
 
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
-	usecaseApplicationCommand "example/internal/usecase/application/command/admin/resource"
+	usecaseApplicationCommand "example/internal/usecase/application/any/admin/resource"
 	usecaseApplicationConsumer "example/internal/usecase/application/consumer/admin/resource"
 	usecaseApplicationCron "example/internal/usecase/application/cron/admin/resource"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"

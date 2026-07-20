@@ -1,4 +1,4 @@
-package command
+package any
 
 import "example/internal/domain"
 

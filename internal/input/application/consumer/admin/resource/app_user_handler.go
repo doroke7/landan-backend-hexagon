@@ -6,7 +6,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	inputConsumer "example/internal/input/application/consumer"
-	port "example/internal/usecase/port/consumer/admin/resource"
+	port "example/internal/usecase/port/any/admin/resource"
 	pkg "example/pkg"
 
 	"go.uber.org/zap"

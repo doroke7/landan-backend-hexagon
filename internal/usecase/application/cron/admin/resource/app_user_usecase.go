@@ -3,7 +3,7 @@ package cron
 import (
 	"example/internal/domain"
 	outputPort "example/internal/output/port/any/model"
-	port "example/internal/usecase/port/cron/admin/resource"
+	port "example/internal/usecase/port/any/admin/resource"
 )
 
 type AppUserUsecase struct {
@@ -16,6 +16,6 @@ func NewAppUserUsecase(oAppUserRepository outputPort.AppUserRepository) port.App
 	}
 }
 
-func (oSelf *AppUserUsecase) IncreaseBalance() (*domain.AppUser, error) {
-	return oSelf.AppUserRepository.IncreaseBalance(1, 10)
+func (oSelf *AppUserUsecase) IncreaseBalance(id uint, amount uint) (*domain.AppUser, error) {
+	return oSelf.AppUserRepository.IncreaseBalance(id, amount)
 }

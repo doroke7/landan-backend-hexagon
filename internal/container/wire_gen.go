@@ -11,7 +11,7 @@ import (
 	"example/internal/client"
 	"example/internal/helper"
 	"example/internal/input/application/command"
-	command3 "example/internal/input/application/command/admin/resource"
+	command2 "example/internal/input/application/command/admin/resource"
 	"example/internal/input/application/consumer"
 	consumer3 "example/internal/input/application/consumer/admin/resource"
 	cron2 "example/internal/input/application/cron"
@@ -28,7 +28,7 @@ import (
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
-	command2 "example/internal/usecase/application/command/admin/resource"
+	any2 "example/internal/usecase/application/any/admin/resource"
 	consumer2 "example/internal/usecase/application/consumer/admin/resource"
 	"example/internal/usecase/application/cron/admin/resource"
 	"example/internal/usecase/application/http/admin/authentication"
@@ -218,8 +218,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
 	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
-	appUserUsecase := command2.NewAppUserUsecase(appUserRepository)
-	appUserHandler := command3.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
+	appUserHandler := command2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
@@ -349,5 +349,5 @@ type CommandContainer struct {
 
 	// command
 	*command.AbstractHandler
-	CommandAppUser *command3.AppUserHandler
+	CommandAppUser *command2.AppUserHandler
 }

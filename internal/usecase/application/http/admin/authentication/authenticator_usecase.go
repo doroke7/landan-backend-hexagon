@@ -5,7 +5,7 @@ import (
 
 	"example/internal/domain"
 	outputPortAnyModel "example/internal/output/port/any/model"
-	usecasePortHttpAdminAuthentication "example/internal/usecase/port/http/admin/authentication"
+	usecasePortHttpAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
 )
 
 type AuthenticatorUsecase struct {

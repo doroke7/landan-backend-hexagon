@@ -2,7 +2,7 @@ package cron
 
 import (
 	inputCron "example/internal/input/application/cron"
-	port "example/internal/usecase/port/cron/admin/resource"
+	port "example/internal/usecase/port/any/admin/resource"
 	pkg "example/pkg"
 
 	"go.uber.org/zap"
@@ -21,7 +21,7 @@ func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *in
 }
 
 func (oSelf *AppUserHandler) IncreaseBalance() {
-	oAppUser, err := oSelf.appUserUsecase.IncreaseBalance()
+	oAppUser, err := oSelf.appUserUsecase.IncreaseBalance(1, 10)
 	if err != nil {
 		pkg.Logger(pkg.Cron).Error("IncreaseBalance 失敗",
 			zap.Error(err),

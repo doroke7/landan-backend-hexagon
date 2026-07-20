@@ -3,7 +3,7 @@ package consumer
 import (
 	"example/internal/domain"
 	outputPort "example/internal/output/port/any/model"
-	port "example/internal/usecase/port/consumer/admin/resource"
+	port "example/internal/usecase/port/any/admin/resource"
 )
 
 type AppUserUsecase struct {
