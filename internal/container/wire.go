@@ -94,12 +94,12 @@ func InitHttpContainer() (*HttpContainer, error) {
 		helper.NewRsaHelper,
 		helper.NewJwtHelper,
 
+		// output
+		outputApplicationResourceModel.NewAdminUserRepository,
+
 		// usecase
 		usecaseApplicationHttpAdminAuthentication.NewAbstractUsecase,
 		usecaseApplicationHttpAdminAuthentication.NewAuthenticatorUsecase,
-
-		// output
-		outputApplicationResourceModel.NewAdminUserRepository,
 
 		// client
 		Client.NewModel,
@@ -203,6 +203,14 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
 
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAdminUserRepository,
+
+		// usecase
+		usecaseApplicationResourceModel.NewAbstractUsecase,
+		usecaseApplicationResourceModel.NewAdminUserUsecase,
+
 		// input-resource
 		inputResource.NewAbstractHandler,
 		inputResourceModel.NewAdminUserHandler,
@@ -210,14 +218,6 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		// interceptor-resource
 		InterceptorResource.NewAbstractInterceptor,
 		InterceptorResource.NewAllInterceptor,
-
-		// usecase
-		usecaseApplicationResourceModel.NewAbstractUsecase,
-		usecaseApplicationResourceModel.NewAdminUserUsecase,
-
-		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
-		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		wire.Struct(new(ResourceContainer), "*"),
 	)
@@ -249,16 +249,16 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
-		// input-consumer
-		inputConsumer.NewAbstractHandler,
-		inputConsumer.NewAppUserHandler,
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
 		usecaseApplicationConsumer.NewAppUserUsecase,
 
-		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
-		outputApplicationMysqlModel.NewAppUserRepository,
+		// input-consumer
+		inputConsumer.NewAbstractHandler,
+		inputConsumer.NewAppUserHandler,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -288,16 +288,16 @@ func InitCronContainer() (*CronContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
-		// input-cron
-		inputCron.NewAbstractHandler,
-		inputCron.NewAppUserHandler,
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
 		usecaseApplicationCron.NewAppUserUsecase,
 
-		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
-		outputApplicationMysqlModel.NewAppUserRepository,
+		// input-cron
+		inputCron.NewAbstractHandler,
+		inputCron.NewAppUserHandler,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -370,16 +370,16 @@ func InitCommandContainer() (*CommandContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
-		// command
-		inputCommand.NewAbstractHandler,
-		inputCommand.NewAppUserHandler,
+		// output
+		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
 		usecaseApplicationCommand.NewAppUserUsecase,
 
-		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
-		outputApplicationMysqlModel.NewAppUserRepository,
+		// command
+		inputCommand.NewAbstractHandler,
+		inputCommand.NewAppUserHandler,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)
