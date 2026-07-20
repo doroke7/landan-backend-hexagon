@@ -1,7 +1,7 @@
 package cron
 
 import (
-	port "example/internal/usecase/port/cron"
+	port "example/internal/usecase/port/cron/admin/resource"
 	pkg "example/pkg"
 
 	"go.uber.org/zap"

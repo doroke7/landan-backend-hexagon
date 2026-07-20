@@ -3,7 +3,7 @@ package cron
 import (
 	"example/internal/domain"
 	outputPort "example/internal/output/port/any/model"
-	port "example/internal/usecase/port/cron"
+	port "example/internal/usecase/port/cron/admin/resource"
 )
 
 type AppUserUsecase struct {
