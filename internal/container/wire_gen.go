@@ -20,7 +20,6 @@ import (
 	facade3 "example/internal/input/application/facade/table"
 	"example/internal/input/application/http/admin"
 	"example/internal/input/application/http/admin/authentication"
-	handler2 "example/internal/input/application/http/admin/resource"
 	"example/internal/input/application/resource"
 	service2 "example/internal/input/application/resource/model"
 	"example/internal/input/application/websocket"
@@ -62,7 +61,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
-	userHandler := handler2.NewUserHandler(userUsecase, abstractHandler)
 	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
 	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, adminUserRepository)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)
@@ -85,7 +83,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 		AbstractUsecase:                      abstractUsecase,
 		UserUsecase:                          userUsecase,
 		ResourceClient:                       resourceClient,
-		HttpAdminResourceUser:                userHandler,
 		HttpAdminAuthenticationAuthenticator: authenticatorHandler,
 		AdminAbstractMiddleware:              abstractMiddleware,
 		AdminAdminMiddleware:                 adminMiddleware,
@@ -335,7 +332,6 @@ type HttpContainer struct {
 	ResourceClient *client.ResourceClient
 
 	// HTTP server -Controller
-	HttpAdminResourceUser                *handler2.UserHandler
 	HttpAdminAuthenticationAuthenticator *controller_admin_authentication.AuthenticatorHandler
 
 	// HTTP server -Middleware

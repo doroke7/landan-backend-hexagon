@@ -28,9 +28,6 @@ func HttpInit(oGin *gin.Engine, oContainer *container.HttpContainer) *gin.Engine
 	oAdmin := oGin.Group("/Admin").Use(adminMiddlewares(oContainer)...)
 	{
 		oAdmin.POST("/Authentication/Authenticator/SignIn", oContainer.HttpAdminAuthenticationAuthenticator.SignIn)
-
-		oAdmin.POST("/Resource/User/Add", oContainer.HttpAdminResourceUser.AddUser)
-		oAdmin.GET("/Resource/User/Show", oContainer.HttpAdminResourceUser.ShowUser)
 	}
 
 	return oGin

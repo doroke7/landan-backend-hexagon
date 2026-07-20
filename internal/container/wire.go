@@ -32,7 +32,6 @@ import (
 	inputFacadeTable "example/internal/input/application/facade/table"
 	inputHttpAdmin "example/internal/input/application/http/admin"
 	inputHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
-	inputHttpAdminResource "example/internal/input/application/http/admin/resource"
 	inputWebsocket "example/internal/input/application/websocket"
 
 	inputResource "example/internal/input/application/resource"
@@ -69,7 +68,6 @@ type HttpContainer struct {
 	ResourceClient *Client.ResourceClient
 
 	// HTTP server -Controller
-	HttpAdminResourceUser                *inputHttpAdminResource.UserHandler
 	HttpAdminAuthenticationAuthenticator *inputHttpAdminAuthentication.AuthenticatorHandler
 
 	// HTTP server -Middleware
@@ -119,7 +117,6 @@ func InitHttpContainer() (*HttpContainer, error) {
 
 		// input-http
 		inputHttpAdmin.NewAbstractHandler,
-		inputHttpAdminResource.NewUserHandler,
 
 		inputHttpAdminAuthentication.NewAuthenticatorHandler,
 
