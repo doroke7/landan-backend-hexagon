@@ -339,7 +339,7 @@ type ClientContainer struct {
 func InitClientContainer() (*ClientContainer, error) {
 	wire.Build(
 
-		// helper
+		// helper 部份
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
