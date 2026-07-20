@@ -3,17 +3,18 @@ package cron
 import (
 	"go.uber.org/zap"
 
-	inputCron "example/internal/input/application/cron"
-	port "example/internal/usecase/port/any/admin/resource"
 	pkg "example/pkg"
+
+	inputApplicationCron "example/internal/input/application/cron"
+	usecasePortAnyAdminResource "example/internal/usecase/port/any/admin/resource"
 )
 
 type AppUserHandler struct {
-	*inputCron.AbstractHandler
-	appUserUsecase port.AppUserUsecase
+	*inputApplicationCron.AbstractHandler
+	appUserUsecase usecasePortAnyAdminResource.AppUserUsecase
 }
 
-func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *inputCron.AbstractHandler) *AppUserHandler {
+func NewAppUserHandler(oAppUserUsecase usecasePortAnyAdminResource.AppUserUsecase, oAbstractHandler *inputApplicationCron.AbstractHandler) *AppUserHandler {
 	return &AppUserHandler{
 		AbstractHandler: oAbstractHandler,
 		appUserUsecase:  oAppUserUsecase,

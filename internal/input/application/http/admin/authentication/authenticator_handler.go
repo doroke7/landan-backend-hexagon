@@ -3,8 +3,9 @@ package controller_admin_authentication
 import (
 	"github.com/gin-gonic/gin"
 
-	bootstrap "example/bootstrap"
 	utility "example/internal/utility"
+
+	bootstrap "example/bootstrap"
 
 	inputHttpAdmin "example/internal/input/application/http"
 	port "example/internal/usecase/port/any/admin/authentication"

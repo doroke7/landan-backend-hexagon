@@ -3,24 +3,24 @@ package facade
 import (
 	"context"
 
-	inputFacade "example/internal/input/application/facade"
-	pb "example/pb/facade/table"
+	inputApplicationFacade "example/internal/input/application/facade"
+	pbFacadeTable "example/pb/facade/table"
 )
 
 type ScannerHandler struct {
-	pb.UnimplementedScannerServer
-	*inputFacade.AbstractHandler
+	pbFacadeTable.UnimplementedScannerServer
+	*inputApplicationFacade.AbstractHandler
 }
 
-func NewScannerHandler(oAbstractHandler *inputFacade.AbstractHandler) *ScannerHandler {
+func NewScannerHandler(oAbstractHandler *inputApplicationFacade.AbstractHandler) *ScannerHandler {
 	return &ScannerHandler{
 		AbstractHandler: oAbstractHandler,
 	}
 }
 
-func (oSelf *ScannerHandler) AddUser(ctx context.Context, req *pb.OneRequest) (*pb.OneResponse, error) {
+func (oSelf *ScannerHandler) AddUser(ctx context.Context, req *pbFacadeTable.OneRequest) (*pbFacadeTable.OneResponse, error) {
 
-	return &pb.OneResponse{
+	return &pbFacadeTable.OneResponse{
 		Name: "AA",
 	}, nil
 }

@@ -3,24 +3,24 @@ package facade
 import (
 	"context"
 
-	inputFacade "example/internal/input/application/facade"
-	pb "example/pb/facade/register"
+	inputApplicationFacade "example/internal/input/application/facade"
+	pbFacadeRegister "example/pb/facade/register"
 )
 
 type AuthenticatorHandler struct {
-	pb.UnimplementedAuthenticatorServer
-	*inputFacade.AbstractHandler
+	pbFacadeRegister.UnimplementedAuthenticatorServer
+	*inputApplicationFacade.AbstractHandler
 }
 
-func NewAuthenticatorHandler(oAbstractHandler *inputFacade.AbstractHandler) *AuthenticatorHandler {
+func NewAuthenticatorHandler(oAbstractHandler *inputApplicationFacade.AbstractHandler) *AuthenticatorHandler {
 	return &AuthenticatorHandler{
 		AbstractHandler: oAbstractHandler,
 	}
 }
 
-func (oSelf *AuthenticatorHandler) SingUp(oContext context.Context, oRequest *pb.OneRequest) (*pb.OneResponse, error) {
+func (oSelf *AuthenticatorHandler) SingUp(oContext context.Context, oRequest *pbFacadeRegister.OneRequest) (*pbFacadeRegister.OneResponse, error) {
 
-	return &pb.OneResponse{
+	return &pbFacadeRegister.OneResponse{
 		Name: "AA",
 	}, nil
 }
