@@ -3,15 +3,15 @@ package client
 import (
 	"google.golang.org/grpc"
 
-	pb "example/pb/client"
+	pbClient "example/pb/client"
 )
 
 type Client struct {
-	User pb.UserServiceClient
+	User pbClient.UserServiceClient
 }
 
 func NewClient(oConn *grpc.ClientConn) *Client {
 	return &Client{
-		User: pb.NewUserServiceClient(oConn),
+		User: pbClient.NewUserServiceClient(oConn),
 	}
 }

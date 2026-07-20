@@ -1,11 +1,11 @@
 package cron
 
 import (
+	"go.uber.org/zap"
+
 	inputCron "example/internal/input/application/cron"
 	port "example/internal/usecase/port/any/admin/resource"
 	pkg "example/pkg"
-
-	"go.uber.org/zap"
 )
 
 type AppUserHandler struct {

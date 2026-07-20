@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"go.uber.org/zap"
 
-	inputConsumer "example/internal/input/application/consumer"
-	port "example/internal/usecase/port/any/admin/resource"
 	pkg "example/pkg"
 
-	"go.uber.org/zap"
+	inputApplicationConsumer "example/internal/input/application/consumer"
+	usecasePortAnyAdminResource "example/internal/usecase/port/any/admin/resource"
 )
 
 type increaseBalanceMessage struct {
@@ -18,11 +18,11 @@ type increaseBalanceMessage struct {
 }
 
 type AppUserHandler struct {
-	*inputConsumer.AbstractHandler
-	appUserUsecase port.AppUserUsecase
+	*inputApplicationConsumer.AbstractHandler
+	appUserUsecase usecasePortAnyAdminResource.AppUserUsecase
 }
 
-func NewAppUserHandler(oAppUserUsecase port.AppUserUsecase, oAbstractHandler *inputConsumer.AbstractHandler) *AppUserHandler {
+func NewAppUserHandler(oAppUserUsecase usecasePortAnyAdminResource.AppUserUsecase, oAbstractHandler *inputApplicationConsumer.AbstractHandler) *AppUserHandler {
 	return &AppUserHandler{
 		AbstractHandler: oAbstractHandler,
 		appUserUsecase:  oAppUserUsecase,
