@@ -47,8 +47,8 @@
 
 ```
 .
-├── main.go                        # 進入點，只呼叫 cmd.Execute()
-├── cmd/                           # cobra 指令，每個檔案對應一個可獨立啟動的服務／進程
+├── main.go                        #   全程式進入點，只呼叫 cmd.Execute()
+├── cmd/                           #   cobra 指令，每個檔案對應一個可獨立啟動的服務／進程
 │   ├── root.go                    #   root command，Execute() 供 main.go 呼叫
 │   ├── facade.go                  #   啟動 facade gRPC 服務（對外入口）
 │   ├── resource.go                #   啟動 resource gRPC 服務（資料服務，僅供 facade / http 呼叫）
@@ -89,8 +89,8 @@
 │   │   │   └── game/
 │   │   └── resource/
 │   │
-│   ├── usecase/                   # 商務案例：實作 + 端口介面
-│   │   ├── application/
+│   ├── usecase/                           # 商務案例：實作 + 端口介面
+│   │   ├── application/                   # 實作
 │   │   │   └── any/                       #  「any」表示這份 usecase 不綁定特定 adapter，可以被多個 driving
 │   │   │       │                          # usecase端一種命名結構對應不同input 但是多種輸入
 │   │   │       ├── admin/                 #  後台服務
@@ -101,7 +101,7 @@
 │   │   │       ├── game/                  #  遊戲邏輯服務
 │   │   │       ├── register/              #  認證服務
 │   │   │       └── table/                 #  地端上報服務
-│   │   └── port/
+│   │   └── port/                          #  介面
 │   │       └── any/                       #  對應上面每一組的 interface，同樣用「功能」命名
 │   │           ├── admin/
 │   │           │   ├── authentication/
@@ -110,7 +110,7 @@
 │   │           └── logic/
 │   │
 │   ├── output/                    # 輸出端（driven adapter）：實作 + 端口介面
-│   │   ├── application/
+│   │   ├── application/           # 實作
 │   │   │   ├── mysql/
 │   │   │   │   └── model/         #   
 │   │   │   │                      #   
@@ -120,7 +120,7 @@
 │   │   │   │   └── logic/         #   AppUserRepository
 │   │   │   └── producer/
 │   │   │       └── model/         #   AMQP UserProducer
-│   │   └── port/
+│   │   └── port/                  #  介面
 │   │       └── any/               #  跟 usecase/port/any 一樣的命名邏輯：這裡的「介面」不分誰在用，
 │   │           ├── model/         #   UserRepository / AdminUserRepository / AppUserRepository
 │   │           └── logic/         #   AppUserRepository
