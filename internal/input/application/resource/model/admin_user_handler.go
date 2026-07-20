@@ -4,7 +4,7 @@ import (
 	"context"
 
 	inputResource "example/internal/input/application/resource"
-	port "example/internal/usecase/port/resource/model"
+	port "example/internal/usecase/port/any/model"
 	pb "example/pb/resource/model"
 )
 

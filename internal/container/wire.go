@@ -37,10 +37,9 @@ import (
 	inputResource "example/internal/input/application/resource"
 	inputResourceModel "example/internal/input/application/resource/model"
 
-	usecasePortResourceModel "example/internal/usecase/port/resource/model"
+	usecasePortResourceModel "example/internal/usecase/port/any/model"
 
-	usecaseApplicationCommand "example/internal/usecase/application/any/admin/resource"
-	usecaseApplicationConsumer "example/internal/usecase/application/consumer/admin/resource"
+	usecaseApplicationAny "example/internal/usecase/application/any/admin/resource"
 	usecaseApplicationCron "example/internal/usecase/application/cron/admin/resource"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
@@ -257,7 +256,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
-		usecaseApplicationConsumer.NewAppUserUsecase,
+		usecaseApplicationAny.NewAppUserUsecase,
 
 		// input-consumer
 		inputConsumer.NewAbstractHandler,
@@ -378,7 +377,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
-		usecaseApplicationCommand.NewAppUserUsecase,
+		usecaseApplicationAny.NewAppUserUsecase,
 
 		// command
 		inputCommand.NewAbstractHandler,

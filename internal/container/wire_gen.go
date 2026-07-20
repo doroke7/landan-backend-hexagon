@@ -13,7 +13,7 @@ import (
 	"example/internal/input/application/command"
 	command2 "example/internal/input/application/command/admin/resource"
 	"example/internal/input/application/consumer"
-	consumer3 "example/internal/input/application/consumer/admin/resource"
+	consumer2 "example/internal/input/application/consumer/admin/resource"
 	cron2 "example/internal/input/application/cron"
 	cron3 "example/internal/input/application/cron/admin/resource"
 	"example/internal/input/application/facade"
@@ -29,11 +29,10 @@ import (
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	any2 "example/internal/usecase/application/any/admin/resource"
-	consumer2 "example/internal/usecase/application/consumer/admin/resource"
 	"example/internal/usecase/application/cron/admin/resource"
 	"example/internal/usecase/application/http/admin/authentication"
 	usecase2 "example/internal/usecase/application/resource/model"
-	"example/internal/usecase/port/resource/model"
+	any3 "example/internal/usecase/port/any/model"
 	"example/pkg"
 )
 
@@ -157,8 +156,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
 	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
-	appUserUsecase := consumer2.NewAppUserUsecase(appUserRepository)
-	appUserHandler := consumer3.NewAppUserHandler(appUserUsecase, abstractHandler)
+	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
+	appUserHandler := consumer2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
 		AbstractHelper:  abstractHelper,
 		AesHelper:       aesHelper,
@@ -291,7 +290,7 @@ type ResourceContainer struct {
 	*helper.RsaHelper
 
 	*usecase2.AbstractUsecase
-	port.AdminUserUsecase
+	any3.AdminUserUsecase
 
 	// gRPC Resource server
 	ResourceAbstract       *service.AbstractHandler
@@ -310,7 +309,7 @@ type ConsumerContainer struct {
 
 	// MQ 消費者
 	*consumer.AbstractHandler
-	ConsumerAppUser *consumer3.AppUserHandler
+	ConsumerAppUser *consumer2.AppUserHandler
 }
 
 // CronContainer 只給 `cron` 排程服務使用。

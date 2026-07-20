@@ -1,4 +1,4 @@
-package port
+package any
 
 import (
 	"example/internal/domain"
