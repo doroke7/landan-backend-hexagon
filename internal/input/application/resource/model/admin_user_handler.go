@@ -1,4 +1,4 @@
-package service
+package input_application
 
 import (
 	"context"

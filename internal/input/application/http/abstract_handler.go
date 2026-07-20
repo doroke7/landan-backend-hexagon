@@ -1,4 +1,4 @@
-package handler
+package input_application
 
 import (
 	pkg "example/pkg"

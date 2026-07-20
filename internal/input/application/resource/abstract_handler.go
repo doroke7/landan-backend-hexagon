@@ -1,4 +1,4 @@
-package service
+package input_application
 
 func NewAbstractHandler() *AbstractHandler {
 	return &AbstractHandler{}

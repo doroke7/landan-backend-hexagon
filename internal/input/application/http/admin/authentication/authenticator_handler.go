@@ -1,4 +1,4 @@
-package controller_admin_authentication
+package input_application
 
 import (
 	"github.com/gin-gonic/gin"

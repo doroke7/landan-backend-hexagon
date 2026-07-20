@@ -1,4 +1,4 @@
-package resource
+package output_application
 
 import (
 	"context"

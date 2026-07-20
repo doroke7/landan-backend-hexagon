@@ -1,4 +1,4 @@
-package consumer
+package input_application
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"

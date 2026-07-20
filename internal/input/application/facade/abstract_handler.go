@@ -1,4 +1,4 @@
-package facade
+package fainput_applicationcade
 
 import (
 	helper "example/internal/helper"

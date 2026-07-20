@@ -1,4 +1,4 @@
-package command
+package input_application
 
 import (
 	helper "example/internal/helper"
