@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	container "example/internal/container"
+	register "example/internal/register"
 )
 
 var CommandCommand = &cobra.Command{
@@ -22,6 +23,6 @@ func init() {
 		panic(err)
 	}
 
-	CommandCommand.AddCommand(oContainer.CommandAdminReourceAppUser.IncreaseBalance())
+	CommandCommand = register.CommandInit(CommandCommand, oContainer)
 	oRootCommand.AddCommand(CommandCommand)
 }
