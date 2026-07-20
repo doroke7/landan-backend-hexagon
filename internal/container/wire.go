@@ -42,7 +42,6 @@ import (
 	usecaseApplicationFacadeModel "example/internal/usecase/application/facade/model"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
-	outputApplicationCacheModel "example/internal/output/application/cache/model"
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
 )
@@ -91,14 +90,12 @@ func InitHttpContainer() (*HttpContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewRedis,
 		bootstrap.NewResource,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
-		helper.NewCacheHelper,
 		helper.NewJwtHelper,
 
 		// usecase
@@ -106,7 +103,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationMysqlModel.NewUserRepository,
 		outputApplicationResourceModel.NewAdminUserRepository,
 
 		// client
@@ -164,13 +161,11 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewRedis,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
-		helper.NewCacheHelper,
 
 		// input-facade
 		inputFacade.NewAbstractHandler,
@@ -190,7 +185,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(FacadeContainer), "*"),
 	)
@@ -270,12 +265,10 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		// bootstrap
 		bootstrap.NewMysql,
 		bootstrap.NewAmqp,
-		bootstrap.NewRedis,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-		helper.NewCacheHelper,
 
 		// input-consumer
 		inputConsumer.NewAbstractHandler,
@@ -285,7 +278,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(ConsumerContainer), "*"),
 	)
@@ -313,12 +306,10 @@ func InitCronContainer() (*CronContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewRedis,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-		helper.NewCacheHelper,
 
 		// input-cron
 		inputCron.NewAbstractHandler,
@@ -329,7 +320,7 @@ func InitCronContainer() (*CronContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -357,12 +348,10 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewRedis,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-		helper.NewCacheHelper,
 
 		// input-websocket
 		inputWebsocket.NewAbstractHandler,
@@ -373,7 +362,7 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(WebsocketContainer), "*"),
 	)
@@ -398,19 +387,17 @@ func InitClientContainer() (*ClientContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
-		bootstrap.NewRedis,
 
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
-		helper.NewCacheHelper,
 
 		// usecase
 		usecaseApplicationFacadeModel.NewAbstractUsecase,
 		usecaseApplicationFacadeModel.NewUserUsecase,
 
 		// output
-		outputApplicationCacheModel.NewUserRepository,
+		outputApplicationMysqlModel.NewUserRepository,
 
 		wire.Struct(new(ClientContainer), "*"),
 	)

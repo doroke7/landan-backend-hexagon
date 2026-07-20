@@ -25,7 +25,6 @@ import (
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
-	"example/internal/output/application/cache/model"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/facade/model"
@@ -48,12 +47,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userRepository := mysql.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	clientConn := bootstrap.NewResource()
 	model := client.NewModel(clientConn)
@@ -106,12 +100,7 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userRepository := mysql.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := facade.NewAbstractHandler(aesHelper)
 	userHandler := facade2.NewUserHandler(userUsecase, abstractHandler)
@@ -176,12 +165,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userRepository := mysql.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	connection, err := bootstrap.NewAmqp()
 	if err != nil {
@@ -206,12 +190,7 @@ func InitCronContainer() (*CronContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userRepository := mysql.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := cron.NewAbstractHandler(aesHelper)
 	userCron, err := cron.NewUserCron(userUsecase, abstractHandler)
@@ -236,12 +215,7 @@ func InitWebsocketContainer() (*WebsocketContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userRepository := mysql.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	abstractHandler := websocket.NewAbstractHandler(aesHelper)
 	userHandler := websocket.NewUserHandler(userUsecase, abstractHandler)
@@ -263,12 +237,7 @@ func InitClientContainer() (*ClientContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
-	userRepository := cache.NewUserRepository(db, cacheHelper)
+	userRepository := mysql.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, abstractUsecase)
 	clientContainer := &ClientContainer{
 		AbstractHelper:  abstractHelper,
