@@ -179,9 +179,9 @@ func InitCronContainer() (*CronContainer, error) {
 	abstractHandler := input_application_cron.NewAbstractHandler(aesHelper)
 	appUserHandler := input_application_cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	cronContainer := &CronContainer{
-		AbstractHelper: abstractHelper,
-		AesHelper:      aesHelper,
-		CronAppUser:    appUserHandler,
+		AbstractHelper:           abstractHelper,
+		AesHelper:                aesHelper,
+		CronAdminResourceAppUser: appUserHandler,
 	}
 	return cronContainer, nil
 }
@@ -219,10 +219,10 @@ func InitCommandContainer() (*CommandContainer, error) {
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := input_application_command2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
-		AbstractHelper:  abstractHelper,
-		AesHelper:       aesHelper,
-		AbstractHandler: abstractHandler,
-		CommandAppUser:  appUserHandler,
+		AbstractHelper:             abstractHelper,
+		AesHelper:                  aesHelper,
+		AbstractHandler:            abstractHandler,
+		CommandAdminReourceAppUser: appUserHandler,
 	}
 	return commandContainer, nil
 }
@@ -319,7 +319,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *input_application_cron2.AppUserHandler
+	CronAdminResourceAppUser *input_application_cron2.AppUserHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。
@@ -347,5 +347,5 @@ type CommandContainer struct {
 
 	// command
 	*input_application_command.AbstractHandler
-	CommandAppUser *input_application_command2.AppUserHandler
+	CommandAdminReourceAppUser *input_application_command2.AppUserHandler
 }

@@ -11,7 +11,7 @@ import (
 func CronInit(oContainer *container.CronContainer) *cron.Cron {
 	oCron := cron.New()
 
-	if _, err := oCron.AddFunc("* * * * *", oContainer.CronAppUser.IncreaseBalance); err != nil {
+	if _, err := oCron.AddFunc("* * * * *", oContainer.CronAdminResourceAppUser.IncreaseBalance); err != nil {
 		log.Fatalf("cron: failed to register CronAppUser.IncreaseBalance job: %v", err)
 	}
 

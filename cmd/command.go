@@ -22,6 +22,6 @@ func init() {
 		panic(err)
 	}
 
-	CommandCommand.AddCommand(oContainer.CommandAppUser.IncreaseBalance())
+	CommandCommand.AddCommand(oContainer.CommandAdminReourceAppUser.IncreaseBalance())
 	oRootCommand.AddCommand(CommandCommand)
 }

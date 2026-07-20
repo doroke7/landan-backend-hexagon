@@ -276,7 +276,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *inputApplicationCronAdminResource.AppUserHandler
+	CronAdminResourceAppUser *inputApplicationCronAdminResource.AppUserHandler
 }
 
 func InitCronContainer() (*CronContainer, error) {
@@ -358,7 +358,7 @@ type CommandContainer struct {
 
 	// command
 	*inputApplicationCommand.AbstractHandler
-	CommandAppUser *inputApplicationCommandAdminResource.AppUserHandler
+	CommandAdminReourceAppUser *inputApplicationCommandAdminResource.AppUserHandler
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
