@@ -12,7 +12,7 @@ import (
 	"example/internal/helper"
 	"example/internal/input/application/command"
 	"example/internal/input/application/consumer"
-	"example/internal/input/application/cron"
+	cron2 "example/internal/input/application/cron"
 	"example/internal/input/application/facade"
 	facade3 "example/internal/input/application/facade/register"
 	facade2 "example/internal/input/application/facade/table"
@@ -25,6 +25,7 @@ import (
 	"example/internal/middleware/admin"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
+	"example/internal/usecase/application/cron"
 	"example/internal/usecase/application/http/admin/authentication"
 	usecase2 "example/internal/usecase/application/resource/model"
 	"example/internal/usecase/port/resource/model"
@@ -155,8 +156,9 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
-	abstractHandler := cron.NewAbstractHandler(aesHelper)
-	appUserHandler := cron.NewAppUserHandler(abstractHandler)
+	appUserUsecase := cron.NewAppUserUsecase()
+	abstractHandler := cron2.NewAbstractHandler(aesHelper)
+	appUserHandler := cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	cronContainer := &CronContainer{
 		AbstractHelper: abstractHelper,
 		AesHelper:      aesHelper,
@@ -288,7 +290,7 @@ type CronContainer struct {
 	*helper.AesHelper
 
 	// 排程 server
-	CronAppUser *cron.AppUserHandler
+	CronAppUser *cron2.AppUserHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。

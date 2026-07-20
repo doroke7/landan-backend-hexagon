@@ -36,6 +36,7 @@ import (
 
 	usecasePortResourceModel "example/internal/usecase/port/resource/model"
 
+	usecaseApplicationCron "example/internal/usecase/application/cron"
 	usecaseApplicationHttpAdminAuthentication "example/internal/usecase/application/http/admin/authentication"
 	usecaseApplicationResourceModel "example/internal/usecase/application/resource/model"
 
@@ -274,6 +275,9 @@ func InitCronContainer() (*CronContainer, error) {
 		// input-cron
 		inputCron.NewAbstractHandler,
 		inputCron.NewAppUserHandler,
+
+		// usecase
+		usecaseApplicationCron.NewAppUserUsecase,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
