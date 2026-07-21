@@ -36,6 +36,10 @@ type Config struct {
 			HOST string `mapstructure:"host"`
 			PORT string `mapstructure:"port"`
 		} `mapstructure:"websocket"`
+		SOURCE struct {
+			HOST string `mapstructure:"host"`
+			PORT string `mapstructure:"port"`
+		} `mapstructure:"source"`
 	} `mapstructure:"services"`
 	CLIENTS struct {
 		FACADE struct {

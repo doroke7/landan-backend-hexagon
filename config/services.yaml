@@ -8,3 +8,6 @@ resource:
   password: '!Scg]4"?VYY`mzFOV(Nu247ou6O5E@jB'
 websocket:
   port: 6001
+
+source:
+  port: 3005
