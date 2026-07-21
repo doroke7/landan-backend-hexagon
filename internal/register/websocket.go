@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	bootstrap "example/bootstrap"
-	container "example/internal/container"
+	container "example/container"
 )
 
 func WebsocketInit(oContainer *container.WebsocketContainer) *http.Server {

@@ -8,7 +8,7 @@ import (
 
 	pbSourceAnnouncement "example/pb/source/announcement"
 
-	container "example/internal/container"
+	container "example/container"
 	pkg "example/pkg"
 )
 

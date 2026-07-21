@@ -8,7 +8,7 @@ import (
 
 	pkg "example/pkg"
 
-	container "example/internal/container"
+	container "example/container"
 
 	pbFacadeRegister "example/pb/facade/register"
 	pbFacadeTable "example/pb/facade/table"

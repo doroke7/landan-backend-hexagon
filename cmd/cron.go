@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	container "example/internal/container"
+	container "example/container"
 	register "example/internal/register"
 )
 

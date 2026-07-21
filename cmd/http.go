@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	bootstrap "example/bootstrap"
-	container "example/internal/container"
+	container "example/container"
 	register "example/internal/register"
 )
 

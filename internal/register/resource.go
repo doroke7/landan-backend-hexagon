@@ -8,7 +8,7 @@ import (
 
 	pbResourceModel "example/pb/resource/model"
 
-	container "example/internal/container"
+	container "example/container"
 	pkg "example/pkg"
 )
 

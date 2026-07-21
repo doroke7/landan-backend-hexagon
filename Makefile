@@ -18,7 +18,7 @@ protoc:
 
 .PHONY: wire
 wire:
-	cd internal/container/ && wire
+	cd container/ && wire
 
 
 

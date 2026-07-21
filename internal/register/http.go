@@ -3,7 +3,7 @@ package register
 import (
 	"github.com/gin-gonic/gin"
 
-	container "example/internal/container"
+	container "example/container"
 )
 
 func adminMiddlewares(oContainer *container.HttpContainer) []gin.HandlerFunc {

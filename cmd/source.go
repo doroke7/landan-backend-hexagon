@@ -9,7 +9,7 @@ import (
 	pkg "example/pkg"
 
 	bootstrap "example/bootstrap"
-	container "example/internal/container"
+	container "example/container"
 	register "example/internal/register"
 )
 

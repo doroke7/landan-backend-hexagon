@@ -3,7 +3,7 @@ package register
 import (
 	pkg "example/pkg"
 
-	container "example/internal/container"
+	container "example/container"
 )
 
 func ConsumerInit(oContainer *container.ConsumerContainer) *pkg.ConsumerRouter {

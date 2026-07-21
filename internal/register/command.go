@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	container "example/internal/container"
+	container "example/container"
 )
 
 // CommandInit 只組裝子命令的「形狀」（名字、flag），不在這裡連任何基礎設施；
