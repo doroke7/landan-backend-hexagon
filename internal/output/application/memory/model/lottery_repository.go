@@ -3,6 +3,7 @@ package model
 import (
 	domain "example/internal/domain"
 	outputPortAnyModel "example/internal/output/port/any/model"
+	"fmt"
 	"math/rand/v2"
 	"strconv"
 	"strings"
@@ -11,15 +12,19 @@ import (
 
 type LotteryRepository struct {
 	*AbstractRepository
+	startTime time.Time
 }
 
 func NewLotteryRepository(oAbstractRepository *AbstractRepository) outputPortAnyModel.LotteryRepository {
 	return &LotteryRepository{
 		AbstractRepository: oAbstractRepository,
+		startTime:          time.Now(),
 	}
 }
 
 func (oSelf *LotteryRepository) WatchOneByKey(sKey string) (*domain.Lottery, error) {
+
+	iId := uint(time.Since(oSelf.startTime).Minutes()) + 1
 
 	iCount := 4 // 產生幾個數字
 
@@ -33,8 +38,8 @@ func (oSelf *LotteryRepository) WatchOneByKey(sKey string) (*domain.Lottery, err
 	sNumbers := strings.Join(aNumbers, ",")
 
 	return &domain.Lottery{
-		Id:      1,
-		Round:   "2026-001-001",
+		Id:      iId,
+		Round:   fmt.Sprintf("2026-%04d", iId),
 		Time:    time.Now().UnixNano(),
 		Numbers: sNumbers,
 	}, nil
