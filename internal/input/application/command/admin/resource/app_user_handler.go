@@ -1,10 +1,6 @@
 package command
 
 import (
-	"log"
-
-	"github.com/spf13/cobra"
-
 	inputApplicationCommand "example/internal/input/application/command"
 	usecasePortAnyAdminResource "example/internal/usecase/port/any/admin/resource"
 )
@@ -21,24 +17,9 @@ func NewAppUserHandler(oAppUserUsecase usecasePortAnyAdminResource.AppUserUsecas
 	}
 }
 
-func (oSelf *AppUserHandler) IncreaseBalance() *cobra.Command {
-
-	var iId uint
-	var iAmount uint
-
-	var oAppUserIncreaseBalanceCommand = &cobra.Command{
-		Use:   "Admin-Resource-AppUser-IncreaseBalance",
-		Short: "AppUser-IncreaseBalance 相關命令",
-		Run: func(oCmd *cobra.Command, args []string) {
-			if _, err := oSelf.appUserUsecase.IncreaseBalance(iId, iAmount); err != nil {
-				log.Printf("increase balance failed: %v", err)
-				return
-			}
-		},
-	}
-
-	oAppUserIncreaseBalanceCommand.Flags().UintVar(&iId, "id", 1, "AppUser 的 id")
-	oAppUserIncreaseBalanceCommand.Flags().UintVar(&iAmount, "amount", 10, "要增加的餘額")
-
-	return oAppUserIncreaseBalanceCommand
+// IncreaseBalance 只負責轉呼叫 usecase，不知道自己是被 CLI 呼叫的——
+// cobra.Command 的組裝、container 的建立時機，都交給 cmd/register 那層決定。
+func (oSelf *AppUserHandler) IncreaseBalance(id uint, amount uint) error {
+	_, err := oSelf.appUserUsecase.IncreaseBalance(id, amount)
+	return err
 }

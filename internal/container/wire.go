@@ -33,18 +33,25 @@ import (
 
 	inputApplicationCommand "example/internal/input/application/command"
 	inputApplicationCommandAdminResource "example/internal/input/application/command/admin/resource"
+
 	inputApplicationConsumer "example/internal/input/application/consumer"
 	inputApplicationConsumerAdminResource "example/internal/input/application/consumer/admin/resource"
+
 	inputApplicationCron "example/internal/input/application/cron"
 	inputApplicationCronAdminResource "example/internal/input/application/cron/admin/resource"
-	inputApplicationFacade "example/internal/input/application/facade"
-	inputApplicationFacadeRegister "example/internal/input/application/facade/register"
-	inputApplicationFacadeTable "example/internal/input/application/facade/table"
-	inputApplicationHttp "example/internal/input/application/http"
-	inputApplicationHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
+
+	inputApplicationSource "example/internal/input/application/source"
+	inputApplicationSourceAnnouncement "example/internal/input/application/source/announcement"
 
 	inputApplicationResource "example/internal/input/application/resource"
 	inputApplicationResourceModel "example/internal/input/application/resource/model"
+
+	inputApplicationFacade "example/internal/input/application/facade"
+	inputApplicationFacadeRegister "example/internal/input/application/facade/register"
+	inputApplicationFacadeTable "example/internal/input/application/facade/table"
+
+	inputApplicationHttp "example/internal/input/application/http"
+	inputApplicationHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
 )
 
 // HttpContainer 只給 `http` Gin 服務使用。
@@ -383,6 +390,32 @@ func InitCommandContainer() (*CommandContainer, error) {
 		inputApplicationCommandAdminResource.NewAppUserHandler,
 
 		wire.Struct(new(CommandContainer), "*"),
+	)
+	return nil, nil
+}
+
+type SourceContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	SourceAnnouncementLottery *inputApplicationSourceAnnouncement.LotteryHandler
+}
+
+func InitSourceContainer() (*SourceContainer, error) {
+	wire.Build(
+
+		// bootstrap
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+
+		inputApplicationSource.NewAbstractHandler,
+		inputApplicationSourceAnnouncement.NewLotteryHandler,
+
+		wire.Struct(new(SourceContainer), "*"),
 	)
 	return nil, nil
 }

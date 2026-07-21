@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pb.source.announcement;
+
+option go_package = "./pb_source_announcement";
+
+service Lottery {
+  rpc Watch(LotteryWatchRequest) returns (stream LotteryWatchReply);
+}
+
+message LotteryWatchRequest {
+    string key = 1;
+}
+
+message LotteryWatchReply {
+  int32 id = 1;        // 期號
+  string round = 2;        // 期號
+  int64 time = 3;        // 開獎時間（unix 秒）
+  repeated int32 numbers = 4; // 開獎號碼列表
+}
+
+
+/*
+   如何 建立一個獨立服務
+   1. 建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
+   2. 設定 config/services.yaml  與 bootstrap/config.go
+   3. 建立 cmd/source.go 與 container tree 與 register
+   4. 建立 input/source/announcement/lottery.go 的服務類，並且綁定 pb， 並注入 container，並且註冊 register/
+*/

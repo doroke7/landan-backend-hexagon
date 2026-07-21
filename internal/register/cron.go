@@ -11,6 +11,7 @@ import (
 func CronInit(oContainer *container.CronContainer) *cron.Cron {
 	oCron := cron.New()
 
+	// 這裡 oContainer.CronAdminResourceAppUser.IncreaseBalance 是，閉包，還沒執行，所以啟動不會連 mysql
 	if _, err := oCron.AddFunc("* * * * *", oContainer.CronAdminResourceAppUser.IncreaseBalance); err != nil {
 		log.Fatalf("cron: failed to register CronAppUser.IncreaseBalance job: %v", err)
 	}
