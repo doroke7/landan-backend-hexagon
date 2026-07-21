@@ -1,13 +1,38 @@
 package register
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
 
 	container "example/internal/container"
 )
 
-func CommandInit(CommandCommand *cobra.Command, oContainer *container.CommandContainer) *cobra.Command {
-	CommandCommand.AddCommand(oContainer.CommandAdminReourceAppUser.IncreaseBalance())
+// CommandInit 只組裝子命令的「形狀」（名字、flag），不在這裡連任何基礎設施；
+// container.InitCommandContainer() 延後到 Run: 真正執行時才呼叫，
+// 這樣註冊子命令樹（init() 階段）就不需要先連上 MySQL。
+func CommandInit(oCommandCommand *cobra.Command) *cobra.Command {
+	var iId uint
+	var iAmount uint
 
-	return CommandCommand
+	oAppUserIncreaseBalanceCommand := &cobra.Command{
+		Use:   "Admin-Resource-AppUser-IncreaseBalance",
+		Short: "AppUser-IncreaseBalance 相關命令",
+		Run: func(oCmd *cobra.Command, args []string) {
+			oContainer, err := container.InitCommandContainer()
+			if err != nil {
+				log.Fatalf("command: failed to init container: %v", err)
+			}
+
+			if err := oContainer.CommandAdminReourceAppUser.IncreaseBalance(iId, iAmount); err != nil {
+				log.Printf("increase balance failed: %v", err)
+			}
+		},
+	}
+
+	oAppUserIncreaseBalanceCommand.Flags().UintVar(&iId, "id", 1, "AppUser 的 id")
+	oAppUserIncreaseBalanceCommand.Flags().UintVar(&iAmount, "amount", 10, "要增加的餘額")
+
+	oCommandCommand.AddCommand(oAppUserIncreaseBalanceCommand)
+	return oCommandCommand
 }
