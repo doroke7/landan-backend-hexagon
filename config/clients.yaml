@@ -8,6 +8,10 @@ resource:        # 數據服務
   user: 'resource'
   password: '!Scg]4"?VYY`mzFOV(Nu247ou6O5E@jB'
 
+ource:        # 數據服務
+  hosts: ["127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"]
+  ports: ["2008", "2008", "2008", "2008"]
+
 
 # services 是服務端要配置什麼密碼
 # clients 是客戶端連線時候要配置什麼密碼
