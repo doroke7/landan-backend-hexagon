@@ -28,10 +28,12 @@ import (
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
+	"example/internal/output/application/memory/model"
 	"example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/any/admin/authentication"
 	any2 "example/internal/usecase/application/any/admin/resource"
+	usecase3 "example/internal/usecase/application/any/annoucement"
 	usecase2 "example/internal/usecase/application/any/model"
 	any3 "example/internal/usecase/port/any/model"
 	"example/pkg"
@@ -233,7 +235,11 @@ func InitSourceContainer() (*SourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := resource3.NewAbstractHandler()
-	lotteryHandler := announcement.NewLotteryHandler(abstractHandler)
+	abstractUsecase := usecase3.NewAbstractUsecase(aesHelper)
+	abstractRepository := model.NewAbstractRepository()
+	lotteryRepository := model.NewLotteryRepository(abstractRepository)
+	lotteryUsecase := usecase3.NewLotteryUsecase(abstractUsecase, lotteryRepository)
+	lotteryHandler := announcement.NewLotteryHandler(abstractHandler, lotteryUsecase)
 	sourceContainer := &SourceContainer{
 		AbstractHelper:            abstractHelper,
 		AesHelper:                 aesHelper,

@@ -17,6 +17,8 @@ import (
 
 	helper "example/internal/helper"
 
+	outputApplicationMemoryModel "example/internal/output/application/memory/model"
+
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
 
@@ -24,6 +26,7 @@ import (
 
 	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
 	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
+	usecaseApplicationAnyAnnouncement "example/internal/usecase/application/any/annoucement"
 	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
 
 	middlewareAdmin "example/internal/middleware/admin"
@@ -411,6 +414,11 @@ func InitSourceContainer() (*SourceContainer, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
+
+		outputApplicationMemoryModel.NewAbstractRepository,
+		outputApplicationMemoryModel.NewLotteryRepository,
+		usecaseApplicationAnyAnnouncement.NewAbstractUsecase,
+		usecaseApplicationAnyAnnouncement.NewLotteryUsecase,
 
 		inputApplicationSource.NewAbstractHandler,
 		inputApplicationSourceAnnouncement.NewLotteryHandler,
