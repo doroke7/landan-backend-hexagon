@@ -227,6 +227,16 @@ func InitCommandContainer() (*CommandContainer, error) {
 	return commandContainer, nil
 }
 
+func InitSourceContainer() (*SourceContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	sourceContainer := &SourceContainer{
+		AbstractHelper: abstractHelper,
+		AesHelper:      aesHelper,
+	}
+	return sourceContainer, nil
+}
+
 // wire.go:
 
 // HttpContainer 只給 `http` Gin 服務使用。
@@ -348,4 +358,11 @@ type CommandContainer struct {
 	// command
 	*command.AbstractHandler
 	CommandAdminReourceAppUser *command2.AppUserHandler
+}
+
+type SourceContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
 }

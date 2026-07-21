@@ -386,3 +386,24 @@ func InitCommandContainer() (*CommandContainer, error) {
 	)
 	return nil, nil
 }
+
+type SourceContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+}
+
+func InitSourceContainer() (*SourceContainer, error) {
+	wire.Build(
+
+		// bootstrap
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+
+		wire.Struct(new(SourceContainer), "*"),
+	)
+	return nil, nil
+}
