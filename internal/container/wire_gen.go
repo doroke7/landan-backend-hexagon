@@ -32,6 +32,7 @@ import (
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/any/admin/authentication"
 	any2 "example/internal/usecase/application/any/admin/resource"
+	usecase3 "example/internal/usecase/application/any/annoucement"
 	usecase2 "example/internal/usecase/application/any/model"
 	any3 "example/internal/usecase/port/any/model"
 	"example/pkg"
@@ -233,7 +234,9 @@ func InitSourceContainer() (*SourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := resource3.NewAbstractHandler()
-	lotteryHandler := announcement.NewLotteryHandler(abstractHandler)
+	abstractUsecase := usecase3.NewAbstractUsecase(aesHelper)
+	lotteryUsecase := usecase3.NewLotteryUsecase(abstractUsecase)
+	lotteryHandler := announcement.NewLotteryHandler(abstractHandler, lotteryUsecase)
 	sourceContainer := &SourceContainer{
 		AbstractHelper:            abstractHelper,
 		AesHelper:                 aesHelper,

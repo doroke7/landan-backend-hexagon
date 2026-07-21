@@ -24,6 +24,7 @@ import (
 
 	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
 	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
+	usecaseApplicationAnyAnnouncement "example/internal/usecase/application/any/annoucement"
 	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
 
 	middlewareAdmin "example/internal/middleware/admin"
@@ -411,6 +412,9 @@ func InitSourceContainer() (*SourceContainer, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
+
+		usecaseApplicationAnyAnnouncement.NewAbstractUsecase,
+		usecaseApplicationAnyAnnouncement.NewLotteryUsecase,
 
 		inputApplicationSource.NewAbstractHandler,
 		inputApplicationSourceAnnouncement.NewLotteryHandler,

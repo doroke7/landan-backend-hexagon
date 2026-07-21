@@ -25,8 +25,8 @@ func (oSelf *LotteryUsecase) WatchOneByKey(sKey string) (*domain.Lottery, error)
 
 	return &domain.Lottery{
 		Id:      1,
-		Round:   "111111",
-		Time:    "111111",
+		Round:   "2026-001-001",
+		Time:    111111111111111111,
 		Numbers: "7,97,72,53",
 	}, nil
 }
