@@ -33,15 +33,50 @@
 |      MySQL / Redis / Kafka / S3 / MQ / Third-party API         |
 +----------------------------------------------------------------+
 
-## 這套框架使用重點
-1. input 不同輸入driver 相同的路徑應該是相同的設備方法。譬如 cron/admin/resource/app_user 與 http/admin/resource/app_user 是相同業務但是不同協議
-2. usecase/application/any 底下的代表所有 二級服務的聯集。
-3. 
+## 六角框架使用重點
+1. input 不同輸入 adaptor 相同的路徑應該是相同的設備方法。
+    譬如 cron/admin/authentication/authenticator, 
+        command/admin/authentication/authenticator,
+        http/admin/authentication/authenticator,
+        facade/admin/authentication/authenticator,
+        
+    以不同協議但是相同業務邏輯實現
+2. output 同理
 
 
-## 六角架構核心優點
-1. 可以同時輸入 http / grpc / cron / consumer / websocket / client-stream / command，但共用同一套 usecase 業務邏輯。
-2. 每種輸入各自只組裝自己需要的依賴（見下方「每個服務獨立 container」），不會因為要跑 `cron` 就順便把 gRPC client、AMQP 都連上。
+
+
+
+## 如何利用這套框架 從 1到100 建立一個獨立 服務端-服務。 (一定要一點一點加，不然很容易 interface 對不上)
+1. proto基本文檔撰寫: 
+    建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
+
+2. config設定當基本參數: 
+    設定 config/services.yaml  與 bootstrap/config.go
+
+3. cmd 撰寫啟動入口程序：
+    建立 cmd/source.go 與 container tree 與 register
+
+4. input & handler 協議輸入代碼建立：
+    建立 input/source/announcement/lottery.go 的服務類，並且綁定 pb， 並注入 container (記得注入 abstract 類)，並且註冊 register/
+
+5. usecase 業務邏輯建立： 
+    5-1 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），
+    5-2. 並且注入 handler 與 container  (記得注入 abstract 類)，並且修改 input 使用 usecase 類
+
+6. output 資料輸出建立： 
+    6-1 .建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），
+    6-2. 並且注入 usecase 與 container (記得注入 abstract 類), 並且修改 usecase 使用 repository 類
+
+
+
+
+## 如何 建立一個獨立 grpc客戶端-連線。 
+1. proto: 建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
+2. config: 設定 config/clients.yaml  與 bootstrap/config.go
+3. bootstrap： bootstrap/source.go 基本客戶端連線（conn） + internal/client/source_client.go
+
+   4. cmd ：建立 cmd/watcher.go 與 container tree 與 register
 
 ## 目錄結構
 

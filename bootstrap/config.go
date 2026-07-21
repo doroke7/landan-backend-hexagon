@@ -52,6 +52,10 @@ type Config struct {
 			USER     string   `mapstructure:"user"`
 			PASSWORD string   `mapstructure:"password"`
 		} `mapstructure:"resource"`
+		SOURCE struct {
+			HOSTS []string `mapstructure:"hosts"`
+			PORTS []string `mapstructure:"ports"`
+		} `mapstructure:"source"`
 	} `mapstructure:"clients"`
 	DATABASE struct {
 		USER                 string `mapstructure:"user"`
