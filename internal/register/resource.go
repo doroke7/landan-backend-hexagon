@@ -6,10 +6,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
+	pbResourceModel "example/pb/resource/model"
+
 	container "example/internal/container"
 	pkg "example/pkg"
-
-	pbResourceModel "example/pb/resource/model"
 )
 
 func resourceInterceptors(oContainer *container.ResourceContainer) grpc.UnaryServerInterceptor {

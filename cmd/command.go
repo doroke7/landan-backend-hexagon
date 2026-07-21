@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	container "example/internal/container"
 	register "example/internal/register"
 )
 
@@ -18,11 +17,6 @@ var CommandCommand = &cobra.Command{
 }
 
 func init() {
-	oContainer, err := container.InitCommandContainer()
-	if err != nil {
-		panic(err)
-	}
-
-	CommandCommand = register.CommandInit(CommandCommand, oContainer)
+	CommandCommand = register.CommandInit(CommandCommand)
 	oRootCommand.AddCommand(CommandCommand)
 }
