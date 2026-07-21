@@ -17,6 +17,8 @@ import (
 
 	helper "example/internal/helper"
 
+	outputApplicationMemoryModel "example/internal/output/application/memory/model"
+
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
 
@@ -413,6 +415,8 @@ func InitSourceContainer() (*SourceContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
+		outputApplicationMemoryModel.NewAbstractRepository,
+		outputApplicationMemoryModel.NewLotteryRepository,
 		usecaseApplicationAnyAnnouncement.NewAbstractUsecase,
 		usecaseApplicationAnyAnnouncement.NewLotteryUsecase,
 

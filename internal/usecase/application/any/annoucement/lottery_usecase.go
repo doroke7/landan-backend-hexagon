@@ -3,17 +3,19 @@ package usecase
 import (
 	domain "example/internal/domain"
 
-	// outputPortAnyLogic "example/internal/output/port/any/logic"
+	outputPortAnyModel "example/internal/output/port/any/model"
 	usecasePortAnyAnnoucement "example/internal/usecase/port/any/announcement"
 )
 
 type LotteryUsecase struct {
 	*AbstractUsecase
+	outputPortAnyModel.LotteryRepository
 }
 
-func NewLotteryUsecase(oAbstractUsecase *AbstractUsecase) usecasePortAnyAnnoucement.LotteryUsecase {
+func NewLotteryUsecase(oAbstractUsecase *AbstractUsecase, oLotteryRepository outputPortAnyModel.LotteryRepository) usecasePortAnyAnnoucement.LotteryUsecase {
 	return &LotteryUsecase{
-		AbstractUsecase: oAbstractUsecase,
+		AbstractUsecase:   oAbstractUsecase,
+		LotteryRepository: oLotteryRepository,
 	}
 }
 
@@ -23,10 +25,6 @@ func NewLotteryUsecase(oAbstractUsecase *AbstractUsecase) usecasePortAnyAnnoucem
 
 func (oSelf *LotteryUsecase) WatchOneByKey(sKey string) (*domain.Lottery, error) {
 
-	return &domain.Lottery{
-		Id:      1,
-		Round:   "2026-001-001",
-		Time:    111111111111111111,
-		Numbers: "7,97,72,53",
-	}, nil
+	return oSelf.LotteryRepository.WatchOneByKey(sKey)
+
 }
