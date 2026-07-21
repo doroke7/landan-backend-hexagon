@@ -6,11 +6,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
+	pbSourceAnnouncement "example/pb/source/announcement"
+
 	container "example/internal/container"
 	pkg "example/pkg"
 )
 
-func sourceInterceptors(oContainer *container.ResourceContainer) grpc.UnaryServerInterceptor {
+func sourceInterceptors(_ *container.SourceContainer) grpc.UnaryServerInterceptor {
 
 	// aBase 全局攔截器：目前 resource 只需要 facade -> resource 的 Basic Auth 驗證
 	aBase := []grpc.UnaryServerInterceptor{
@@ -23,7 +25,7 @@ func sourceInterceptors(oContainer *container.ResourceContainer) grpc.UnaryServe
 		Build()
 }
 
-func SourceInit(oContainer *container.ResourceContainer) *grpc.Server {
+func SourceInit(oContainer *container.SourceContainer) *grpc.Server {
 
 	oGrpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(sourceInterceptors(oContainer)),
@@ -40,6 +42,7 @@ func SourceInit(oContainer *container.ResourceContainer) *grpc.Server {
 			},
 		),
 	)
+	pbSourceAnnouncement.RegisterLotteryServer(oGrpcServer, oContainer.SourceAnnouncementLottery)
 
 	return oGrpcServer
 }

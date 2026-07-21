@@ -23,6 +23,8 @@ import (
 	"example/internal/input/application/http/admin/authentication"
 	resource2 "example/internal/input/application/resource"
 	"example/internal/input/application/resource/model"
+	resource3 "example/internal/input/application/source"
+	"example/internal/input/application/source/announcement"
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
@@ -230,9 +232,12 @@ func InitCommandContainer() (*CommandContainer, error) {
 func InitSourceContainer() (*SourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
+	abstractHandler := resource3.NewAbstractHandler()
+	lotteryHandler := announcement.NewLotteryHandler(abstractHandler)
 	sourceContainer := &SourceContainer{
-		AbstractHelper: abstractHelper,
-		AesHelper:      aesHelper,
+		AbstractHelper:            abstractHelper,
+		AesHelper:                 aesHelper,
+		SourceAnnouncementLottery: lotteryHandler,
 	}
 	return sourceContainer, nil
 }
@@ -365,4 +370,6 @@ type SourceContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+
+	SourceAnnouncementLottery *announcement.LotteryHandler
 }

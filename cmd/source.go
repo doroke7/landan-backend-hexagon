@@ -19,7 +19,7 @@ var oSourceCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		pkg.Logger(pkg.Default).Info("啟動 source 服務。 port: " + bootstrap.CONFIG.SERVICES.SOURCE.PORT)
 
-		oContainer, err := container.InitResourceContainer()
+		oContainer, err := container.InitSourceContainer()
 		if err != nil {
 			log.Fatal(err)
 		}
