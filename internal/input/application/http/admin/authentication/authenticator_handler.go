@@ -27,6 +27,7 @@ func NewAuthenticatorHandler(oAbstractHandler *inputApplicationHttp.AbstractHand
 }
 
 func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
+
 	sParamName := oContext.PostForm("param.name")
 	sParamPassword := oContext.PostForm("param.password")
 

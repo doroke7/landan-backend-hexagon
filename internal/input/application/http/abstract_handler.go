@@ -3,7 +3,6 @@ package handler
 import (
 	pkg "example/pkg"
 
-	client "example/internal/client"
 	helper "example/internal/helper"
 )
 
@@ -13,14 +12,12 @@ type AbstractHandler struct {
 	*pkg.Response
 	*helper.AesHelper
 	*helper.JwtHelper
-	*client.ResourceClient
 }
 
-func NewAbstractHandler(oResponse *pkg.Response, oAesHelper *helper.AesHelper, oJwtHelper *helper.JwtHelper, oResourceClient *client.ResourceClient) *AbstractHandler {
+func NewAbstractHandler(oResponse *pkg.Response, oAesHelper *helper.AesHelper, oJwtHelper *helper.JwtHelper) *AbstractHandler {
 	return &AbstractHandler{
-		AesHelper:      oAesHelper,
-		JwtHelper:      oJwtHelper,
-		Response:       oResponse,
-		ResourceClient: oResourceClient,
+		AesHelper: oAesHelper,
+		JwtHelper: oJwtHelper,
+		Response:  oResponse,
 	}
 }

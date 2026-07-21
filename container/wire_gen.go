@@ -50,7 +50,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	clientConn := bootstrap.NewResource()
 	model := client.NewModel(clientConn)
 	resourceClient := client.NewResourceClient(clientConn, model)
-	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper, resourceClient)
+	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper)
 	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
@@ -248,6 +248,16 @@ func InitSourceContainer() (*SourceContainer, error) {
 	return sourceContainer, nil
 }
 
+func InitDaemonContainer() (*DaemonContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	daemonContainer := &DaemonContainer{
+		AbstractHelper: abstractHelper,
+		AesHelper:      aesHelper,
+	}
+	return daemonContainer, nil
+}
+
 // wire.go:
 
 // HttpContainer 只給 `http` Gin 服務使用。
@@ -378,4 +388,11 @@ type SourceContainer struct {
 	*helper.AesHelper
 
 	SourceAnnouncementLottery *announcement.LotteryHandler
+}
+
+type DaemonContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
 }

@@ -76,7 +76,7 @@
 2. config: 設定 config/clients.yaml  與 bootstrap/config.go
 3. bootstrap： bootstrap/source.go 基本客戶端連線（conn） + internal/client/source_client.go
 
-   4. cmd ：建立 cmd/watcher.go 與 container tree 與 register
+4. cmd ：建立 cmd/daemon.go 與 container tree 與 register
 
 ## 目錄結構
 
