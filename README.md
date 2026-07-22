@@ -107,7 +107,15 @@
    - announcement：開獎邏輯服務
    - watcher：採集開獎資料的邏輯服務
 
-
+3. 實際運作服務堆疊
+   - Source : announcement
+   - Daemon：watcher
+   - Facade：game, table, register
+   - Resource：logic, model
+   - Http: admin, app, third
+   - Command: admin
+   - Cron: admin
+   - Websocket
 
 ## 目錄結構
 
