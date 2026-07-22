@@ -197,11 +197,11 @@ func InitCronContainer() (*CronContainer, error) {
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
 	authenticatorHandler := authentication.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
 	cronContainer := &CronContainer{
-		AbstractHelper:                abstractHelper,
-		AesHelper:                     aesHelper,
-		JwtHelper:                     jwtHelper,
-		CronAdminResourceAppUser:      appUserHandler,
-		CronAdminAuthenticationSignIn: authenticatorHandler,
+		AbstractHelper:                       abstractHelper,
+		AesHelper:                            aesHelper,
+		JwtHelper:                            jwtHelper,
+		CronAdminResourceAppUser:             appUserHandler,
+		CronAdminAuthenticationAuthenticator: authenticatorHandler,
 	}
 	return cronContainer, nil
 }
@@ -390,8 +390,8 @@ type CronContainer struct {
 	*helper.JwtHelper
 
 	// 排程 server
-	CronAdminResourceAppUser      *cron2.AppUserHandler
-	CronAdminAuthenticationSignIn *authentication.AuthenticatorHandler
+	CronAdminResourceAppUser             *cron2.AppUserHandler
+	CronAdminAuthenticationAuthenticator *authentication.AuthenticatorHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。

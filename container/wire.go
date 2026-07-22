@@ -298,8 +298,8 @@ type CronContainer struct {
 	*helper.JwtHelper
 
 	// 排程 server
-	CronAdminResourceAppUser         *inputApplicationCronAdminResource.AppUserHandler
-	CronAdminAuthenticationSignIn *inputApplicationCronAdminAuthentication.AuthenticatorHandler
+	CronAdminResourceAppUser             *inputApplicationCronAdminResource.AppUserHandler
+	CronAdminAuthenticationAuthenticator *inputApplicationCronAdminAuthentication.AuthenticatorHandler
 }
 
 func InitCronContainer() (*CronContainer, error) {
