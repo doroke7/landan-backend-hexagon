@@ -1,9 +1,5 @@
 package any
 
-import (
-	"example/internal/domain"
-)
-
 type AuthenticatorUsecase interface {
-	ShowOneByName(name string) (*domain.AdminUser, error)
+	SignIn(name string, password string) (authorization string, err error)
 }

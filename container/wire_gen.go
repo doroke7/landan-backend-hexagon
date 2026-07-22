@@ -59,7 +59,7 @@ func InitHttpContainer() (*HttpContainer, error) {
 	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := handler.NewAbstractHandler(response, aesHelper, jwtHelper)
 	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
-	abstractUsecase := usecase.NewAbstractUsecase(aesHelper)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
 	authenticatorHandler := controller_admin_authentication.NewAuthenticatorHandler(abstractHandler, authenticatorUsecase)
 	abstractMiddleware := middleware_admin.NewAbstractMiddleware(response, rsaHelper, aesHelper)

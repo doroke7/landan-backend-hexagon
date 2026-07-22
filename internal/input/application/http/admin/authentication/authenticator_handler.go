@@ -3,10 +3,6 @@ package controller_admin_authentication
 import (
 	"github.com/gin-gonic/gin"
 
-	utility "example/internal/utility"
-
-	bootstrap "example/bootstrap"
-
 	inputApplicationHttp "example/internal/input/application/http"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
 )
@@ -31,36 +27,13 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext *gin.Context) {
 	sParamName := oContext.PostForm("param.name")
 	sParamPassword := oContext.PostForm("param.password")
 
-	if sParamName == "" {
-		oSelf.Response.Set(oContext, 200, -1, "name 不能為空", struct{}{}, "")
-		return
-	}
-
-	if sParamPassword == "" {
-		oSelf.Response.Set(oContext, 200, -1, "password 不能為空", struct{}{}, "")
-		return
-	}
-
-	oAdminUser, oErr := oSelf.AuthenticatorUsecase.ShowOneByName(
+	sAuthorization, oErr := oSelf.AuthenticatorUsecase.SignIn(
 		sParamName,
+		sParamPassword,
 	)
 
 	if oErr != nil {
-		oSelf.Response.Set(oContext, 200, -2, oErr.Error(), struct{}{}, "")
-		return
-	}
-
-	sMd5 := utility.Md5(sParamPassword + bootstrap.CONFIG.TABLE.ADMIN_USER.PASSWORD)
-
-	if oAdminUser.Password != sMd5 {
-		oSelf.Response.SetWithNext(oContext, 200, -2, "密碼錯誤", struct{}{}, "")
-		return
-	}
-
-	sAuthorization, oErr := oSelf.JwtHelper.Generate(int64(oAdminUser.Id), 0, map[string]any{})
-
-	if oErr != nil {
-		oSelf.Response.SetWithNext(oContext, 200, -2, "JWT 產生失敗", struct{}{}, "")
+		oSelf.Response.Set(oContext, 200, -1, oErr.Error(), struct{}{}, "")
 		return
 	}
 
