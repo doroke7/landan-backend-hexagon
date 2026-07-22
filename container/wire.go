@@ -32,8 +32,8 @@ import (
 	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
 	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
 	usecaseApplicationAnyAnnouncement "example/internal/usecase/application/any/annoucement"
-	usecaseApplicationAnyWatcherSource "example/internal/usecase/application/any/watcher/source"
 	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
+	usecaseApplicationAnyWatcherSource "example/internal/usecase/application/any/watcher/source"
 
 	middlewareAdmin "example/internal/middleware/admin"
 
@@ -41,12 +41,14 @@ import (
 	interceptorResource "example/internal/interceptor/resource"
 
 	inputApplicationCommand "example/internal/input/application/command"
+	inputApplicationCommandAdminAuthentication "example/internal/input/application/command/admin/authentication"
 	inputApplicationCommandAdminResource "example/internal/input/application/command/admin/resource"
 
 	inputApplicationConsumer "example/internal/input/application/consumer"
 	inputApplicationConsumerAdminResource "example/internal/input/application/consumer/admin/resource"
 
 	inputApplicationCron "example/internal/input/application/cron"
+	inputApplicationCronAdminAuthentication "example/internal/input/application/cron/admin/authentication"
 	inputApplicationCronAdminResource "example/internal/input/application/cron/admin/resource"
 
 	inputApplicationSource "example/internal/input/application/source"
@@ -293,9 +295,11 @@ type CronContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+	*helper.JwtHelper
 
 	// 排程 server
-	CronAdminResourceAppUser *inputApplicationCronAdminResource.AppUserHandler
+	CronAdminResourceAppUser         *inputApplicationCronAdminResource.AppUserHandler
+	CronAdminAuthenticationSignIn *inputApplicationCronAdminAuthentication.AuthenticatorHandler
 }
 
 func InitCronContainer() (*CronContainer, error) {
@@ -307,17 +311,22 @@ func InitCronContainer() (*CronContainer, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
+		helper.NewJwtHelper,
 
 		// output
 		outputApplicationMysql.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAppUserRepository,
+		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		// usecase
 		usecaseApplicationAnyAdminResource.NewAppUserUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAbstractUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAuthenticatorUsecase,
 
 		// input-cron
 		inputApplicationCron.NewAbstractHandler,
 		inputApplicationCronAdminResource.NewAppUserHandler,
+		inputApplicationCronAdminAuthentication.NewAuthenticatorHandler,
 
 		wire.Struct(new(CronContainer), "*"),
 	)
@@ -374,10 +383,12 @@ type CommandContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+	*helper.JwtHelper
 
 	// command
 	*inputApplicationCommand.AbstractHandler
-	CommandAdminReourceAppUser *inputApplicationCommandAdminResource.AppUserHandler
+	CommandAdminReourceAppUser       *inputApplicationCommandAdminResource.AppUserHandler
+	CommandAdminAuthenticationSignIn *inputApplicationCommandAdminAuthentication.AuthenticatorHandler
 }
 
 func InitCommandContainer() (*CommandContainer, error) {
@@ -389,17 +400,22 @@ func InitCommandContainer() (*CommandContainer, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
+		helper.NewJwtHelper,
 
 		// output
 		outputApplicationMysql.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAppUserRepository,
+		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		// usecase
 		usecaseApplicationAnyAdminResource.NewAppUserUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAbstractUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAuthenticatorUsecase,
 
 		// command
 		inputApplicationCommand.NewAbstractHandler,
 		inputApplicationCommandAdminResource.NewAppUserHandler,
+		inputApplicationCommandAdminAuthentication.NewAuthenticatorHandler,
 
 		wire.Struct(new(CommandContainer), "*"),
 	)

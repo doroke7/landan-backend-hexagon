@@ -16,5 +16,9 @@ func CronInit(oContainer *container.CronContainer) *cron.Cron {
 		log.Fatalf("cron: failed to register CronAppUser.IncreaseBalance job: %v", err)
 	}
 
+	if _, err := oCron.AddFunc("* * * * *", oContainer.CronAdminAuthenticationSignIn.SignIn); err != nil {
+		log.Fatalf("cron: failed to register CronAdminAuthenticationSignIn.SignIn job: %v", err)
+	}
+
 	return oCron
 }

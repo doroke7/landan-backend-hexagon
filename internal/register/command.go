@@ -34,5 +34,33 @@ func CommandInit(oCommandCommand *cobra.Command) *cobra.Command {
 	oAppUserIncreaseBalanceCommand.Flags().UintVar(&iAmount, "amount", 10, "要增加的餘額")
 
 	oCommandCommand.AddCommand(oAppUserIncreaseBalanceCommand)
+
+	var sName string
+	var sPassword string
+
+	oAuthenticatorSignInCommand := &cobra.Command{
+		Use:   "Admin-Authentication-Authenticator-SignIn",
+		Short: "Authenticator-SignIn 相關命令",
+		Run: func(oCmd *cobra.Command, args []string) {
+			oContainer, err := container.InitCommandContainer()
+			if err != nil {
+				log.Fatalf("command: failed to init container: %v", err)
+			}
+
+			sAuthorization, err := oContainer.CommandAdminAuthenticationSignIn.SignIn(sName, sPassword)
+			if err != nil {
+				log.Printf("sign in failed: %v", err)
+				return
+			}
+
+			log.Printf("sign in succeeded, authorization: %s", sAuthorization)
+		},
+	}
+
+	oAuthenticatorSignInCommand.Flags().StringVar(&sName, "name", "", "登入帳號")
+	oAuthenticatorSignInCommand.Flags().StringVar(&sPassword, "password", "", "登入密碼")
+
+	oCommandCommand.AddCommand(oAuthenticatorSignInCommand)
+
 	return oCommandCommand
 }

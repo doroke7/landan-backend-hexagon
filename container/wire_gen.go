@@ -11,10 +11,12 @@ import (
 	"example/internal/client"
 	"example/internal/helper"
 	"example/internal/input/application/command"
+	authentication2 "example/internal/input/application/command/admin/authentication"
 	command2 "example/internal/input/application/command/admin/resource"
 	"example/internal/input/application/consumer"
 	consumer2 "example/internal/input/application/consumer/admin/resource"
 	"example/internal/input/application/cron"
+	"example/internal/input/application/cron/admin/authentication"
 	cron2 "example/internal/input/application/cron/admin/resource"
 	"example/internal/input/application/daemon"
 	source2 "example/internal/input/application/daemon/watcher/source"
@@ -180,6 +182,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 func InitCronContainer() (*CronContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
+	jwtHelper := helper.NewJwtHelper(abstractHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
 		return nil, err
@@ -189,10 +192,16 @@ func InitCronContainer() (*CronContainer, error) {
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	abstractHandler := cron.NewAbstractHandler(aesHelper)
 	appUserHandler := cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
+	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
+	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
+	authenticatorHandler := authentication.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
 	cronContainer := &CronContainer{
-		AbstractHelper:           abstractHelper,
-		AesHelper:                aesHelper,
-		CronAdminResourceAppUser: appUserHandler,
+		AbstractHelper:                abstractHelper,
+		AesHelper:                     aesHelper,
+		JwtHelper:                     jwtHelper,
+		CronAdminResourceAppUser:      appUserHandler,
+		CronAdminAuthenticationSignIn: authenticatorHandler,
 	}
 	return cronContainer, nil
 }
@@ -220,6 +229,7 @@ func InitClientContainer() (*ClientContainer, error) {
 func InitCommandContainer() (*CommandContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
+	jwtHelper := helper.NewJwtHelper(abstractHelper)
 	abstractHandler := command.NewAbstractHandler(aesHelper)
 	db, err := bootstrap.NewMysql()
 	if err != nil {
@@ -229,11 +239,17 @@ func InitCommandContainer() (*CommandContainer, error) {
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := command2.NewAppUserHandler(appUserUsecase, abstractHandler)
+	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
+	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
+	authenticatorHandler := authentication2.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
-		AbstractHelper:             abstractHelper,
-		AesHelper:                  aesHelper,
-		AbstractHandler:            abstractHandler,
-		CommandAdminReourceAppUser: appUserHandler,
+		AbstractHelper:                   abstractHelper,
+		AesHelper:                        aesHelper,
+		JwtHelper:                        jwtHelper,
+		AbstractHandler:                  abstractHandler,
+		CommandAdminReourceAppUser:       appUserHandler,
+		CommandAdminAuthenticationSignIn: authenticatorHandler,
 	}
 	return commandContainer, nil
 }
@@ -371,9 +387,11 @@ type CronContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+	*helper.JwtHelper
 
 	// 排程 server
-	CronAdminResourceAppUser *cron2.AppUserHandler
+	CronAdminResourceAppUser      *cron2.AppUserHandler
+	CronAdminAuthenticationSignIn *authentication.AuthenticatorHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。
@@ -398,10 +416,12 @@ type CommandContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+	*helper.JwtHelper
 
 	// command
 	*command.AbstractHandler
-	CommandAdminReourceAppUser *command2.AppUserHandler
+	CommandAdminReourceAppUser       *command2.AppUserHandler
+	CommandAdminAuthenticationSignIn *authentication2.AuthenticatorHandler
 }
 
 type SourceContainer struct {
