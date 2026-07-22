@@ -110,12 +110,33 @@
 3. 實際運作服務堆疊
    - Source : announcement
    - Daemon：watcher
-   - Facade：game, table, register
+   - Facade：game, table, register, admin（admin只是範例）
    - Resource：logic, model
    - Http: admin, app, third
    - Command: admin
    - Cron: admin
    - Websocket
+
+```
+協議服務（載體）        實際掛載的邏輯服務
++-------------+     +--------------------------------+
+|   Source    | --> | announcement                   |
++-------------+     +--------------------------------+
+|   Daemon    | --> | watcher                        |
++-------------+     +--------------------------------+
+|   Facade    | --> | game, table, register, admin   |
++-------------+     +--------------------------------+
+|   Resource  | --> | logic, model                   |
++-------------+     +--------------------------------+
+|   Http      | --> | admin, app, third              |
++-------------+     +--------------------------------+
+|   Command   | --> | admin                          |
++-------------+     +--------------------------------+
+|   Cron      | --> | admin                          |
++-------------+     +--------------------------------+
+|   Websocket | --> | (尚未掛載任何邏輯服務)            |
++-------------+     +--------------------------------+
+```
 
 ## 目錄結構
 
