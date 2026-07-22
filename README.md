@@ -165,6 +165,8 @@
 │   ├── http.go                    #   啟動 HTTP（Gin）服務
 │   ├── consumer.go                #   啟動 AMQP consumer
 │   ├── client.go / socket.go      #   啟動 gRPC client-side stream 訂閱
+│   ├── source.go                  #   啟動開獎資料來源服務（source client 訂閱）
+│   ├── daemon.go                  #   啟動常駐任務（watcher）
 │   ├── cron.go                    #   啟動排程服務
 │   ├── websocket.go               #   啟動 websocket 服務
 │   └── command.go                 #   啟動一次性 CLI 指令
@@ -177,19 +179,23 @@
 │   │
 │   ├── input/                     #   協議輸入端（driving adapter），只有實作，沒有介面
 │   │   └── application/           #   不同協議輸入端，不同的端且相同的相對目錄 代表同一個業務輸入。
-│   │       ├── facade/            #   對外 gRPC 入口
-│   │       ├── resource/          #   resource 內部 gRPC 服務（僅供 facade / http 呼叫）
-│   │       ├── http/              #   對外 Http 入口
-│   │       ├── client/            #   gRPC client（訂閱外部 stream）
-│   │       ├── consumer/          #   AMQP consumer
-│   │       ├── cron/              #   排程任務
-│   │       ├── websocket/         #   websocket 入口
-│   │       └── command/           #   CLI 指令
+│   │       ├── facade/            #   對外 gRPC 入口：register/、table/、admin/authentication/
+│   │       ├── resource/          #   resource 內部 gRPC 服務（僅供 facade / http 呼叫）：model/
+│   │       ├── http/              #   對外 Http 入口：admin/authentication/、admin/resource/
+│   │       ├── client/            #   gRPC client（訂閱外部 stream）：admin/resource/
+│   │       ├── consumer/          #   AMQP consumer：admin/resource/
+│   │       ├── source/            #   開獎資料來源服務載體：announcement/
+│   │       ├── daemon/            #   常駐任務服務載體：watcher/source/
+│   │       ├── cron/              #   排程任務：admin/authentication/、admin/resource/
+│   │       ├── websocket/         #   websocket 入口：admin/resource/
+│   │       └── command/           #   CLI 指令：admin/authentication/、admin/resource/
 │   │       （每個 adapter 底下都有自己獨立的 abstract_handler.go，彼此不共用；
 │   │        adapter 內部依 leaf 功能再分 admin/resource、admin/authentication 這種子資料夾——
 │   │        這是跨層的對應 key，不是字面語意：input/<adapter>/admin/resource、
 │   │        usecase/application/any/admin/resource、usecase/port/any/admin/resource
-│   │        三者相對路徑相同，代表同一條 usecase 邏輯，不代表跟 HTTP 後台路由有關）
+│   │        三者相對路徑相同，代表同一條 usecase 邏輯，不代表跟 HTTP 後台路由有關；
+│   │        目前四個 adapter：http / command / cron / facade 都已經掛上同一條
+│   │        admin/authentication 登入邏輯，是這套框架「一個 usecase、多種載體」的主要範例）
 │   │
 │   ├── middleware/
 │   │   └── admin/                    # HTTP 專用 middleware 鏈
@@ -204,30 +210,45 @@
 │   │   │   └── any/                       #  「any」表示這份 usecase 不綁定特定 adapter，可以被多個 driving
 │   │   │       │                          # usecase端一種命名結構對應不同input 但是多種輸入
 │   │   │       ├── admin/                 #  後台服務
-│   │   │       │   ├── authentication/    #  登入在用
+│   │   │       │   ├── authentication/    #  登入邏輯，被 http/command/cron/facade 四個 adapter 共用
 │   │   │       │   └── resource/          #  資源
 │   │   │       ├── model/                 #  單一數據服務
 │   │   │       ├── logic/                 #  複雜數據服務
 │   │   │       ├── game/                  #  遊戲邏輯服務
-│   │   │       ├── register/              #  認證服務
-│   │   │       └── table/                 #  地端上報服務
+│   │   │       ├── register/              #  前台驗證邏輯服務
+│   │   │       ├── table/                 #  地端上報服務
+│   │   │       ├── annoucement/           #  開獎邏輯服務（資料夾拼字沿用舊名，跟 port/any/announcement 拼法不同步，屬已知瑕疵）
+│   │   │       └── watcher/
+│   │   │           └── source/            #  採集開獎資料的邏輯服務
 │   │   └── port/                          #  介面
 │   │       └── any/                       #  對應上面每一組的 interface，同樣用「功能」命名
 │   │           ├── admin/
 │   │           │   ├── authentication/
 │   │           │   └── resource/
 │   │           ├── model/
-│   │           └── logic/
+│   │           ├── logic/
+│   │           ├── game/
+│   │           ├── register/
+│   │           ├── table/
+│   │           ├── announcement/
+│   │           └── watcher/
+│   │               └── source/
 │   │
 │   ├── output/                    # 輸出端（driven adapter）：實作 + 端口介面
 │   │   ├── application/           # 實作
 │   │   │   ├── mysql/
-│   │   │   │   └── model/         #   
-│   │   │   │                      #   
+│   │   │   │   ├── model/         #   AdminUserRepository / AppUserRepository，直連 DB
+│   │   │   │   └── logic/         #   複雜查詢邏輯，直連 DB
 │   │   │   ├── resource/
 │   │   │   │   ├── model/         #   AdminUserRepository，透過 gRPC ResourceClient 呼叫 resource 服務
-│   │   │   │   │                  #   （http 登入用這份，不直接連 DB）
+│   │   │   │   │                  #   （http / facade 登入用這份，不直接連 DB）
 │   │   │   │   └── logic/         #   AppUserRepository
+│   │   │   ├── cache/
+│   │   │   │   ├── model/         #   Redis 直接讀寫，不嵌套/不包裝底層 repository
+│   │   │   │   └── logic/
+│   │   │   ├── memory/
+│   │   │   │   ├── model/         #   進程內記憶體快取
+│   │   │   │   └── logic/
 │   │   │   └── producer/
 │   │   │       └── model/         #   AMQP UserProducer
 │   │   └── port/                  #  介面
@@ -235,20 +256,21 @@
 │   │           ├── model/         #   UserRepository / AdminUserRepository / AppUserRepository
 │   │           └── logic/         #   AppUserRepository
 │   │
-│   ├── register/                  # 組裝層：把 container 生好的 handler 註冊到對應的 server/router
-│   │                                #   （grpc.RegisterXxxServer / gin.Group / cron.AddFunc ...），
-│   │                                #   cmd/ 只管呼叫 XxxInit 拿到 server 物件再 Serve，不碰組裝細節
-│   │
-│   └── container/                 # wire 組裝根：wire.go 手寫、wire_gen.go 自動產生，別手改後者
+│   └── register/                  # 組裝層：把 container 生好的 handler 註冊到對應的 server/router
+│                                    #   （grpc.RegisterXxxServer / gin.Group / cron.AddFunc ...），
+│                                    #   cmd/ 只管呼叫 XxxInit 拿到 server 物件再 Serve，不碰組裝細節
+│
+├── container/                      # wire 組裝根（跟 internal/ 平級，不在裡面）：
+│                                    #   wire.go 手寫、wire_gen.go 自動產生，別手改後者
 │       （每個服務各自一個 Container + InitXxxContainer：FacadeContainer / ResourceContainer /
 │        HttpContainer / ConsumerContainer / CronContainer / WebsocketContainer /
-│        ClientContainer / CommandContainer）
+│        ClientContainer / CommandContainer / SourceContainer / DaemonContainer）
 │
 ├── pkg/                            # 跟 domain 無關、可重用的通用元件（logger / router / cache / response / aop 等泛用工具）
 │
 ├── config/                         # viper 讀取的 yaml 設定檔，
 │
-├── proto/                          # protobuf 原始定義（facade/ 對外、resource/ 資料服務、client/ 外部訂閱）
+├── proto/                          # protobuf 原始定義（facade/ 對外、resource/ 資料服務、client/ 外部訂閱、source/ 資料來源）
 └── pb/                             # protoc 產生的程式碼，對應 proto/ 底下的定義
 ```
 
