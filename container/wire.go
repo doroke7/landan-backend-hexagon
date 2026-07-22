@@ -17,8 +17,13 @@ import (
 
 	helper "example/internal/helper"
 
+	outputApplicationCache "example/internal/output/application/cache"
+	outputApplicationCacheModel "example/internal/output/application/cache/model"
+
+	outputApplicationMemory "example/internal/output/application/memory"
 	outputApplicationMemoryModel "example/internal/output/application/memory/model"
 
+	outputApplicationMysql "example/internal/output/application/mysql"
 	outputApplicationMysqlModel "example/internal/output/application/mysql/model"
 	outputApplicationResourceModel "example/internal/output/application/resource/model"
 
@@ -219,7 +224,7 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		helper.NewRsaHelper,
 
 		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysql.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAdminUserRepository,
 
 		// usecase
@@ -265,7 +270,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		helper.NewAesHelper,
 
 		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysql.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
@@ -304,7 +309,7 @@ func InitCronContainer() (*CronContainer, error) {
 		helper.NewAesHelper,
 
 		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysql.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
@@ -386,7 +391,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 		helper.NewAesHelper,
 
 		// output
-		outputApplicationMysqlModel.NewAbstractRepository,
+		outputApplicationMysql.NewAbstractRepository,
 		outputApplicationMysqlModel.NewAppUserRepository,
 
 		// usecase
@@ -419,7 +424,7 @@ func InitSourceContainer() (*SourceContainer, error) {
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 
-		outputApplicationMemoryModel.NewAbstractRepository,
+		outputApplicationMemory.NewAbstractRepository,
 		outputApplicationMemoryModel.NewLotteryRepository,
 		usecaseApplicationAnyAnnouncement.NewAbstractUsecase,
 		usecaseApplicationAnyAnnouncement.NewLotteryUsecase,
@@ -449,6 +454,7 @@ func InitDaemonContainer() (*DaemonContainer, error) {
 
 		// bootstrap
 		bootstrap.NewSource,
+		bootstrap.NewRedis,
 
 		// client
 		client.NewAnnouncement,
@@ -457,6 +463,11 @@ func InitDaemonContainer() (*DaemonContainer, error) {
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
+		helper.NewCacheHelper,
+
+		// output
+		outputApplicationCache.NewAbstractRepository,
+		outputApplicationCacheModel.NewLotteryRepository,
 
 		// usecase
 		usecaseApplicationAnyWatcherSource.NewAbstractUsecase,

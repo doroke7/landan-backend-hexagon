@@ -1,27 +1,30 @@
 package model
 
 import (
-	domain "example/internal/domain"
-	outputPortAnyModel "example/internal/output/port/any/model"
 	"fmt"
 	"math/rand/v2"
 	"strconv"
 	"strings"
 	"time"
+
+	domain "example/internal/domain"
+	outputApplicationMemory "example/internal/output/application/memory"
+	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type LotteryRepository struct {
-	*AbstractRepository
+	*outputApplicationMemory.AbstractRepository
 	startTime time.Time
 }
 
-func NewLotteryRepository(oAbstractRepository *AbstractRepository) outputPortAnyModel.LotteryRepository {
+func NewLotteryRepository(oAbstractRepository *outputApplicationMemory.AbstractRepository) outputPortAnyModel.LotteryRepository {
 	return &LotteryRepository{
 		AbstractRepository: oAbstractRepository,
 		startTime:          time.Now(),
 	}
 }
 
+// WatchOneByKey 是讀：依照從 startTime 到現在經過的分鐘數計算目前這一期。
 func (oSelf *LotteryRepository) WatchOneByKey(sKey string) (*domain.Lottery, error) {
 
 	iId := uint(time.Since(oSelf.startTime).Minutes()) + 1
@@ -44,4 +47,10 @@ func (oSelf *LotteryRepository) WatchOneByKey(sKey string) (*domain.Lottery, err
 		Numbers: sNumbers,
 	}, nil
 
+}
+
+// EditOneByKey 是寫，但 memory 沒有真的儲存空間可以落地，
+// 這裡只是把呼叫端給的 oLottery 原樣回傳，不做任何持久化（demo 用途）。
+func (oSelf *LotteryRepository) EditOneByKey(oLottery *domain.Lottery, sKey string) (*domain.Lottery, error) {
+	return oLottery, nil
 }

@@ -30,8 +30,12 @@ import (
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
+	"example/internal/output/application/cache"
+	model2 "example/internal/output/application/cache/model"
+	"example/internal/output/application/memory"
 	"example/internal/output/application/memory/model"
-	"example/internal/output/application/mysql/model"
+	"example/internal/output/application/mysql"
+	mysql2 "example/internal/output/application/mysql/model"
 	"example/internal/output/application/resource/model"
 	"example/internal/usecase/application/any/admin/authentication"
 	any2 "example/internal/usecase/application/any/admin/resource"
@@ -129,7 +133,7 @@ func InitResourceContainer() (*ResourceContainer, error) {
 		return nil, err
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
-	adminUserRepository := mysql.NewAdminUserRepository(abstractRepository)
+	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := resource2.NewAbstractHandler()
 	adminUserHandler := service.NewAdminUserHandler(abstractHandler, adminUserUsecase)
@@ -161,7 +165,7 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		return nil, err
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
-	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
+	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := consumer2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	consumerContainer := &ConsumerContainer{
@@ -181,7 +185,7 @@ func InitCronContainer() (*CronContainer, error) {
 		return nil, err
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
-	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
+	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	abstractHandler := cron.NewAbstractHandler(aesHelper)
 	appUserHandler := cron2.NewAppUserHandler(appUserUsecase, abstractHandler)
@@ -222,7 +226,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 		return nil, err
 	}
 	abstractRepository := mysql.NewAbstractRepository(db)
-	appUserRepository := mysql.NewAppUserRepository(abstractRepository)
+	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := command2.NewAppUserHandler(appUserUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
@@ -239,7 +243,7 @@ func InitSourceContainer() (*SourceContainer, error) {
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	abstractHandler := resource3.NewAbstractHandler()
 	abstractUsecase := usecase3.NewAbstractUsecase(aesHelper)
-	abstractRepository := model.NewAbstractRepository()
+	abstractRepository := memory.NewAbstractRepository()
 	lotteryRepository := model.NewLotteryRepository(abstractRepository)
 	lotteryUsecase := usecase3.NewLotteryUsecase(abstractUsecase, lotteryRepository)
 	lotteryHandler := announcement.NewLotteryHandler(abstractHandler, lotteryUsecase)
@@ -258,7 +262,14 @@ func InitDaemonContainer() (*DaemonContainer, error) {
 	clientAnnouncement := client.NewAnnouncement(clientConn)
 	sourceClient := client.NewSourceClient(clientConn, clientAnnouncement)
 	abstractUsecase := source.NewAbstractUsecase(aesHelper)
-	announcementLotteryUsecase := source.NewAnnouncementLotteryUsecase(abstractUsecase)
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
+	abstractRepository := cache.NewAbstractRepository(cacheHelper)
+	lotteryRepository := model2.NewLotteryRepository(abstractRepository)
+	announcementLotteryUsecase := source.NewAnnouncementLotteryUsecase(abstractUsecase, lotteryRepository)
 	abstractHandler := daemon.NewAbstractHandler(aesHelper)
 	announcementLotteryHandler := source2.NewAnnouncementLotteryHandler(announcementLotteryUsecase, abstractHandler)
 	daemonContainer := &DaemonContainer{

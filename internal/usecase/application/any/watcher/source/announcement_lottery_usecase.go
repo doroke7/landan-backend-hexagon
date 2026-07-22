@@ -2,6 +2,7 @@ package source
 
 import (
 	domain "example/internal/domain"
+	outputPortAnyModel "example/internal/output/port/any/model"
 	usecasePortAnyWatcherSource "example/internal/usecase/port/any/watcher/source"
 	pkg "example/pkg"
 
@@ -10,17 +11,27 @@ import (
 
 type AnnouncementLotteryUsecase struct {
 	*AbstractUsecase
+	outputPortAnyModel.LotteryRepository
 }
 
-func NewAnnouncementLotteryUsecase(oAbstractUsecase *AbstractUsecase) usecasePortAnyWatcherSource.AnnouncementLotteryUsecase {
+func NewAnnouncementLotteryUsecase(oAbstractUsecase *AbstractUsecase, oLotteryRepository outputPortAnyModel.LotteryRepository) usecasePortAnyWatcherSource.AnnouncementLotteryUsecase {
 	return &AnnouncementLotteryUsecase{
-		AbstractUsecase: oAbstractUsecase,
+		AbstractUsecase:   oAbstractUsecase,
+		LotteryRepository: oLotteryRepository,
 	}
 }
 
-// HandleDraw 收到一筆開獎資料要做什麼，業務邏輯寫在這裡——先只記 log，
-// 之後如果要落地存檔，再幫這裡注入一個真正的 output repository。
+// Watch 收到一筆開獎資料，用 Round 當 key 落地存起來。
 func (oSelf *AnnouncementLotteryUsecase) Watch(oLottery *domain.Lottery) error {
+
+	if _, err := oSelf.LotteryRepository.EditOneByKey(oLottery, oLottery.Round); err != nil {
+		pkg.Logger(pkg.Client).Error("儲存開獎資料失敗",
+			zap.Uint("id", oLottery.Id),
+			zap.String("round", oLottery.Round),
+			zap.Error(err),
+		)
+		return err
+	}
 
 	pkg.Logger(pkg.Client).Info("收到開獎資料",
 		zap.Uint("id", oLottery.Id),

@@ -6,14 +6,15 @@ import (
 	"gorm.io/gorm"
 
 	domain "example/internal/domain"
+	outputApplicationMysql "example/internal/output/application/mysql"
 	outputPortAnyModel "example/internal/output/port/any/model"
 )
 
 type AdminUserRepository struct {
-	*AbstractRepository
+	*outputApplicationMysql.AbstractRepository
 }
 
-func NewAdminUserRepository(oAbstractRepository *AbstractRepository) outputPortAnyModel.AdminUserRepository {
+func NewAdminUserRepository(oAbstractRepository *outputApplicationMysql.AbstractRepository) outputPortAnyModel.AdminUserRepository {
 	return &AdminUserRepository{
 		AbstractRepository: oAbstractRepository,
 	}
@@ -22,7 +23,7 @@ func NewAdminUserRepository(oAbstractRepository *AbstractRepository) outputPortA
 func (oSelf *AdminUserRepository) ShowOneByName(sName string) (*domain.AdminUser, error) {
 	var oAdminUser domain.AdminUser
 
-	if err := oSelf.db.Where("name = ?", sName).First(&oAdminUser).Error; err != nil {
+	if err := oSelf.DB.Where("name = ?", sName).First(&oAdminUser).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("not found")
 		}

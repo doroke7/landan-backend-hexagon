@@ -1,4 +1,4 @@
-package model
+package memory
 
 type AbstractRepository struct {
 }

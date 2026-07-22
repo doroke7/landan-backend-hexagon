@@ -84,7 +84,15 @@
 第一層是做協議的服務，他其實只是個服務載體，實現方式（http or grpc or command or cron），不具備服務邏輯
 第二層開始是用到的邏輯服務，如 Admin 服務 是邏輯的，其實可以 同時裝載到 http 也可以裝載到 grpc, command
 
-1. 協議服務（實例服務）：Source Daemon Facade Resource Http Command Cron Websocket
+1. 協議服務（實例服務）：
+    Source： 開獎員服務
+    Daemon：常駐服務
+    Facade ： 主要 grpc 服務
+    Resource ： 數據 grpc 服務 
+    Http ： 主要 http 服務
+    Command ： cli 服務 
+    Cron ： 定時服務
+    Websocket： 
 2. 邏輯服務 (虛擬服務)：admin app third game table register logic model announcement watcher 
 
 ## 目錄結構
