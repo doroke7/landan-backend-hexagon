@@ -1,11 +1,18 @@
 package authentication
 
 import (
+	"context"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+
 	inputApplicationFacade "example/internal/input/application/facade"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
+	pbFacadeAdminAuthentication "example/pb/facade/admin/authentication"
 )
 
 type AuthenticatorHandler struct {
+	pbFacadeAdminAuthentication.UnimplementedAuthenticatorServer
 	*inputApplicationFacade.AbstractHandler
 	AuthenticatorUsecase usecasePortAnyAdminAuthentication.AuthenticatorUsecase
 }
@@ -17,8 +24,15 @@ func NewAuthenticatorHandler(oAuthenticatorUsecase usecasePortAnyAdminAuthentica
 	}
 }
 
-// SignIn 只負責轉呼叫 usecase，不知道自己是被 CLI 呼叫的——
-// cobra.Command 的組裝、container 的建立時機，都交給 cmd/register 那層決定。
-func (oSelf *AuthenticatorHandler) SignIn(sName string, sPassword string) (string, error) {
-	return oSelf.AuthenticatorUsecase.SignIn(sName, sPassword)
+func (oSelf *AuthenticatorHandler) SignIn(oContext context.Context, oRequest *pbFacadeAdminAuthentication.OneRequest) (*pbFacadeAdminAuthentication.OneResponse, error) {
+	sAuthorization, err := oSelf.AuthenticatorUsecase.SignIn(oRequest.Name, oRequest.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := grpc.SetHeader(oContext, metadata.Pairs("authorization", sAuthorization)); err != nil {
+		return nil, err
+	}
+
+	return &pbFacadeAdminAuthentication.OneResponse{}, nil
 }

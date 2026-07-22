@@ -10,6 +10,7 @@ import (
 
 	container "example/container"
 
+	pbFacadeAdminAuthentication "example/pb/facade/admin/authentication"
 	pbFacadeRegister "example/pb/facade/register"
 	pbFacadeTable "example/pb/facade/table"
 )
@@ -51,6 +52,7 @@ func FacadeInit(oContainer *container.FacadeContainer) *grpc.Server {
 	)
 	pbFacadeTable.RegisterScannerServer(oGrpcServer, oContainer.FacadeTableScanner)
 	pbFacadeRegister.RegisterAuthenticatorServer(oGrpcServer, oContainer.FacadeTableAuthenticator)
+	pbFacadeAdminAuthentication.RegisterAuthenticatorServer(oGrpcServer, oContainer.FacadeAdminAuthenticationAuthenticator)
 
 	return oGrpcServer
 }

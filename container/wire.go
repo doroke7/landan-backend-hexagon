@@ -61,6 +61,7 @@ import (
 	inputApplicationResourceModel "example/internal/input/application/resource/model"
 
 	inputApplicationFacade "example/internal/input/application/facade"
+	inputApplicationFacadeAdminAuthentication "example/internal/input/application/facade/admin/authentication"
 	inputApplicationFacadeRegister "example/internal/input/application/facade/register"
 	inputApplicationFacadeTable "example/internal/input/application/facade/table"
 
@@ -156,11 +157,16 @@ type FacadeContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
+	*helper.JwtHelper
+
+	// Clients
+	ResourceClient *client.ResourceClient
 
 	// gRPC Facade server
-	FacadeAbstract           *inputApplicationFacade.AbstractHandler
-	FacadeTableScanner       *inputApplicationFacadeTable.ScannerHandler
-	FacadeTableAuthenticator *inputApplicationFacadeRegister.AuthenticatorHandler
+	FacadeAbstract                         *inputApplicationFacade.AbstractHandler
+	FacadeTableScanner                     *inputApplicationFacadeTable.ScannerHandler
+	FacadeTableAuthenticator               *inputApplicationFacadeRegister.AuthenticatorHandler
+	FacadeAdminAuthenticationAuthenticator *inputApplicationFacadeAdminAuthentication.AuthenticatorHandler
 
 	// gRPC Facade Interceptor
 	FacadeAdminErrorInterceptor          *interceptorFacadeGame.ErrorInterceptor
@@ -172,15 +178,31 @@ type FacadeContainer struct {
 func InitFacadeContainer() (*FacadeContainer, error) {
 	wire.Build(
 
+		// bootstrap
+		bootstrap.NewResource,
+
 		// helper
 		helper.NewAbstractHelper,
 		helper.NewAesHelper,
 		helper.NewRsaHelper,
+		helper.NewJwtHelper,
+
+		// output
+		outputApplicationResourceModel.NewAdminUserRepository,
+
+		// usecase
+		usecaseApplicationAnyAdminAuthentication.NewAbstractUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAuthenticatorUsecase,
+
+		// client
+		client.NewModel,
+		client.NewResourceClient,
 
 		// input-facade
 		inputApplicationFacade.NewAbstractHandler,
 		inputApplicationFacadeTable.NewScannerHandler,
 		inputApplicationFacadeRegister.NewAuthenticatorHandler,
+		inputApplicationFacadeAdminAuthentication.NewAuthenticatorHandler,
 
 		// interceptor-facade
 		interceptorFacadeGame.NewAbstractInterceptor,

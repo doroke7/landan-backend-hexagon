@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb.facade.admin.authentication;
+
+option go_package = "./pb_facade_admin_authentication";
+
+service Authenticator {
+  rpc SignIn(OneRequest) returns (OneResponse);
+}
+
+message OneRequest {
+  string name = 1;
+  string password = 2;
+}
+
+message OneResponse {}

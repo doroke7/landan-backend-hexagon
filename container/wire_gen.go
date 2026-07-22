@@ -11,16 +11,17 @@ import (
 	"example/internal/client"
 	"example/internal/helper"
 	"example/internal/input/application/command"
-	authentication2 "example/internal/input/application/command/admin/authentication"
+	authentication3 "example/internal/input/application/command/admin/authentication"
 	command2 "example/internal/input/application/command/admin/resource"
 	"example/internal/input/application/consumer"
 	consumer2 "example/internal/input/application/consumer/admin/resource"
 	"example/internal/input/application/cron"
-	"example/internal/input/application/cron/admin/authentication"
+	authentication2 "example/internal/input/application/cron/admin/authentication"
 	cron2 "example/internal/input/application/cron/admin/resource"
 	"example/internal/input/application/daemon"
 	source2 "example/internal/input/application/daemon/watcher/source"
 	"example/internal/input/application/facade"
+	"example/internal/input/application/facade/admin/authentication"
 	facade3 "example/internal/input/application/facade/register"
 	facade2 "example/internal/input/application/facade/table"
 	"example/internal/input/application/http"
@@ -102,25 +103,36 @@ func InitFacadeContainer() (*FacadeContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	rsaHelper := helper.NewRsaHelper(abstractHelper)
+	jwtHelper := helper.NewJwtHelper(abstractHelper)
+	clientConn := bootstrap.NewResource()
+	model := client.NewModel(clientConn)
+	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := facade.NewAbstractHandler(aesHelper)
 	scannerHandler := facade2.NewScannerHandler(abstractHandler)
 	authenticatorHandler := facade3.NewAuthenticatorHandler(abstractHandler)
+	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
+	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
+	authenticationAuthenticatorHandler := authentication.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
 	abstractInterceptor := interceptor_facade_admin.NewAbstractInterceptor()
 	errorInterceptor := interceptor_facade_admin.NewErrorInterceptor(abstractInterceptor)
 	statusInterceptor := interceptor_facade_admin.NewStatusInterceptor(abstractInterceptor)
 	loggerInterceptor := interceptor_facade_admin.NewLoggerInterceptor(abstractInterceptor)
 	authenticationInterceptor := interceptor_facade_admin.NewAuthenticationInterceptor(abstractInterceptor)
 	facadeContainer := &FacadeContainer{
-		AbstractHelper:                       abstractHelper,
-		AesHelper:                            aesHelper,
-		RsaHelper:                            rsaHelper,
-		FacadeAbstract:                       abstractHandler,
-		FacadeTableScanner:                   scannerHandler,
-		FacadeTableAuthenticator:             authenticatorHandler,
-		FacadeAdminErrorInterceptor:          errorInterceptor,
-		FacadeAdminStatusInterceptor:         statusInterceptor,
-		FacadeAdminLoggerInterceptor:         loggerInterceptor,
-		FacadeAdminAuthenticationInterceptor: authenticationInterceptor,
+		AbstractHelper:                         abstractHelper,
+		AesHelper:                              aesHelper,
+		RsaHelper:                              rsaHelper,
+		JwtHelper:                              jwtHelper,
+		ResourceClient:                         resourceClient,
+		FacadeAbstract:                         abstractHandler,
+		FacadeTableScanner:                     scannerHandler,
+		FacadeTableAuthenticator:               authenticatorHandler,
+		FacadeAdminAuthenticationAuthenticator: authenticationAuthenticatorHandler,
+		FacadeAdminErrorInterceptor:            errorInterceptor,
+		FacadeAdminStatusInterceptor:           statusInterceptor,
+		FacadeAdminLoggerInterceptor:           loggerInterceptor,
+		FacadeAdminAuthenticationInterceptor:   authenticationInterceptor,
 	}
 	return facadeContainer, nil
 }
@@ -195,7 +207,7 @@ func InitCronContainer() (*CronContainer, error) {
 	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
-	authenticatorHandler := authentication.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
+	authenticatorHandler := authentication2.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
 	cronContainer := &CronContainer{
 		AbstractHelper:                       abstractHelper,
 		AesHelper:                            aesHelper,
@@ -242,7 +254,7 @@ func InitCommandContainer() (*CommandContainer, error) {
 	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
-	authenticatorHandler := authentication2.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
+	authenticatorHandler := authentication3.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
 	commandContainer := &CommandContainer{
 		AbstractHelper:                   abstractHelper,
 		AesHelper:                        aesHelper,
@@ -338,11 +350,16 @@ type FacadeContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.RsaHelper
+	*helper.JwtHelper
+
+	// Clients
+	ResourceClient *client.ResourceClient
 
 	// gRPC Facade server
-	FacadeAbstract           *facade.AbstractHandler
-	FacadeTableScanner       *facade2.ScannerHandler
-	FacadeTableAuthenticator *facade3.AuthenticatorHandler
+	FacadeAbstract                         *facade.AbstractHandler
+	FacadeTableScanner                     *facade2.ScannerHandler
+	FacadeTableAuthenticator               *facade3.AuthenticatorHandler
+	FacadeAdminAuthenticationAuthenticator *authentication.AuthenticatorHandler
 
 	// gRPC Facade Interceptor
 	FacadeAdminErrorInterceptor          *interceptor_facade_admin.ErrorInterceptor
@@ -391,7 +408,7 @@ type CronContainer struct {
 
 	// 排程 server
 	CronAdminResourceAppUser             *cron2.AppUserHandler
-	CronAdminAuthenticationAuthenticator *authentication.AuthenticatorHandler
+	CronAdminAuthenticationAuthenticator *authentication2.AuthenticatorHandler
 }
 
 // WebsocketContainer 只給 `websocket` 服務使用。
@@ -421,7 +438,7 @@ type CommandContainer struct {
 	// command
 	*command.AbstractHandler
 	CommandAdminReourceAppUser       *command2.AppUserHandler
-	CommandAdminAuthenticationSignIn *authentication2.AuthenticatorHandler
+	CommandAdminAuthenticationSignIn *authentication3.AuthenticatorHandler
 }
 
 type SourceContainer struct {
