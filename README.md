@@ -79,21 +79,33 @@
 4. cmd ：建立 cmd/daemon.go 與 container tree 與 register/daemon.go
 
 
-## 我們的服務區分2層
-我們講服務定義2個層級，
-第一層是做協議的服務，他其實只是個服務載體，實現方式（http or grpc or command or cron），不具備服務邏輯
-第二層開始是用到的邏輯服務，如 Admin 服務 是邏輯的，其實可以 同時裝載到 http 也可以裝載到 grpc, command
+## 我們的服務分成兩層
+
+我們把服務定義成兩個層級：
+
+- **第一層是協議層服務**：本質上只是一個服務載體，對應不同的協議實作方式（http / grpc / command / cron ...），本身不包含任何業務邏輯。
+- **第二層才是邏輯服務**：真正的業務邏輯放在這一層，例如 `admin` 服務屬於邏輯層，同一份邏輯可以同時掛載到 http、grpc、command 等不同的協議載體上，不綁定特定協議。
 
 1. 協議服務（實例服務）：
-    Source： 開獎員服務
-    Daemon：常駐服務
-    Facade ： 主要 grpc 服務
-    Resource ： 數據 grpc 服務 
-    Http ： 主要 http 服務
-    Command ： cli 服務 
-    Cron ： 定時服務
-    Websocket： 
-2. 邏輯服務 (虛擬服務)：admin app third game table register logic model announcement watcher 
+    - Source：開獎資料來源服務載體
+    - Daemon：常駐任務服務載體
+    - Facade：對外主要 gRPC 服務載體
+    - Resource：資料 gRPC 服務載體
+    - Http：主要 HTTP 服務載體
+    - Command：CLI 服務載體
+    - Cron：排程服務載體
+    - Websocket：WebSocket 服務載體
+2. 邏輯服務（虛擬服務）：
+   - admin：後台介面邏輯服務，負責所有後台相關業務邏輯
+   - app：前台介面邏輯服務，負責所有前台相關業務邏輯
+   - third：第三方介接邏輯服務，負責所有第三方串接相關業務邏輯
+   - game：前台遊戲介面邏輯服務，負責所有前台遊戲相關業務邏輯
+   - table：前台資料介面邏輯服務，負責所有前台地端上報相關業務邏輯
+   - register：前台驗證邏輯服務，負責所有前台身份驗證相關業務邏輯
+   - logic：次級（衍生）資料邏輯服務，處理跨多個資源、需要額外組合運算的資料邏輯
+   - model：次級資料的增刪改查（CRUD）邏輯服務
+   - announcement：開獎邏輯服務
+   - watcher：採集開獎資料的邏輯服務
 
 ## 目錄結構
 
