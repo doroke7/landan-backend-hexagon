@@ -16,6 +16,8 @@ import (
 	consumer2 "example/internal/input/application/consumer/admin/resource"
 	"example/internal/input/application/cron"
 	cron2 "example/internal/input/application/cron/admin/resource"
+	"example/internal/input/application/daemon"
+	source2 "example/internal/input/application/daemon/watcher/source"
 	"example/internal/input/application/facade"
 	facade3 "example/internal/input/application/facade/register"
 	facade2 "example/internal/input/application/facade/table"
@@ -35,6 +37,7 @@ import (
 	any2 "example/internal/usecase/application/any/admin/resource"
 	usecase3 "example/internal/usecase/application/any/annoucement"
 	usecase2 "example/internal/usecase/application/any/model"
+	"example/internal/usecase/application/any/watcher/source"
 	any3 "example/internal/usecase/port/any/model"
 	"example/pkg"
 )
@@ -251,9 +254,18 @@ func InitSourceContainer() (*SourceContainer, error) {
 func InitDaemonContainer() (*DaemonContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
+	clientConn := bootstrap.NewSource()
+	clientAnnouncement := client.NewAnnouncement(clientConn)
+	sourceClient := client.NewSourceClient(clientConn, clientAnnouncement)
+	abstractUsecase := source.NewAbstractUsecase(aesHelper)
+	announcementLotteryUsecase := source.NewAnnouncementLotteryUsecase(abstractUsecase)
+	abstractHandler := daemon.NewAbstractHandler(aesHelper)
+	announcementLotteryHandler := source2.NewAnnouncementLotteryHandler(announcementLotteryUsecase, abstractHandler)
 	daemonContainer := &DaemonContainer{
-		AbstractHelper: abstractHelper,
-		AesHelper:      aesHelper,
+		AbstractHelper:                         abstractHelper,
+		AesHelper:                              aesHelper,
+		SourceClient:                           sourceClient,
+		DaemonWatcherSourceAnnouncementLottery: announcementLotteryHandler,
 	}
 	return daemonContainer, nil
 }
@@ -395,4 +407,9 @@ type DaemonContainer struct {
 	// Helper
 	*helper.AbstractHelper
 	*helper.AesHelper
+
+	// Clients
+	SourceClient *client.SourceClient
+
+	DaemonWatcherSourceAnnouncementLottery *source2.AnnouncementLotteryHandler
 }

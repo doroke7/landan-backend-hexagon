@@ -27,6 +27,7 @@ import (
 	usecaseApplicationAnyAdminAuthentication "example/internal/usecase/application/any/admin/authentication"
 	usecaseApplicationAnyAdminResource "example/internal/usecase/application/any/admin/resource"
 	usecaseApplicationAnyAnnouncement "example/internal/usecase/application/any/annoucement"
+	usecaseApplicationAnyWatcherSource "example/internal/usecase/application/any/watcher/source"
 	usecaseApplicationAnyModel "example/internal/usecase/application/any/model"
 
 	middlewareAdmin "example/internal/middleware/admin"
@@ -45,6 +46,9 @@ import (
 
 	inputApplicationSource "example/internal/input/application/source"
 	inputApplicationSourceAnnouncement "example/internal/input/application/source/announcement"
+
+	inputApplicationDaemon "example/internal/input/application/daemon"
+	inputApplicationDaemonWatcherSource "example/internal/input/application/daemon/watcher/source"
 
 	inputApplicationResource "example/internal/input/application/resource"
 	inputApplicationResourceModel "example/internal/input/application/resource/model"
@@ -424,6 +428,45 @@ func InitSourceContainer() (*SourceContainer, error) {
 		inputApplicationSourceAnnouncement.NewLotteryHandler,
 
 		wire.Struct(new(SourceContainer), "*"),
+	)
+	return nil, nil
+}
+
+type DaemonContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+
+	// Clients
+	SourceClient *client.SourceClient
+
+	DaemonWatcherSourceAnnouncementLottery *inputApplicationDaemonWatcherSource.AnnouncementLotteryHandler
+}
+
+func InitDaemonContainer() (*DaemonContainer, error) {
+	wire.Build(
+
+		// bootstrap
+		bootstrap.NewSource,
+
+		// client
+		client.NewAnnouncement,
+		client.NewSourceClient,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+
+		// usecase
+		usecaseApplicationAnyWatcherSource.NewAbstractUsecase,
+		usecaseApplicationAnyWatcherSource.NewAnnouncementLotteryUsecase,
+
+		// input-daemon
+		inputApplicationDaemon.NewAbstractHandler,
+		inputApplicationDaemonWatcherSource.NewAnnouncementLotteryHandler,
+
+		wire.Struct(new(DaemonContainer), "*"),
 	)
 	return nil, nil
 }

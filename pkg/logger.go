@@ -24,6 +24,8 @@ const (
 	MiddlewareApp   Module = "middleware-app"
 	MiddlewareThird Module = "middleware-third"
 	Client          Module = "client"
+	Deamon          Module = "deamon"
+	DeamonWatcher   Module = "deamon-watcher"
 	FacadeGame      Module = "facade-game"
 	FacadeTable     Module = "facade-table"
 	FacadeRegister  Module = "facade-register"

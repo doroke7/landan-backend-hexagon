@@ -11,3 +11,5 @@ websocket:
 
 source:
   port: 2008
+
+daemon:

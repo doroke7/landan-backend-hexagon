@@ -8,7 +8,7 @@ resource:        # 數據服務
   user: 'resource'
   password: '!Scg]4"?VYY`mzFOV(Nu247ou6O5E@jB'
 
-ource:        # 數據服務
+source:        # 數據服務
   hosts: ["127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"]
   ports: ["2008", "2008", "2008", "2008"]
 

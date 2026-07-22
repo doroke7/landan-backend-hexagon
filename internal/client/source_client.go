@@ -26,8 +26,8 @@ func NewSourceClient(oClientConn *grpc.ClientConn, oAnnouncement *Announcement) 
 }
 
 type SourceClient struct {
-	conn *grpc.ClientConn
-	*Announcement
+	conn         *grpc.ClientConn
+	Announcement *Announcement
 }
 
 func (oClient *SourceClient) Close() error {
