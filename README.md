@@ -47,7 +47,7 @@
 
 
 
-## 如何利用這套框架 從 1到100 建立一個獨立 服務端-服務。 (一定要一點一點加，不然很容易 interface 對不上)
+## 如何利用這套框架 從 1到100 建立一個獨立 grpc服務端-服務。 (一定要一點一點加，不然很容易 interface 對不上)
 1. proto基本文檔撰寫: 
     建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
 
@@ -71,12 +71,21 @@
 
 
 
-## 如何 建立一個獨立 grpc客戶端-連線。 
+## 如何 建立一個獨立 grpc客戶端-連線 conn。 
 1. proto: 建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
 2. config: 設定 config/clients.yaml  與 bootstrap/config.go
 3. bootstrap： bootstrap/source.go 基本客戶端連線（conn） + internal/client/source_client.go
 
-4. cmd ：建立 cmd/daemon.go 與 container tree 與 register
+4. cmd ：建立 cmd/daemon.go 與 container tree 與 register/daemon.go
+
+
+## 我們的服務區分2層
+我們講服務定義2個層級，
+第一層是做協議的服務，他其實只是個服務載體，實現方式（http or grpc or command or cron），不具備服務邏輯
+第二層開始是用到的邏輯服務，如 Admin 服務 是邏輯的，其實可以 同時裝載到 http 也可以裝載到 grpc, command
+
+1. 協議服務（實例服務）：Source Daemon Facade Resource Http Command Cron Websocket
+2. 邏輯服務 (虛擬服務)：admin app third game table register logic model announcement watcher 
 
 ## 目錄結構
 
