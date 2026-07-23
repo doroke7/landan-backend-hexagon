@@ -24,7 +24,7 @@ func facadeInterceptors(oContainer *container.FacadeContainer) grpc.UnaryServerI
 		oContainer.FacadeAdminLoggerInterceptor.Handle(),
 	}
 
-	return pkg.NewRouter(aBase...).
+	return pkg.NewGrpcRouter(aBase...).
 		// 登入接口：不需要額外驗證，只套用全局攔截器
 		Group("/facae.admin.authentication.").
 		// 資源接口：全局攔截器 + Token 驗證（proto 尚未生成，先預留 group，

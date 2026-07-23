@@ -9,6 +9,8 @@ import (
 	"io"
 	"log"
 	"net"
+
+	types "example/types"
 )
 
 /*
@@ -40,42 +42,28 @@ var (
 	ErrTcpMethodNotFound = errors.New("tcp: method not found")
 )
 
-// TcpRequest 是 client 送給 server 的內容，method 用來給 Tcp 分發到對應的 handler。
-type TcpRequest struct {
-	Code   int    `json:"code"`
-	Method string `json:"method"`
-	Param  string `json:"param"`
-}
-
-// TcpResponse 是 server 回給 client 的內容，跟 pkg.Response 的 code/message/result 是同一套慣例。
-type TcpResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Result  any    `json:"result"`
-}
-
 // TcpHandlerFunc 是一個 method 對應的處理方法，簽名統一，方便用 method name 當 key 做路由。
-type TcpHandlerFunc func(oReq TcpRequest) TcpResponse
+type TcpHandlerFunc func(oReq types.TcpRequest) types.TcpResponse
 
-// Tcp 職責跟 ConsumerRouter 一樣：只負責把 method name 對應到一個處理方法，
+// TcpRouter 職責跟 ConsumerRouter 一樣：只負責把 method name 對應到一個處理方法，
 // 不管 unmarshal／business 邏輯；Serve 時自己負責 accept 連線、讀 frame、分發、回包。
-type Tcp struct {
+type TcpRouter struct {
 	routes map[string]TcpHandlerFunc
 }
 
-func NewTcp() *Tcp {
-	return &Tcp{routes: make(map[string]TcpHandlerFunc)}
+func NewTcpRouter() *TcpRouter {
+	return &TcpRouter{routes: make(map[string]TcpHandlerFunc)}
 }
 
 // HandleFunc 註冊一個 method 對應的處理方法，用法跟 ConsumerRouter.HandleFunc 一樣。
-func (oSelf *Tcp) HandleFunc(sMethod string, fnHandler TcpHandlerFunc) *Tcp {
+func (oSelf *TcpRouter) HandleFunc(sMethod string, fnHandler TcpHandlerFunc) *TcpRouter {
 	oSelf.routes[sMethod] = fnHandler
 	return oSelf
 }
 
 // Serve 監聽 sAddr，每個連線各自在自己的 goroutine 讀 frame、分發、回包，
 // ctx 取消時關掉 listener，讓 Accept 中斷、Serve 返回。
-func (oSelf *Tcp) Serve(ctx context.Context, sAddr string) error {
+func (oSelf *TcpRouter) Serve(ctx context.Context, sAddr string) error {
 	oListener, err := net.Listen("tcp", sAddr)
 	if err != nil {
 		return err
@@ -101,13 +89,13 @@ func (oSelf *Tcp) Serve(ctx context.Context, sAddr string) error {
 	}
 }
 
-func (oSelf *Tcp) serveConn(oConn net.Conn) {
+func (oSelf *TcpRouter) serveConn(oConn net.Conn) {
 	defer oConn.Close()
 
 	oReader := bufio.NewReader(oConn)
 
 	for {
-		var oReq TcpRequest
+		var oReq types.TcpRequest
 		if err := oSelf.DecodeFrame(oReader, &oReq); err != nil {
 			return
 		}
@@ -126,16 +114,16 @@ func (oSelf *Tcp) serveConn(oConn net.Conn) {
 	}
 }
 
-func (oSelf *Tcp) dispatch(oReq TcpRequest) TcpResponse {
+func (oSelf *TcpRouter) dispatch(oReq types.TcpRequest) types.TcpResponse {
 	fnHandler, ok := oSelf.routes[oReq.Method]
 	if !ok {
-		return TcpResponse{Code: -1, Message: ErrTcpMethodNotFound.Error()}
+		return types.TcpResponse{Code: -1, Message: ErrTcpMethodNotFound.Error()}
 	}
 	return fnHandler(oReq)
 }
 
-// EncodeFrame 把 oPayload（TcpRequest 或 TcpResponse）編碼成一個完整的 frame。
-func (oSelf *Tcp) EncodeFrame(oPayload any) ([]byte, error) {
+// EncodeFrame 把 oPayload（types.TcpRequest 或 types.TcpResponse）編碼成一個完整的 frame。
+func (oSelf *TcpRouter) EncodeFrame(oPayload any) ([]byte, error) {
 	aBody, err := json.Marshal(oPayload)
 	if err != nil {
 		return nil, err
@@ -152,8 +140,8 @@ func (oSelf *Tcp) EncodeFrame(oPayload any) ([]byte, error) {
 	return aFrame, nil
 }
 
-// DecodeFrame 從 reader 讀出一個完整 frame，解到 oPayload（傳 &TcpRequest{} 或 &TcpResponse{}）。
-func (oSelf *Tcp) DecodeFrame(oReader *bufio.Reader, oPayload any) error {
+// DecodeFrame 從 reader 讀出一個完整 frame，解到 oPayload（傳 &types.TcpRequest{} 或 &types.TcpResponse{}）。
+func (oSelf *TcpRouter) DecodeFrame(oReader *bufio.Reader, oPayload any) error {
 	aLengthBuf := make([]byte, 4)
 	if _, err := io.ReadFull(oReader, aLengthBuf); err != nil {
 		return err

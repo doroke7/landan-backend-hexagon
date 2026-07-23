@@ -8,7 +8,7 @@ import (
 )
 
 /*
-Router 模仿 Hyperf 的 Router::addGroup(prefix, ['middleware' => [...]])：
+GrpcRouter 模仿 Hyperf 的 Router::addGroup(prefix, ['middleware' => [...]])：
 group 註冊時就把攔截器綁死在 prefix 上，dispatch 時只需要對 gRPC 的
 info.FullMethod（格式為 "/package.Service/Method"）做前綴比對，
 不再靠切字串位置去猜 group。
@@ -23,13 +23,13 @@ type Route struct {
 	Interceptors []grpc.UnaryServerInterceptor
 }
 
-type Router struct {
+type GrpcRouter struct {
 	base   []grpc.UnaryServerInterceptor
 	routes []Route
 }
 
-func NewRouter(aBase ...grpc.UnaryServerInterceptor) *Router {
-	return &Router{base: aBase}
+func NewGrpcRouter(aBase ...grpc.UnaryServerInterceptor) *GrpcRouter {
+	return &GrpcRouter{base: aBase}
 }
 
 func ChainInterceptors(interceptors ...grpc.UnaryServerInterceptor) grpc.UnaryServerInterceptor {
@@ -46,7 +46,7 @@ func ChainInterceptors(interceptors ...grpc.UnaryServerInterceptor) grpc.UnarySe
 }
 
 // Group 註冊一個 prefix 對應的攔截器鏈，aExtra 會疊加在 aBase 之後
-func (oSelf *Router) Group(sPrefix string, aExtra ...grpc.UnaryServerInterceptor) *Router {
+func (oSelf *GrpcRouter) Group(sPrefix string, aExtra ...grpc.UnaryServerInterceptor) *GrpcRouter {
 	aInterceptors := make([]grpc.UnaryServerInterceptor, 0, len(oSelf.base)+len(aExtra))
 	aInterceptors = append(aInterceptors, oSelf.base...)
 	aInterceptors = append(aInterceptors, aExtra...)
@@ -58,7 +58,7 @@ func (oSelf *Router) Group(sPrefix string, aExtra ...grpc.UnaryServerInterceptor
 	return oSelf
 }
 
-func (oSelf *Router) Build() grpc.UnaryServerInterceptor {
+func (oSelf *GrpcRouter) Build() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		for _, oRoute := range oSelf.routes {
 			if strings.HasPrefix(info.FullMethod, oRoute.Prefix) {

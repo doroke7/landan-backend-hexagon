@@ -64,6 +64,10 @@ type Config struct {
 			HOSTS []string `mapstructure:"hosts"`
 			PORTS []string `mapstructure:"ports"`
 		} `mapstructure:"source"`
+		TCP struct {
+			HOSTS []string `mapstructure:"hosts"`
+			PORTS []string `mapstructure:"ports"`
+		} `mapstructure:"tcp"`
 	} `mapstructure:"clients"`
 	DATABASE struct {
 		USER                 string `mapstructure:"user"`

@@ -5,7 +5,7 @@ import (
 
 	inputApplicationTcp "example/internal/input/application/tcp"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
-	pkg "example/pkg"
+	types "example/types"
 )
 
 type AuthenticatorHandler struct {
@@ -22,16 +22,16 @@ func NewAuthenticatorHandler(oAuthenticatorUsecase usecasePortAnyAdminAuthentica
 
 // SignIn 簽名就是 pkg.TcpHandlerFunc，可以直接被 Tcp.HandleFunc 註冊。
 // param 格式固定「name:password」。
-func (oSelf *AuthenticatorHandler) SignIn(oReq pkg.TcpRequest) pkg.TcpResponse {
+func (oSelf *AuthenticatorHandler) SignIn(oReq types.TcpRequest) types.TcpResponse {
 	aParts := strings.SplitN(oReq.Param, ":", 2)
 	if len(aParts) != 2 {
-		return pkg.TcpResponse{Code: -1, Message: "invalid param, expect \"name:password\""}
+		return types.TcpResponse{Code: -1, Message: "invalid param, expect \"name:password\""}
 	}
 
 	sAuthorization, err := oSelf.AuthenticatorUsecase.SignIn(aParts[0], aParts[1])
 	if err != nil {
-		return pkg.TcpResponse{Code: -1, Message: err.Error()}
+		return types.TcpResponse{Code: -1, Message: err.Error()}
 	}
 
-	return pkg.TcpResponse{Code: 1, Message: "成功登入", Result: sAuthorization}
+	return types.TcpResponse{Code: 1, Message: "成功登入", Result: sAuthorization}
 }
