@@ -47,15 +47,15 @@ func (oSelf *TcpClient) AdminAuthenticationAuthenticatorSignIn(sName string, sPa
 		return nil, err
 	}
 
-	if _, err = oSelf.Write(aFrame); err != nil {
+	if _, err = oSelf.Conn.Write(aFrame); err != nil {
 		log.Println("tcp client: write failed:", err)
 		return nil, err
 	}
 
 	var oResp types.TcpResponse
 	// IMPORTANT
-	// TCP 是stream， 你有可能讀取 到 第二個 response 的資料
-	if err = oSelf.DecodeFrame(bufio.NewReader(oSelf.Conn), &oResp); err != nil {
+	// TCP 是stream， 你有可能讀取 到 第二個 response 的資料， oSelf.DecodeFrame(bufio.NewReader(oSelf.Conn), &oResp)
+	if err = oSelf.DecodeFrame(oSelf.reader, &oResp); err != nil {
 		log.Println("tcp client: decode failed:", err)
 		return nil, err
 	}
