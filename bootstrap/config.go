@@ -40,6 +40,14 @@ type Config struct {
 			HOST string `mapstructure:"host"`
 			PORT string `mapstructure:"port"`
 		} `mapstructure:"source"`
+		TCP struct {
+			HOST string `mapstructure:"host"`
+			PORT string `mapstructure:"port"`
+		} `mapstructure:"tcp"`
+		UDP struct {
+			HOST string `mapstructure:"host"`
+			PORT string `mapstructure:"port"`
+		} `mapstructure:"udp"`
 	} `mapstructure:"services"`
 	CLIENTS struct {
 		FACADE struct {

@@ -12,4 +12,10 @@ websocket:
 source:
   port: 2008
 
+tcp:
+  port: 2008
+
+udp:
+  port: 2008
+
 daemon:
