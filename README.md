@@ -279,37 +279,6 @@
 
 ## DI 依賴注入樹狀圖（ResourceContainer）
 
-說明：`A --> B` 代表 A 被注入到 B（A 是 B 的建構依賴），ResourceContainer 為最底層、最終組裝出來的容器。
-
-```mermaid
-graph TD
-    subgraph bootstrap
-    end
-
-    subgraph internal/resource
-        Helpers --> MysqlRepositories
-
-        subgraph internal/output
-            MysqlRepositories
-            MemoryRepositories
-            ProducerRepositories
-        end
-
-        Helpers --> Usecases
-        MysqlRepositories --> Usecases
-        Usecases --> GrpcHandlers
-        Helpers --> GrpcHandlers
-
-        Interceptors
-        Helpers --> Interceptors
-
-        GrpcHandlers --> ResourceContainer
-        Interceptors --> ResourceContainer
-    end
-
-    bootstrap --> internal/resource
-```
-
 文字版（由下往上）：
 ```
 ┌ bootstrap ──┐
@@ -362,7 +331,7 @@ graph TD
 - **resource**：內部資料服務，直接讀寫 mysql，僅供 facade / http 呼叫（`AdminUserUsecase` 專屬於這條路徑，走 `usecase/application/any/model`）。
 - **http**：Gin REST API，目前只有 `Admin/Authentication/Authenticator/SignIn` 這個登入端點，走專屬的 `AuthenticatorUsecase`（`usecase/application/any/admin/authentication`），透過 gRPC 呼叫 resource 服務查帳號。
 - **cron / consumer / command**：三個週邊輸入來源，各自觸發「幫 AppUser 加餘額」，共用同一份 `AppUserUsecase.IncreaseBalance`（`usecase/application/any/admin/resource`），底層都是直接打 mysql。三者差異只在參數怎麼來：cron 排程寫死、consumer 解 MQ payload、command 吃 CLI flag。
-- **websocket / client**：容器都還在，但目前沒有掛任何 handler，指令啟動後不會處理任何請求（是之前拿掉舊 `User` 垂直切面後留下的空殼，等有新需求再補）。
+- **websocket / client**：容器都還在，但目前沒有掛任何 handler
 
 依賴方向永遠是「外層指向內層」：`input adapter → usecase/port → usecase → output/port ← output adapter`，
 `usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是走 gRPC 轉發。
@@ -373,14 +342,6 @@ graph TD
 ```zsh
 go install github.com/air-verse/air@latest
 ```
-
-
-## 代碼開發流程(以 Http 為例子)
-1. input：建立新的 Http handlers，註冊到 container，container 再註冊到路由上
-2. usecase：建立新的 usecase/application/any/<功能> + usecase/port/any/<功能>，把實作註冊到 container，修改 Http handlers 讓 usecase（port）注入
-   - 命名用「功能」不是用「adapter 名稱」：如果這個 usecase 未來可能被其他 adapter（cron/consumer/command...）共用，直接放 any 底下就好，不用每個 adapter 各生一份
-3. output：建立新的 output/application/mysql/model + output/port/any/model，把實作註冊到 container，修改 usecase 讓 repo-port 注入
-*. 如果 container 首次增加 mysql 需要注入 bootstrap.NewMysql 
 
 
 ## 微服務地端如果有強大的數據需求，又對網路延遲鳴感，怎麼辦？
