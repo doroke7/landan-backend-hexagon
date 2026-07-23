@@ -157,12 +157,16 @@
 │   ├── cron.go                    #   啟動排程服務
 │   ├── websocket.go               #   啟動 websocket 服務
 │   └── command.go                 #   啟動一次性 CLI 指令
-│
+│ 
+│ 
+│ 
+├── bootstrap/                    # 讀 CONFIG、建立各種基礎設施連線（mysql / redis / amqp / mongo / grpc client） 
+│ 
+│ 
 ├── internal/
-│   ├── bootstrap/                 # 讀 CONFIG、建立各種基礎設施連線（mysql / redis / amqp / mongo / grpc client）
 │   ├── domain/                    # 領域物件（entity）：AdminUser、AppUser、User，跟框架、資料庫無關
 │   ├── helper/                    # 通用工具（AES、RSA、JWT、Cache 讀寫……），跟業務邏輯無關可到處注入
-│   ├── client/                    # 對外部 gRPC stream server / resource 服務的 client 封裝
+│   ├── client/                    # 對外部 gRPC server 服務的 client 封裝
 │   │
 │   ├── input/                     #   協議輸入端（driving adapter），只有實作，沒有介面
 │   │   └── application/           #   不同協議輸入端，不同的端且相同的相對目錄 代表同一個業務輸入。
