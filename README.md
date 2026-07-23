@@ -1,5 +1,7 @@
 ## 六角架構圖
+
 文字版（由下往上）：
+
 ```
 +----------------------------------------------------------------+
 |                            input                               |
@@ -35,63 +37,53 @@
 +----------------------------------------------------------------+
 
 ```
+
 ## 六角框架使用重點
-1. input 不同輸入 adaptor 相同的路徑應該是相同的設備方法。
-    譬如 cron/admin/authentication/authenticator, 
-        command/admin/authentication/authenticator,
-        http/admin/authentication/authenticator,
+
+1. input 不同輸入 adaptor 相同的路徑應該是相同的設備方法
+  譬如 cron/admin/authentication/authenticator,  
+        command/admin/authentication/authenticator,  
+        http/admin/authentication/authenticator,  
         facade/admin/authentication/authenticator,
-        
-    以不同協議但是相同業務邏輯實現
+    以不同協議但是相同業務邏輯實現 登入取得 token 這個業務。
 2. output 同理
 3. 六角框架的也間接看出，後端的本質其實是在做消息傳遞，不論輸入輸出怎麼變
 
+## 如何利用這套框架 從 1到100 建立一個獨立 grpc服務端-服務
 
-
-
-## 如何利用這套框架 從 1到100 建立一個獨立 grpc服務端-服務。 (一定要一點一點加，不然很容易 interface 對不上)
-1. proto基本文檔撰寫: 
-    建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
-
-2. config設定當基本參數: 
-    設定 config/services.yaml  與 bootstrap/config.go
-
+1. proto基本文檔撰寫:
+  建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
+2. config設定當基本參數:
+  設定 config/services.yaml  與 bootstrap/config.go
 3. cmd 撰寫啟動入口程序：
-    建立 cmd/source.go 與 container tree 與 register
-
+  建立 cmd/source.go 與 container tree 與 register
 4. input & handler 協議輸入代碼建立：
-    建立 input/source/announcement/lottery.go 的服務類，並且綁定 pb， 並注入 container (記得注入 abstract 類)，並且註冊 register/
+  建立 input/source/announcement/lottery.go 的服務類，並且綁定 pb， 並注入 container (記得注入 abstract 類)，並且註冊 register/
+5. usecase 業務邏輯建立：
+  5-1 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），    
+  5-2. 並且注入 handler 與 container  (記得注入 abstract 類)，並且修改 input 使用 usecase 類
+6. output 資料輸出建立：
+  6-1 .建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），    
+  6-2. 並且注入 usecase 與 container (記得注入 abstract 類), 並且修改 usecase 使用 repository 類
 
-5. usecase 業務邏輯建立： 
-    5-1 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），
-    5-2. 並且注入 handler 與 container  (記得注入 abstract 類)，並且修改 input 使用 usecase 類
+## 如何 建立一個獨立 grpc客戶端-連線 conn。
 
-6. output 資料輸出建立： 
-    6-1 .建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），
-    6-2. 並且注入 usecase 與 container (記得注入 abstract 類), 並且修改 usecase 使用 repository 類
-
-
-
-
-## 如何 建立一個獨立 grpc客戶端-連線 conn。 
 1. proto: 建立獨立目錄的 proto/source/announcement/lottery.proto, 並生成
 2. config: 設定 config/clients.yaml  與 bootstrap/config.go
 3. bootstrap： bootstrap/source.go 基本客戶端連線（conn） + internal/client/source_client.go
-
 4. cmd ：建立 cmd/daemon.go 與 container tree 與 register/daemon.go
-
-
-
 
 ## 我們的服務分成兩層
 
 我們把服務定義成兩個層級：
 
-- **第一層是協議層服務**：本質上只是一個服務載體，對應不同的協議實作方式（http / grpc / command / cron ...），本身不包含任何業務邏輯。
+- **第一層是協議層服務**：  
+本質上只是一個服務載體，對應不同的協議實作方式（http / grpc / command / cron ...），本身不包含任何業務邏輯。  
+
 - **第二層才是邏輯服務**：真正的業務邏輯放在這一層，例如 `admin` 服務屬於邏輯層，同一份邏輯可以同時掛載到 http、grpc、command 等不同的協議載體上，不綁定特定協議。
 
 1. 協議服務（實例服務）：
-    - Source：開獎資料來源服務載體
+  - Source：開獎資料來源服務載體
     - Daemon：常駐任務服務載體
     - Facade：對外主要 gRPC 服務載體
     - Resource：資料 gRPC 服務載體
@@ -100,26 +92,17 @@
     - Cron：排程服務載體
     - Websocket：WebSocket 服務載體
 2. 邏輯服務（虛擬服務）：
-   - admin：後台介面邏輯服務，負責所有後台相關業務邏輯
-   - app：前台介面邏輯服務，負責所有前台相關業務邏輯
-   - third：第三方介接邏輯服務，負責所有第三方串接相關業務邏輯
-   - game：前台遊戲介面邏輯服務，負責所有前台遊戲相關業務邏輯
-   - table：前台資料介面邏輯服務，負責所有前台地端上報相關業務邏輯
-   - register：前台驗證邏輯服務，負責所有前台身份驗證相關業務邏輯
-   - logic：次級（衍生）資料邏輯服務，處理跨多個資源、需要額外組合運算的資料邏輯
-   - model：次級資料的增刪改查（CRUD）邏輯服務
-   - announcement：開獎邏輯服務
-   - watcher：採集開獎資料的邏輯服務
-
+  - admin：後台介面邏輯服務，負責所有後台相關業務邏輯
+  - app：前台介面邏輯服務，負責所有前台相關業務邏輯
+  - third：第三方介接邏輯服務，負責所有第三方串接相關業務邏輯
+  - game：前台遊戲介面邏輯服務，負責所有前台遊戲相關業務邏輯
+  - table：前台資料介面邏輯服務，負責所有前台地端上報相關業務邏輯
+  - register：前台驗證邏輯服務，負責所有前台身份驗證相關業務邏輯
+  - logic：次級（衍生）資料邏輯服務，處理跨多個資源、需要額外組合運算的資料邏輯
+  - model：次級資料的增刪改查（CRUD）邏輯服務
+  - announcement：開獎邏輯服務
+  - watcher：採集開獎資料的邏輯服務
 3. 實際運作服務堆疊
-   - Source : announcement
-   - Daemon：watcher
-   - Facade：game, table, register, admin（admin只是範例）
-   - Resource：logic, model
-   - Http: admin, app, third
-   - Command: admin
-   - Cron: admin
-   - Websocket
 
 ```
 協議服務（載體）        實際掛載的邏輯服務
@@ -142,17 +125,16 @@
 +-------------+     +--------------------------------+
 ```
 
-
 ## 傳統 ThinkPHP MVC 遇到的核心問題
+
 1. ThinkPHP 裡面的 Controller 雖然是業務主邏輯，但是裡面包含了 http 協議的代碼，這個會造成多 不同輸入實作有困難
 
-
 ## 這套框架的各個職責
+
 1. input : 只是寫協議的對接 （如 grpc http command），決定這個服務要用在哪一個服務載體
 2. usecase : 業務邏輯，基本上就是 Tp 的 C 去掉了協議的部分。
 3. output/**/model：負責單一數據操作的 數據模型。基本上就是 Tp 的 M
-   output/**/logic：負責複雜數據操作的 數據模型。基本上就是 Tp 的 M
-
+  output/**/logic：負責複雜數據操作的 數據模型。基本上就是 Tp 的 M
 4. 基本上，就是這四個元件交互
 
 ## 目錄結構
@@ -276,10 +258,10 @@
 └── pb/                             # protoc 產生的程式碼，對應 proto/ 底下的定義
 ```
 
-
 ## DI 依賴注入樹狀圖（ResourceContainer）
 
 文字版（由下往上）：
+
 ```
 ┌ bootstrap ──┐
 │             ├─────┐
@@ -323,8 +305,6 @@
 
 ```
 
-
-
 ## 服務拓樸
 
 - **facade**：對外 gRPC 入口，`register` / `table` 兩個 handler 目前是 stub，還沒接 usecase。
@@ -336,14 +316,16 @@
 依賴方向永遠是「外層指向內層」：`input adapter → usecase/port → usecase → output/port ← output adapter`，
 `usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是走 gRPC 轉發。
 
-
 ## 如何 watch 开发
+
 1. go mod 安装下载 air 套件
+
 ```zsh
 go install github.com/air-verse/air@latest
 ```
 
-
 ## 微服務地端如果有強大的數據需求，又對網路延遲鳴感，怎麼辦？
+
 1. 在地端 使用 SQL lite 思維，本地 SQL思維
 2. 再統一上報數據
+
