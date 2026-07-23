@@ -13,9 +13,9 @@ source:
   port: 2008
 
 tcp:
-  port: 2008
+  port: 4007
 
 udp:
-  port: 2008
+  port: 4008
 
 daemon:
