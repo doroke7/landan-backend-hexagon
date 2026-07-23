@@ -40,11 +40,11 @@
 
 ## 六角框架使用重點
 
-1. input 不同輸入 adaptor 相同的路徑應該是相同的設備方法
+1. input 不同輸入 adaptor 相同的路徑應該是相同的設備方法  
   譬如 cron/admin/authentication/authenticator,  
         command/admin/authentication/authenticator,  
         http/admin/authentication/authenticator,  
-        facade/admin/authentication/authenticator,
+        facade/admin/authentication/authenticator,  
     以不同協議但是相同業務邏輯實現 登入取得 token 這個業務。
 2. output 同理
 3. 六角框架的也間接看出，後端的本質其實是在做消息傳遞，不論輸入輸出怎麼變
@@ -60,10 +60,10 @@
 4. input & handler 協議輸入代碼建立：
   建立 input/source/announcement/lottery.go 的服務類，並且綁定 pb， 並注入 container (記得注入 abstract 類)，並且註冊 register/
 5. usecase 業務邏輯建立：
-  5-1 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），    
+  5-1 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），  
   5-2. 並且注入 handler 與 container  (記得注入 abstract 類)，並且修改 input 使用 usecase 類
 6. output 資料輸出建立：
-  6-1 .建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），    
+  6-1 .建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），  
   6-2. 並且注入 usecase 與 container (記得注入 abstract 類), 並且修改 usecase 使用 repository 類
 
 ## 如何 建立一個獨立 grpc客戶端-連線 conn。
@@ -79,7 +79,6 @@
 
 - **第一層是協議層服務**：  
 本質上只是一個服務載體，對應不同的協議實作方式（http / grpc / command / cron ...），本身不包含任何業務邏輯。  
-
 - **第二層才是邏輯服務**：真正的業務邏輯放在這一層，例如 `admin` 服務屬於邏輯層，同一份邏輯可以同時掛載到 http、grpc、command 等不同的協議載體上，不綁定特定協議。
 
 1. 協議服務（實例服務）：
