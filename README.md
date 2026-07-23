@@ -46,6 +46,7 @@
         command/admin/authentication/authenticator_handler.go,  
         http/admin/authentication/authenticator_handler.go,  
         facade/admin/authentication/authenticator_handler.go,  
+  
     以不同協議但是相同業務邏輯實現 登入取得 token 這個業務。
 2. output 同理
 3. 六角框架的也間接看出，後端的本質其實是在做消息傳遞，不論輸入輸出怎麼變
