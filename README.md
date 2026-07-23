@@ -136,8 +136,8 @@
 
 1. input : 只是寫協議的對接 （如 grpc http command），決定這個服務要用在哪一個服務載體
 2. usecase : 業務邏輯，基本上就是 Tp 的 C 去掉了協議的部分。
-3. output/**/model：負責單一數據操作的 數據模型。基本上就是 Tp 的 M-mdoel  
-   output/**/logic：負責複雜數據操作的 數據模型。基本上就是 Tp 的 M-logic
+3. output/\*\*/model：負責單一數據操作的 數據模型。基本上就是 Tp 的 M-mdoel  
+   output/\*\*/logic：負責複雜數據操作的 數據模型。基本上就是 Tp 的 M-logic
 4. 基本上，就是這四個元件交互
 
 ## 目錄結構
