@@ -107,14 +107,14 @@ func (oSelf *Tcp) serveConn(oConn net.Conn) {
 	oReader := bufio.NewReader(oConn)
 
 	for {
-		oReq, err := oSelf.DecodeRequestFrame(oReader)
-		if err != nil {
+		var oReq TcpRequest
+		if err := oSelf.DecodeFrame(oReader, &oReq); err != nil {
 			return
 		}
 
 		oResp := oSelf.dispatch(oReq)
 
-		aFrame, err := oSelf.EncodeResponseFrame(oResp)
+		aFrame, err := oSelf.EncodeFrame(oResp)
 		if err != nil {
 			log.Printf("tcp: encode failed: method=%s err=%v", oReq.Method, err)
 			continue
@@ -134,31 +134,8 @@ func (oSelf *Tcp) dispatch(oReq TcpRequest) TcpResponse {
 	return fnHandler(oReq)
 }
 
-// EncodeRequestFrame 是 client 端組 request 用的。
-func (oSelf *Tcp) EncodeRequestFrame(oReq TcpRequest) ([]byte, error) {
-	return oSelf.encodeFrame(oReq)
-}
-
-// EncodeResponseFrame 是 server 端組 response 用的。
-func (oSelf *Tcp) EncodeResponseFrame(oResp TcpResponse) ([]byte, error) {
-	return oSelf.encodeFrame(oResp)
-}
-
-// DecodeRequestFrame 是 server 端讀 client request 用的。
-func (oSelf *Tcp) DecodeRequestFrame(oReader *bufio.Reader) (TcpRequest, error) {
-	var oReq TcpRequest
-	err := oSelf.decodeFrame(oReader, &oReq)
-	return oReq, err
-}
-
-// DecodeResponseFrame 是 client 端讀 server response 用的。
-func (oSelf *Tcp) DecodeResponseFrame(oReader *bufio.Reader) (TcpResponse, error) {
-	var oResp TcpResponse
-	err := oSelf.decodeFrame(oReader, &oResp)
-	return oResp, err
-}
-
-func (oSelf *Tcp) encodeFrame(oPayload any) ([]byte, error) {
+// EncodeFrame 把 oPayload（TcpRequest 或 TcpResponse）編碼成一個完整的 frame。
+func (oSelf *Tcp) EncodeFrame(oPayload any) ([]byte, error) {
 	aBody, err := json.Marshal(oPayload)
 	if err != nil {
 		return nil, err
@@ -175,7 +152,8 @@ func (oSelf *Tcp) encodeFrame(oPayload any) ([]byte, error) {
 	return aFrame, nil
 }
 
-func (oSelf *Tcp) decodeFrame(oReader *bufio.Reader, oPayload any) error {
+// DecodeFrame 從 reader 讀出一個完整 frame，解到 oPayload（傳 &TcpRequest{} 或 &TcpResponse{}）。
+func (oSelf *Tcp) DecodeFrame(oReader *bufio.Reader, oPayload any) error {
 	aLengthBuf := make([]byte, 4)
 	if _, err := io.ReadFull(oReader, aLengthBuf); err != nil {
 		return err
