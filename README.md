@@ -1,5 +1,6 @@
 ## 六角架構圖
-
+文字版（由下往上）：
+```
 +----------------------------------------------------------------+
 |                            input                               |
 |        HTTP / gRPC / CLI / Cron / WebSocket / GraphQL          |
@@ -33,6 +34,7 @@
 |      MySQL / Redis / Kafka / S3 / MQ / Third-party API         |
 +----------------------------------------------------------------+
 
+```
 ## 六角框架使用重點
 1. input 不同輸入 adaptor 相同的路徑應該是相同的設備方法。
     譬如 cron/admin/authentication/authenticator, 
