@@ -379,3 +379,8 @@ go install github.com/air-verse/air@latest
    - 命名用「功能」不是用「adapter 名稱」：如果這個 usecase 未來可能被其他 adapter（cron/consumer/command...）共用，直接放 any 底下就好，不用每個 adapter 各生一份
 3. output：建立新的 output/application/mysql/model + output/port/any/model，把實作註冊到 container，修改 usecase 讓 repo-port 注入
 *. 如果 container 首次增加 mysql 需要注入 bootstrap.NewMysql 
+
+
+## 微服務地端如果有強大的數據需求，又對網路延遲鳴感，怎麼辦？
+1. 在地端 使用 SQL lite 思維，本地 SQL思維
+2. 再統一上報數據
