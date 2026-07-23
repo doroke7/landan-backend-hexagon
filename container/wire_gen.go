@@ -146,7 +146,12 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := mysql.NewAbstractRepository(db)
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	aop := pkg.NewAop(redisClient)
+	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
 	abstractHandler := resource2.NewAbstractHandler()
@@ -178,7 +183,12 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := mysql.NewAbstractRepository(db)
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	aop := pkg.NewAop(redisClient)
+	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := consumer2.NewAppUserHandler(appUserUsecase, abstractHandler)
@@ -199,7 +209,12 @@ func InitCronContainer() (*CronContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := mysql.NewAbstractRepository(db)
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	aop := pkg.NewAop(redisClient)
+	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	abstractHandler := cron.NewAbstractHandler(aesHelper)
@@ -247,7 +262,12 @@ func InitCommandContainer() (*CommandContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	abstractRepository := mysql.NewAbstractRepository(db)
+	redisClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	aop := pkg.NewAop(redisClient)
+	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
 	appUserHandler := command2.NewAppUserHandler(appUserUsecase, abstractHandler)

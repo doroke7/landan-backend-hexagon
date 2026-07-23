@@ -241,6 +241,8 @@ func InitResourceContainer() (*ResourceContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+		pkg.NewAop,
 
 		// helper
 		helper.NewAbstractHelper,
@@ -288,6 +290,8 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 		// bootstrap
 		bootstrap.NewMysql,
 		bootstrap.NewAmqp,
+		bootstrap.NewRedis,
+		pkg.NewAop,
 
 		// helper
 		helper.NewAbstractHelper,
@@ -329,6 +333,8 @@ func InitCronContainer() (*CronContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+		pkg.NewAop,
 
 		// helper
 		helper.NewAbstractHelper,
@@ -418,6 +424,8 @@ func InitCommandContainer() (*CommandContainer, error) {
 
 		// bootstrap
 		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+		pkg.NewAop,
 
 		// helper
 		helper.NewAbstractHelper,

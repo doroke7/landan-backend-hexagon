@@ -12,11 +12,11 @@ import (
 
 // Aop 結構體：不帶泛型，是一個純粹、萬用的切面工具箱
 type Aop struct {
-	oCache redis.UniversalClient
+	oCache *redis.Client
 }
 
 // NewAop 初始化時注入萬用的 Redis 客戶端
-func NewAop(oCache redis.UniversalClient) *Aop {
+func NewAop(oCache *redis.Client) *Aop {
 	return &Aop{oCache: oCache}
 }
 
