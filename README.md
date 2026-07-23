@@ -85,13 +85,14 @@
 
 1. 協議服務（實例服務）：
   - Source：開獎資料來源服務載體
-    - Daemon：常駐任務服務載體
-    - Facade：對外主要 gRPC 服務載體
-    - Resource：資料 gRPC 服務載體
-    - Http：主要 HTTP 服務載體
-    - Command：CLI 服務載體
-    - Cron：排程服務載體
-    - Websocket：WebSocket 服務載體
+  - Daemon：常駐任務服務載體
+  - Facade：對外主要 gRPC 服務載體
+  - Resource：資料 gRPC 服務載體
+  - Http：對外主要 HTTP 服務載體
+  - Command：CLI 服務載體
+  - Cron：排程服務載體
+  - Consumer：消息隊列服務載體
+  - Websocket：WebSocket 服務載體
 2. 邏輯服務（虛擬服務）：
   - admin：後台介面邏輯服務，負責所有後台相關業務邏輯
   - app：前台介面邏輯服務，負責所有前台相關業務邏輯
