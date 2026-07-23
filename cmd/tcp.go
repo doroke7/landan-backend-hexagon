@@ -1,51 +1,32 @@
 package cmd
 
 import (
+	"context"
 	bootstrap "example/bootstrap"
 	"fmt"
 	"log"
-	"net"
 
 	"github.com/spf13/cobra"
+
+	container "example/container"
+	register "example/internal/register"
 )
 
 var oTcpCommand = &cobra.Command{
 	Use:   "tcp",
 	Short: "啟動 TCP 服務",
 	Run: func(cmd *cobra.Command, args []string) {
-		ln, err := net.Listen("tcp", ":"+bootstrap.CONFIG.SERVICES.TCP.PORT)
+		oContainer, err := container.InitTcpContainer()
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer ln.Close()
+
+		oTcpRouter := register.TcpInit(oContainer)
 
 		fmt.Println("TCP Server Start")
 
-		for {
-			conn, err := ln.Accept()
-			if err != nil {
-				continue
-			}
-
-			go func(conn net.Conn) {
-				defer conn.Close()
-
-				buf := make([]byte, 1024)
-
-				for {
-					n, err := conn.Read(buf)
-					if err != nil {
-						return
-					}
-
-					fmt.Println("Receive:", string(buf[:n]))
-
-					_, err = conn.Write([]byte("OK"))
-					if err != nil {
-						return
-					}
-				}
-			}(conn)
+		if err := oTcpRouter.Serve(context.Background(), ":"+bootstrap.CONFIG.SERVICES.TCP.PORT); err != nil {
+			log.Fatal(err)
 		}
 	},
 }

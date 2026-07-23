@@ -30,6 +30,8 @@ import (
 	"example/internal/input/application/resource/model"
 	resource3 "example/internal/input/application/source"
 	"example/internal/input/application/source/announcement"
+	"example/internal/input/application/tcp"
+	authentication4 "example/internal/input/application/tcp/admin/authentication"
 	"example/internal/interceptor/facade/game"
 	"example/internal/interceptor/resource"
 	"example/internal/middleware/admin"
@@ -286,6 +288,35 @@ func InitCommandContainer() (*CommandContainer, error) {
 	return commandContainer, nil
 }
 
+func InitTcpContainer() (*TcpContainer, error) {
+	abstractHelper := helper.NewAbstractHelper()
+	aesHelper := helper.NewAesHelper(abstractHelper)
+	jwtHelper := helper.NewJwtHelper(abstractHelper)
+	abstractHandler := tcp.NewAbstractHandler(aesHelper)
+	db, err := bootstrap.NewMysql()
+	if err != nil {
+		return nil, err
+	}
+	universalClient, err := bootstrap.NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	aop := pkg.NewAop(universalClient)
+	abstractRepository := mysql.NewAbstractRepository(db, aop)
+	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
+	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
+	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
+	authenticatorHandler := authentication4.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
+	tcpContainer := &TcpContainer{
+		AbstractHelper:               abstractHelper,
+		AesHelper:                    aesHelper,
+		JwtHelper:                    jwtHelper,
+		AbstractHandler:              abstractHandler,
+		TcpAdminAuthenticationSignIn: authenticatorHandler,
+	}
+	return tcpContainer, nil
+}
+
 func InitSourceContainer() (*SourceContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
@@ -459,6 +490,18 @@ type CommandContainer struct {
 	*command.AbstractHandler
 	CommandAdminReourceAppUser       *command2.AppUserHandler
 	CommandAdminAuthenticationSignIn *authentication3.AuthenticatorHandler
+}
+
+type TcpContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+	*helper.JwtHelper
+
+	// tcp
+	*tcp.AbstractHandler
+	TcpAdminAuthenticationSignIn *authentication4.AuthenticatorHandler
 }
 
 type SourceContainer struct {

@@ -67,6 +67,9 @@ import (
 
 	inputApplicationHttp "example/internal/input/application/http"
 	inputApplicationHttpAdminAuthentication "example/internal/input/application/http/admin/authentication"
+
+	inputApplicationTcp "example/internal/input/application/tcp"
+	inputApplicationTcpAdminAuthentication "example/internal/input/application/tcp/admin/authentication"
 )
 
 // HttpContainer 只給 `http` Gin 服務使用。
@@ -448,6 +451,48 @@ func InitCommandContainer() (*CommandContainer, error) {
 		inputApplicationCommandAdminAuthentication.NewAuthenticatorHandler,
 
 		wire.Struct(new(CommandContainer), "*"),
+	)
+	return nil, nil
+}
+
+type TcpContainer struct {
+
+	// Helper
+	*helper.AbstractHelper
+	*helper.AesHelper
+	*helper.JwtHelper
+
+	// tcp
+	*inputApplicationTcp.AbstractHandler
+	TcpAdminAuthenticationSignIn *inputApplicationTcpAdminAuthentication.AuthenticatorHandler
+}
+
+func InitTcpContainer() (*TcpContainer, error) {
+	wire.Build(
+
+		// bootstrap
+		bootstrap.NewMysql,
+		bootstrap.NewRedis,
+		pkg.NewAop,
+
+		// helper
+		helper.NewAbstractHelper,
+		helper.NewAesHelper,
+		helper.NewJwtHelper,
+
+		// output
+		outputApplicationMysql.NewAbstractRepository,
+		outputApplicationMysqlModel.NewAdminUserRepository,
+
+		// usecase
+		usecaseApplicationAnyAdminAuthentication.NewAbstractUsecase,
+		usecaseApplicationAnyAdminAuthentication.NewAuthenticatorUsecase,
+
+		// tcp
+		inputApplicationTcp.NewAbstractHandler,
+		inputApplicationTcpAdminAuthentication.NewAuthenticatorHandler,
+
+		wire.Struct(new(TcpContainer), "*"),
 	)
 	return nil, nil
 }
