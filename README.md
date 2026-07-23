@@ -317,6 +317,39 @@
 依賴方向永遠是「外層指向內層」：`input adapter → usecase/port → usecase → output/port ← output adapter`，
 `usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是走 gRPC 轉發。
 
+## 服務拓撲圖：Facade / Http / Websocket → Resource → Redis / MySQL；Command 直連 MySQL
+
+`facade` 跟 `http` 都沒有自己的資料庫連線，登入查帳號一律經 gRPC 轉發給 `resource`；`resource` 才是真正碰資料庫（mysql）／快取（redis）的那一層。
+（目前 `resource` 的 `bootstrap.NewRedis` 已經接進 `ResourceContainer`，但 `AdminUserUsecase` 這條路徑還只走 mysql，redis 連線已備好、尚未有 usecase 使用；
+`websocket` 目前容器是空殼，還沒接 `ResourceClient` 也沒掛任何 handler，這裡先畫上去代表「預期中」會走的路徑）
+
+`command` 則是唯一不經過 `resource` 的協議層：`CommandContainer` 直接 wire 了 `outputApplicationMysqlModel`，
+繞過 gRPC 自己連 mysql——跟 `resource` 打的是同一個 MySQL instance，只是省了一趟 gRPC。
+
+```
++-------------+  +-------------+  +-------------+     +-------------+
+|    Facade   |  |     Http    |  |  Websocket  |     |   Command   |
++-------------+  +-------------+  +-------------+     +-------------+
+       |                |                |                   |
+       +----------------+----------------+                   |
+                        |                                    |
+                        | gRPC 呼叫                          | 直連 mysql
+                        v                                    | （不走 resource）
+             +--------------------+                          |
+             |      Resource      |                          |
+             +--------------------+                          |
+                        |                                    |
+                  +-----+-----+                              |
+                  |           |                              |
+                  v           v                              |
+            +-----------------------+
+            | +-------+   +-------+ |
+            | | Redis |   | MySQL | |
+            | +-------+   +-------+ |
+            +-----------------------+
+
+```
+
 ## 如何 watch 开发
 
 1. go mod 安装下载 air 套件
