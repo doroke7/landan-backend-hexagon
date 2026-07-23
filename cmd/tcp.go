@@ -23,7 +23,7 @@ var oTcpCommand = &cobra.Command{
 
 		oTcpRouter := register.TcpInit(oContainer)
 
-		fmt.Println("TCP Server Start")
+		fmt.Println("TCP Server Start :" + bootstrap.CONFIG.SERVICES.TCP.PORT)
 
 		if err := oTcpRouter.Serve(context.Background(), ":"+bootstrap.CONFIG.SERVICES.TCP.PORT); err != nil {
 			log.Fatal(err)

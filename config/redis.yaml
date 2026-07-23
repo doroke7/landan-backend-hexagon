@@ -5,4 +5,4 @@ password: 'redis_pass_cli'
 port: '6379'
 ports: ["6379", "6379", "6379", "6379", "6379", "6379"]
 db: 0
-cluster: true
+cluster: false
