@@ -3,6 +3,9 @@ package service
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	pbResourceModel "example/pb/resource/model"
 
 	inputApplicationResource "example/internal/input/application/resource"
@@ -26,7 +29,7 @@ func (oSelf *AdminUserHandler) ShowOneByName(oContext context.Context, oReq *pbR
 
 	oAdminUser, err := oSelf.AdminUserUsecase.ShowOneByName(oReq.Name)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
 	return &pbResourceModel.OneAdminUerResponse{

@@ -29,7 +29,7 @@ func (oSelf *AuthenticatorHandler) SignIn(aMessage []byte) ([]byte, error) {
 
 	sAuthorization, err := oSelf.AuthenticatorUsecase.SignIn(aParts[0], aParts[1])
 	if err != nil {
-		return []byte("ERROR: " + err.Error()), nil
+		return []byte(err.Error()), nil
 	}
 
 	return []byte(sAuthorization), nil

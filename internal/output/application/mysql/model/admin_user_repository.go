@@ -25,7 +25,7 @@ func (oSelf *AdminUserRepository) ShowOneByName(sName string) (*domain.AdminUser
 
 	if err := oSelf.DB.Where("name = ?", sName).First(&oAdminUser).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("not found")
+			return nil, errors.New("沒有 " + sName + " 用戶")
 		}
 		return nil, err
 	}

@@ -148,27 +148,42 @@ func (oSelf *Tcp) EncodeFrame(sMethod string, aMessage []byte) ([]byte, error) {
 
 func (oSelf *Tcp) DecodeFrame(oReader *bufio.Reader) (sMethod string, aMessage []byte, err error) {
 
+	// 建立 4 Bytes Buffer，用來存放封包長度
 	aLengthBuf := make([]byte, 4)
+
+	// 一定要讀滿 4 Bytes，不夠就繼續等待
 	if _, err = io.ReadFull(oReader, aLengthBuf); err != nil {
 		return "", nil, err
 	}
 
+	// 4 Bytes 轉成 uint32
 	iBodyLength := binary.BigEndian.Uint32(aLengthBuf)
+
+	// 防止封包長度異常
 	if iBodyLength == 0 || iBodyLength > tcpMaxBodyLength {
 		return "", nil, ErrTcpBodyTooLarge
 	}
 
+	// 根據剛剛讀到的長度建立 Body Buffer
 	aBody := make([]byte, iBodyLength)
+
+	// 一定要把整個 Body 讀完
 	if _, err = io.ReadFull(oReader, aBody); err != nil {
 		return "", nil, err
 	}
 
+	// Body 第一個 Byte 表示 Method 字串長度
 	iMethodLength := int(aBody[0])
+
+	// 防止 Method 長度超過 Body
 	if len(aBody) < 1+iMethodLength {
 		return "", nil, ErrTcpMethodTooLarge
 	}
 
+	// Body[1:] 開始取出 Method
 	sMethod = string(aBody[1 : 1+iMethodLength])
+
+	// Method 後面的所有資料就是 Message
 	aMessage = aBody[1+iMethodLength:]
 
 	return sMethod, aMessage, nil
