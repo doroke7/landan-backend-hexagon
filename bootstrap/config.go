@@ -89,11 +89,14 @@ type Config struct {
 		MIN_POOL_SIZE uint64 `mapstructure:"min_pool_size"`
 	} `mapstructure:"mongodb"`
 	REDIS struct {
-		HOST     string `mapstructure:"host"`
-		PORT     string `mapstructure:"port"`
-		USERNAME string `mapstructure:"username"`
-		PASSWORD string `mapstructure:"password"` //
-		DB       int    `mapstructure:"db"`
+		HOST     string   `mapstructure:"host"`
+		HOSTS    []string `mapstructure:"hosts"`
+		USERNAME string   `mapstructure:"username"`
+		PASSWORD string   `mapstructure:"password"` //
+		PORT     string   `mapstructure:"port"`
+		PORTS    []string `mapstructure:"ports"`
+		DB       int      `mapstructure:"db"`
+		CLUSTER  bool     `mapstructure:"cluster"`
 	} `mapstructure:"redis"`
 	AMQP struct {
 		HOST string `mapstructure:"host"`

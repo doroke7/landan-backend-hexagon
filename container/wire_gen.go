@@ -146,11 +146,11 @@ func InitResourceContainer() (*ResourceContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
+	universalClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	aop := pkg.NewAop(redisClient)
+	aop := pkg.NewAop(universalClient)
 	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
 	adminUserUsecase := usecase2.NewAdminUserUsecase(adminUserRepository, abstractUsecase)
@@ -183,11 +183,11 @@ func InitConsumerContainer() (*ConsumerContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
+	universalClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	aop := pkg.NewAop(redisClient)
+	aop := pkg.NewAop(universalClient)
 	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
@@ -209,11 +209,11 @@ func InitCronContainer() (*CronContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
+	universalClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	aop := pkg.NewAop(redisClient)
+	aop := pkg.NewAop(universalClient)
 	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
@@ -262,11 +262,11 @@ func InitCommandContainer() (*CommandContainer, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := bootstrap.NewRedis()
+	universalClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	aop := pkg.NewAop(redisClient)
+	aop := pkg.NewAop(universalClient)
 	abstractRepository := mysql.NewAbstractRepository(db, aop)
 	appUserRepository := mysql2.NewAppUserRepository(abstractRepository)
 	appUserUsecase := any2.NewAppUserUsecase(appUserRepository)
@@ -310,11 +310,11 @@ func InitDaemonContainer() (*DaemonContainer, error) {
 	clientAnnouncement := client.NewAnnouncement(clientConn)
 	sourceClient := client.NewSourceClient(clientConn, clientAnnouncement)
 	abstractUsecase := source.NewAbstractUsecase(aesHelper)
-	redisClient, err := bootstrap.NewRedis()
+	universalClient, err := bootstrap.NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	cacheHelper := helper.NewCacheHelper(abstractHelper, redisClient)
+	cacheHelper := helper.NewCacheHelper(abstractHelper, universalClient)
 	abstractRepository := cache.NewAbstractRepository(cacheHelper)
 	lotteryRepository := model2.NewLotteryRepository(abstractRepository)
 	announcementLotteryUsecase := source.NewAnnouncementLotteryUsecase(abstractUsecase, lotteryRepository)

@@ -9,10 +9,10 @@ import (
 
 type CacheHelper struct {
 	*AbstractHelper
-	redis *redis.Client
+	redis redis.UniversalClient
 }
 
-func NewCacheHelper(oAbstractHelper *AbstractHelper, oRedis *redis.Client) *CacheHelper {
+func NewCacheHelper(oAbstractHelper *AbstractHelper, oRedis redis.UniversalClient) *CacheHelper {
 	return &CacheHelper{
 		AbstractHelper: oAbstractHelper,
 		redis:          oRedis,
