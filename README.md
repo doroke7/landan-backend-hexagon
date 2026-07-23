@@ -166,7 +166,7 @@
 ├── internal/
 │   ├── domain/                    # 領域物件（entity）：AdminUser、AppUser、User，跟框架、資料庫無關
 │   ├── helper/                    # 通用工具（AES、RSA、JWT、Cache 讀寫……），跟業務邏輯無關可到處注入
-│   ├── client/                    # 對外部 gRPC server 服務的 client 封裝
+│   ├── client/                    # 對外部 gRPC server 服務的 client 封裝成類別使用
 │   │
 │   ├── input/                     #   協議輸入端（driving adapter），只有實作，沒有介面
 │   │   └── application/           #   不同協議輸入端，不同的端且相同的相對目錄 代表同一個業務輸入。
