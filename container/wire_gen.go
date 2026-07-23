@@ -292,18 +292,11 @@ func InitTcpContainer() (*TcpContainer, error) {
 	abstractHelper := helper.NewAbstractHelper()
 	aesHelper := helper.NewAesHelper(abstractHelper)
 	jwtHelper := helper.NewJwtHelper(abstractHelper)
+	clientConn := bootstrap.NewResource()
+	model := client.NewModel(clientConn)
+	resourceClient := client.NewResourceClient(clientConn, model)
 	abstractHandler := tcp.NewAbstractHandler(aesHelper)
-	db, err := bootstrap.NewMysql()
-	if err != nil {
-		return nil, err
-	}
-	universalClient, err := bootstrap.NewRedis()
-	if err != nil {
-		return nil, err
-	}
-	aop := pkg.NewAop(universalClient)
-	abstractRepository := mysql.NewAbstractRepository(db, aop)
-	adminUserRepository := mysql2.NewAdminUserRepository(abstractRepository)
+	adminUserRepository := resource.NewAdminUserRepository(resourceClient)
 	abstractUsecase := usecase.NewAbstractUsecase(aesHelper, jwtHelper)
 	authenticatorUsecase := usecase.NewAuthenticatorUsecase(adminUserRepository, abstractUsecase)
 	authenticatorHandler := authentication4.NewAuthenticatorHandler(authenticatorUsecase, abstractHandler)
@@ -311,6 +304,7 @@ func InitTcpContainer() (*TcpContainer, error) {
 		AbstractHelper:               abstractHelper,
 		AesHelper:                    aesHelper,
 		JwtHelper:                    jwtHelper,
+		ResourceClient:               resourceClient,
 		AbstractHandler:              abstractHandler,
 		TcpAdminAuthenticationSignIn: authenticatorHandler,
 	}
@@ -498,6 +492,9 @@ type TcpContainer struct {
 	*helper.AbstractHelper
 	*helper.AesHelper
 	*helper.JwtHelper
+
+	// Clients
+	ResourceClient *client.ResourceClient
 
 	// tcp
 	*tcp.AbstractHandler

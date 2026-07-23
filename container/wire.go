@@ -462,6 +462,9 @@ type TcpContainer struct {
 	*helper.AesHelper
 	*helper.JwtHelper
 
+	// Clients
+	ResourceClient *client.ResourceClient
+
 	// tcp
 	*inputApplicationTcp.AbstractHandler
 	TcpAdminAuthenticationSignIn *inputApplicationTcpAdminAuthentication.AuthenticatorHandler
@@ -471,9 +474,7 @@ func InitTcpContainer() (*TcpContainer, error) {
 	wire.Build(
 
 		// bootstrap
-		bootstrap.NewMysql,
-		bootstrap.NewRedis,
-		pkg.NewAop,
+		bootstrap.NewResource,
 
 		// helper
 		helper.NewAbstractHelper,
@@ -481,12 +482,15 @@ func InitTcpContainer() (*TcpContainer, error) {
 		helper.NewJwtHelper,
 
 		// output
-		outputApplicationMysql.NewAbstractRepository,
-		outputApplicationMysqlModel.NewAdminUserRepository,
+		outputApplicationResourceModel.NewAdminUserRepository,
 
 		// usecase
 		usecaseApplicationAnyAdminAuthentication.NewAbstractUsecase,
 		usecaseApplicationAnyAdminAuthentication.NewAuthenticatorUsecase,
+
+		// client
+		client.NewModel,
+		client.NewResourceClient,
 
 		// tcp
 		inputApplicationTcp.NewAbstractHandler,
