@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -16,34 +17,45 @@ TCP 是位元組流（stream），沒有天然的訊息邊界，直接 conn.Read
   - 拆包：一筆訊息太大，一次 Read 讀不完，要跨好幾次 Read 才拼得齊
 
 解法是自訂一個「帶長度前綴」的 frame 格式，讀取端固定「先讀長度、再讀滿長度」；
-中間跨了幾次底層 Read 都由 bufio.Reader + io.ReadFull 自動處理，
-呼叫端每呼叫一次 ReadFrame 就保證拿到剛好一個完整的 method + message。
+中間跨了幾次底層 Read 都由 bufio.Reader + io.ReadFull 自動處理。
 
 Frame 格式（Big Endian）：
 
-	┌──────────────┬──────────────┬─────────────┬──────────────┐
-	│  BodyLength  │ MethodLength │   Method    │   Message    │
-	│   4 bytes    │    1 byte    │   N bytes   │   M bytes    │
-	└──────────────┴──────────────┴─────────────┴──────────────┘
-	                └──────────────── BodyLength ─────────────┘
+	┌──────────────┬─────────────────────────┐
+	│  BodyLength  │   Body (JSON)           │
+	│   4 bytes    │   N bytes               │
+	└──────────────┴─────────────────────────┘
 
-method 用顯式長度前綴切割，而不是用分隔符（例如空白或 \n）去切，
-是因為 Message 內容可能是任意 binary，用分隔符切會有跟 payload 內容衝突的風險。
+Body 是 JSON，內容依方向不同：
+  - Request  ：{ code, method, param }
+  - Response ：{ code, message, result }
 */
 
 const (
-	tcpMaxBodyLength   = 1 << 12  // 4KB，避免錯誤/惡意的長度前綴把記憶體打爆
-	tcpMaxMethodLength = 1<<8 - 1 // MethodLength 只有 1 byte，最大 255
+	tcpMaxBodyLength = 1 << 12 // 4KB，避免錯誤/惡意的長度前綴把記憶體打爆
 )
 
 var (
 	ErrTcpBodyTooLarge   = errors.New("tcp: body too large")
-	ErrTcpMethodTooLarge = errors.New("tcp: method name too large")
 	ErrTcpMethodNotFound = errors.New("tcp: method not found")
 )
 
-// 回傳的 []byte 會被包成 frame 寫回連線。
-type TcpHandlerFunc func(aMessage []byte) ([]byte, error)
+// TcpRequest 是 client 送給 server 的內容，method 用來給 Tcp 分發到對應的 handler。
+type TcpRequest struct {
+	Code   int    `json:"code"`
+	Method string `json:"method"`
+	Param  string `json:"param"`
+}
+
+// TcpResponse 是 server 回給 client 的內容，跟 pkg.Response 的 code/message/result 是同一套慣例。
+type TcpResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Result  any    `json:"result"`
+}
+
+// TcpHandlerFunc 是一個 method 對應的處理方法，簽名統一，方便用 method name 當 key 做路由。
+type TcpHandlerFunc func(oReq TcpRequest) TcpResponse
 
 // Tcp 職責跟 ConsumerRouter 一樣：只負責把 method name 對應到一個處理方法，
 // 不管 unmarshal／business 邏輯；Serve 時自己負責 accept 連線、讀 frame、分發、回包。
@@ -95,20 +107,16 @@ func (oSelf *Tcp) serveConn(oConn net.Conn) {
 	oReader := bufio.NewReader(oConn)
 
 	for {
-		sMethod, aMessage, err := oSelf.DecodeFrame(oReader)
+		oReq, err := oSelf.DecodeRequestFrame(oReader)
 		if err != nil {
 			return
 		}
 
-		aResp, err := oSelf.dispatch(sMethod, aMessage)
-		if err != nil {
-			log.Printf("tcp: dispatch failed: method=%s err=%v", sMethod, err)
-			continue
-		}
+		oResp := oSelf.dispatch(oReq)
 
-		aFrame, err := oSelf.EncodeFrame(sMethod, aResp)
+		aFrame, err := oSelf.EncodeResponseFrame(oResp)
 		if err != nil {
-			log.Printf("tcp: encode failed: method=%s err=%v", sMethod, err)
+			log.Printf("tcp: encode failed: method=%s err=%v", oReq.Method, err)
 			continue
 		}
 
@@ -118,73 +126,70 @@ func (oSelf *Tcp) serveConn(oConn net.Conn) {
 	}
 }
 
-func (oSelf *Tcp) dispatch(sMethod string, aMessage []byte) ([]byte, error) {
-	fnHandler, ok := oSelf.routes[sMethod]
+func (oSelf *Tcp) dispatch(oReq TcpRequest) TcpResponse {
+	fnHandler, ok := oSelf.routes[oReq.Method]
 	if !ok {
-		return nil, ErrTcpMethodNotFound
+		return TcpResponse{Code: -1, Message: ErrTcpMethodNotFound.Error()}
 	}
-	return fnHandler(aMessage)
+	return fnHandler(oReq)
 }
 
-// EncodeFrame 把 method + message 封裝成一個完整的 frame，寫出去的一方（server 回包／client 發送）都用這個。
-func (oSelf *Tcp) EncodeFrame(sMethod string, aMessage []byte) ([]byte, error) {
-	if len(sMethod) > tcpMaxMethodLength {
-		return nil, ErrTcpMethodTooLarge
+// EncodeRequestFrame 是 client 端組 request 用的。
+func (oSelf *Tcp) EncodeRequestFrame(oReq TcpRequest) ([]byte, error) {
+	return oSelf.encodeFrame(oReq)
+}
+
+// EncodeResponseFrame 是 server 端組 response 用的。
+func (oSelf *Tcp) EncodeResponseFrame(oResp TcpResponse) ([]byte, error) {
+	return oSelf.encodeFrame(oResp)
+}
+
+// DecodeRequestFrame 是 server 端讀 client request 用的。
+func (oSelf *Tcp) DecodeRequestFrame(oReader *bufio.Reader) (TcpRequest, error) {
+	var oReq TcpRequest
+	err := oSelf.decodeFrame(oReader, &oReq)
+	return oReq, err
+}
+
+// DecodeResponseFrame 是 client 端讀 server response 用的。
+func (oSelf *Tcp) DecodeResponseFrame(oReader *bufio.Reader) (TcpResponse, error) {
+	var oResp TcpResponse
+	err := oSelf.decodeFrame(oReader, &oResp)
+	return oResp, err
+}
+
+func (oSelf *Tcp) encodeFrame(oPayload any) ([]byte, error) {
+	aBody, err := json.Marshal(oPayload)
+	if err != nil {
+		return nil, err
 	}
 
-	iBodyLength := 1 + len(sMethod) + len(aMessage)
-	if iBodyLength > tcpMaxBodyLength {
+	if len(aBody) > tcpMaxBodyLength {
 		return nil, ErrTcpBodyTooLarge
 	}
 
-	aFrame := make([]byte, 4+iBodyLength)
-	binary.BigEndian.PutUint32(aFrame[0:4], uint32(iBodyLength))
-	aFrame[4] = byte(len(sMethod))
-	copy(aFrame[5:5+len(sMethod)], sMethod)
-	copy(aFrame[5+len(sMethod):], aMessage)
+	aFrame := make([]byte, 4+len(aBody))
+	binary.BigEndian.PutUint32(aFrame[0:4], uint32(len(aBody)))
+	copy(aFrame[4:], aBody)
 
 	return aFrame, nil
 }
 
-func (oSelf *Tcp) DecodeFrame(oReader *bufio.Reader) (sMethod string, aMessage []byte, err error) {
-
-	// 建立 4 Bytes Buffer，用來存放封包長度
+func (oSelf *Tcp) decodeFrame(oReader *bufio.Reader, oPayload any) error {
 	aLengthBuf := make([]byte, 4)
-
-	// 一定要讀滿 4 Bytes，不夠就繼續等待
-	if _, err = io.ReadFull(oReader, aLengthBuf); err != nil {
-		return "", nil, err
+	if _, err := io.ReadFull(oReader, aLengthBuf); err != nil {
+		return err
 	}
 
-	// 4 Bytes 轉成 uint32
 	iBodyLength := binary.BigEndian.Uint32(aLengthBuf)
-
-	// 防止封包長度異常
 	if iBodyLength == 0 || iBodyLength > tcpMaxBodyLength {
-		return "", nil, ErrTcpBodyTooLarge
+		return ErrTcpBodyTooLarge
 	}
 
-	// 根據剛剛讀到的長度建立 Body Buffer
 	aBody := make([]byte, iBodyLength)
-
-	// 一定要把整個 Body 讀完
-	if _, err = io.ReadFull(oReader, aBody); err != nil {
-		return "", nil, err
+	if _, err := io.ReadFull(oReader, aBody); err != nil {
+		return err
 	}
 
-	// Body 第一個 Byte 表示 Method 字串長度
-	iMethodLength := int(aBody[0])
-
-	// 防止 Method 長度超過 Body
-	if len(aBody) < 1+iMethodLength {
-		return "", nil, ErrTcpMethodTooLarge
-	}
-
-	// Body[1:] 開始取出 Method
-	sMethod = string(aBody[1 : 1+iMethodLength])
-
-	// Method 後面的所有資料就是 Message
-	aMessage = aBody[1+iMethodLength:]
-
-	return sMethod, aMessage, nil
+	return json.Unmarshal(aBody, oPayload)
 }

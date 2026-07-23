@@ -1,11 +1,11 @@
 package authentication
 
 import (
-	"fmt"
 	"strings"
 
 	inputApplicationTcp "example/internal/input/application/tcp"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
+	pkg "example/pkg"
 )
 
 type AuthenticatorHandler struct {
@@ -20,17 +20,18 @@ func NewAuthenticatorHandler(oAuthenticatorUsecase usecasePortAnyAdminAuthentica
 	}
 }
 
-// 不需要額外的轉接層。message body 格式固定「name:password」。
-func (oSelf *AuthenticatorHandler) SignIn(aMessage []byte) ([]byte, error) {
-	aParts := strings.SplitN(string(aMessage), ":", 2)
+// SignIn 簽名就是 pkg.TcpHandlerFunc，可以直接被 Tcp.HandleFunc 註冊。
+// param 格式固定「name:password」。
+func (oSelf *AuthenticatorHandler) SignIn(oReq pkg.TcpRequest) pkg.TcpResponse {
+	aParts := strings.SplitN(oReq.Param, ":", 2)
 	if len(aParts) != 2 {
-		return nil, fmt.Errorf("tcp: invalid SignIn message, expect \"name:password\"")
+		return pkg.TcpResponse{Code: -1, Message: "invalid param, expect \"name:password\""}
 	}
 
 	sAuthorization, err := oSelf.AuthenticatorUsecase.SignIn(aParts[0], aParts[1])
 	if err != nil {
-		return []byte(err.Error()), nil
+		return pkg.TcpResponse{Code: -1, Message: err.Error()}
 	}
 
-	return []byte(sAuthorization), nil
+	return pkg.TcpResponse{Code: 1, Message: "成功登入", Result: sAuthorization}
 }
