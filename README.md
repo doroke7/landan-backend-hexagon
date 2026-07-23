@@ -62,10 +62,10 @@
 4. input & handler 協議輸入代碼建立：
   建立 input/source/announcement/lottery.go 的服務類，並且綁定 pb， 並注入 container (記得注入 abstract 類)，並且註冊 register/
 5. usecase 業務邏輯建立：
-  - 5-1 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），  
+  - 5-1. 建立 usecase 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），  
   - 5-2. 並且注入 handler 與 container  (記得注入 abstract 類)，並且修改 input 使用 usecase 類
 6. output 資料輸出建立：
-  - 6-1 .建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），  
+  - 6-1. 建立 output 包含 介面跟實作，（實作先簡單return 寫死 domain 數據），  
   - 6-2. 並且注入 usecase 與 container (記得注入 abstract 類), 並且修改 usecase 使用 repository 類
 
 ## 如何 建立一個獨立 grpc客戶端-連線 conn。
