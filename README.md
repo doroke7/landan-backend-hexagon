@@ -308,58 +308,38 @@
 
 ## 服務拓樸
 
-- **facade**：對外 gRPC 入口，`register` / `table` 兩個 handler 目前是 stub，還沒接 usecase。
-- **resource**：內部資料服務，直接讀寫 mysql，僅供 facade / http 呼叫（`AdminUserUsecase` 專屬於這條路徑，走 `usecase/application/any/model`）。
-- **http**：Gin REST API，目前只有 `Admin/Authentication/Authenticator/SignIn` 這個登入端點，走專屬的 `AuthenticatorUsecase`（`usecase/application/any/admin/authentication`），透過 gRPC 呼叫 resource 服務查帳號。
-- **cron / consumer / command**：三個週邊輸入來源，各自觸發「幫 AppUser 加餘額」，共用同一份 `AppUserUsecase.IncreaseBalance`（`usecase/application/any/admin/resource`），底層都是直接打 mysql。三者差異只在參數怎麼來：cron 排程寫死、consumer 解 MQ payload、command 吃 CLI flag。
-  另外 `cron` 跟 `command` 還各自掛了一份 admin 登入（`AuthenticatorUsecase`），也是直連 mysql（`mysql2.NewAdminUserRepository`），**不透過 resource**——跟 `http` 的登入路徑（走 gRPC 呼叫 resource）是兩條獨立實作，只是剛好共用同一個 usecase/port 命名（`admin/authentication`）。
-- **daemon**：常駐訂閱服務，完全不碰 mysql；透過 `bootstrap.NewSource()` 建立的 gRPC 連線去呼叫 `source` 服務的 `Announcement.Lottery.Watch` stream，收到開獎資料後用 cache repository 直接寫 redis（`watcher/source` 邏輯）。
-- **websocket / client**：容器都還在，但目前沒有掛任何 handler
-
-依賴方向永遠是「外層指向內層」：`input adapter → usecase/port → usecase → output/port ← output adapter`，
-`usecase` 完全不知道自己被 http 還是 grpc 還是 cron 呼叫，也不知道資料到底存在 mysql 還是走 gRPC 轉發。
-
-## 服務拓撲圖：Facade / Http / Websocket → Resource → Redis / MySQL / RabbitMQ；Command / Cron / Consumer 直連 MySQL；Daemon → Source → Redis
-
-`facade` 跟 `http` 都沒有自己的資料庫連線，登入查帳號一律經 gRPC 轉發給 `resource`；`resource` 才是真正碰資料庫（mysql）／快取（redis）的那一層。
-（目前 `resource` 的 `bootstrap.NewRedis` 已經接進 `ResourceContainer`，但 `AdminUserUsecase` 這條路徑還只走 mysql，redis 連線已備好、尚未有 usecase 使用；
-`websocket` 目前容器是空殼，還沒接 `ResourceClient` 也沒掛任何 handler，這裡先畫上去代表「預期中」會走的路徑）
-
-`command`、`cron`、`consumer` 是三個不經過 `resource` 的協議層：三者的 Container 都直接 wire 了 `outputApplicationMysqlModel`，
-繞過 gRPC 自己連 mysql——跟 `resource` 打的是同一個 MySQL instance，只是省了一趟 gRPC。三者也都額外 wire 了 `bootstrap.NewRedis`（給 `pkg.Aop` 用，query cache），但只有 `consumer` 真的有 `bootstrap.NewAmqp`：`ConsumerContainer` 訂閱 `Admin.Resource.AppUser.IncreaseBalance` 這個 queue，收到 MQ payload 才觸發同一份 `AppUserUsecase.IncreaseBalance` 寫 mysql；`command`／`cron` 則完全沒有 MQ 連線。
-
-`daemon` 是另一條完全獨立的路徑：它不打 mysql，也不透過 `resource`，而是把 `source` 服務（`SourceContainer`，資料目前是寫死在記憶體的假資料）當成上游，用 gRPC client-stream 訂閱 `Announcement.Lottery.Watch`，收到資料後直接寫 redis（`internal/output/application/cache/model`），不經過 mysql。
-
 ```
 
-                                                   ┌─────────────┐
-                                                   │   Source    │
-                                                   └─────────────┘
-                                                          ^
-                                                          │ gRPC 呼叫
-                                                          │ (訂閱 Watch stream)
-                                                          │
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│    Facade   │  │     Http    │  │  Websocket  │  │    Daemon   │     │   Command   │  │     Cron    │  │  Consumer   │
-└─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘     └─────────────┘  └─────────────┘  └─────────────┘
-       │                │                │                │                   │               │                │
-       └────────────────┼────────────────┘                │                   │               │                │
-                        │                                 │                   │               │                │
-                        │ gRPC 呼叫                        │                   │               │                │
-                        v                                 │                   │               │                │
-             ┌────────────────────┐                       │                   │               │                │
-             │      Resource      │                       │                   │               │                │
-             └────────────────────┘                       │                   │               │                │
-                        │                                 │                   │               │                │
-                  ┌─────┴─────┐                           │                   │               │                │
-                  │           │                           │                   │               │                │
-                  v           v                           v                   v               v                v
- ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
- │                ┌───────┐                    ┌───────┐                          ┌──────────┐                        │
- │                │ Redis │                    │ MySQL │                          │ RabbitMQ │                        │
- │                └───────┘                    └───────┘                          └──────────┘                        │
- └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-
+                                         ┌───────────┐
+                                         │  Source   │                                 ┌──────────────┐
+                                         └───────────┘                                 │              │
+                                               ▲                                       ▲              │
+                                               │ gRPC 呼叫                              │              │
+                                               │ (訂閱 Watch stream)                    │              │
+                                               │                                       │              │
+┌──────────┐  ┌─────────┐  ┌───────────┐  ┌──────────┐  ┌─────────┐  ┌────────┐  ┌───────────┐        │
+│  Facade  │  │   Http  │  │ Websocket │  │  Daemon  │  │ Command │  │  Cron  │  │ Consumer  │        │
+└──────────┘  └─────────┘  └───────────┘  └──────────┘  └─────────┘  └────────┘  └───────────┘        │
+     │             │             │             │             │           │             │              │
+     └─────────────┼─────────────┘             │             │           │             │              │
+                   │                           │             │           │             │              │
+                   │ gRPC 呼叫                  │             │           │             │              │
+                   ▼                           │             │           │             │              │
+        ┌────────────────────┐                 │             │           │             │              │
+        │      Resource      │                 │             │           │             │              │
+        └────────────────────┘                 │             │           │             │              │
+                   │                           │             │           │             │              │
+             ┌─────┴─────┐                     │             │           │             │              │
+             │           │                     │             │           │             │              │
+             ▼           ▼                     ▼             ▼           ▼             ▼              │
+ ┌─────────────────────────────────────────────────────────────────────────────────────────┐          │
+ │                ┌───────┐              ┌───────┐                   ┌──────────┐          │          │
+ │                │ Redis │              │ MySQL │                   │ RabbitMQ │          │          │
+ │                └───────┘              └───────┘                   └────▲─────┘          │          │
+ └────────────────────────────────────────────────────────────────────────+────────────────┘          │
+                                                                          │                           │
+                                                                          └───────────────────────────┘
+                                                                                                      
 ```
 
 ## 如何 watch 开发
