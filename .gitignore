@@ -1,0 +1,13 @@
+.env
+/vendor/**
+
+tmp/**
+!tmp/gitforkeep
+
+
+# 如果父目錄被忽略，子檔案即使 ! 也不會被重新包含。
+runtime/*
+!runtime/log/
+
+runtime/log/*
+!runtime/log/gitforkeep

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb.source.announcement;
+
+option go_package = "./pb_source_announcement";
+
+service Lottery {
+  rpc Watch(LotteryWatchRequest) returns (stream LotteryWatchReply);
+}
+
+message LotteryWatchRequest {
+    string key = 1;
+}
+
+message LotteryWatchReply {
+  int32 id = 1;        // 期號
+  string round = 2;        // 期號
+  int64 time = 3;        // 開獎時間（unix 秒）
+  repeated int32 numbers = 4; // 開獎號碼列表
+}
+

@@ -1,0 +1,70 @@
+##
+
+# ┌───────┬────────────┬──────────────────┬─────────────────────────────┐
+# │ 写法   │  换行处理   │     末尾 \n       │          结果示例            │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ |     │ 保留换行    │ 有                │ aaa\nbbb\nccc\n             │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ |-    │ 保留换行    │ 无                │ aaa\nbbb\nccc               │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ |+    │ 保留换行    │ 保留所有尾部空行    │ aaa\nbbb\nccc\n\n           │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ >     │ 折叠成空格  │ 有                │ aaa bbb ccc\n               │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ >-    │ 折叠成空格  │ 无                │ aaa bbb ccc                 │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ >+    │ 折叠成空格  │    保留所有尾部空行 │ aaa bbb ccc\n\n             │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ '...' │ 折叠成空格   │ 无               │ aaa bbb ccc                 │
+# ├───────┼────────────┼──────────────────┼─────────────────────────────┤
+# │ "..." │ 折叠成空格   │ 无               │ aaa bbb ccc（支持 \n 转义）   │
+# └───────┴────────────┴──────────────────┴─────────────────────────────┘
+
+
+rsa:
+  public_key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQB3yYpH/nJ+yCATrmb2xI+1
+    k6SzMez1OQ3aebkdnAKwsna51S6hkLBtG7Qg9PIsmwCgvUVbwhmLarcY7J2tf5u2
+    gyL5NdhtRp4OYsrQAZZwo+Ccmf3RPGXc1+Y/2H2tRLWsbmvDWZ8tHxZfIY6A0p5Z
+    F54LfwaDDsBFs0vGXNw3nWeqMMRP0cP2NZV3CqveBDv5ebgNJbyoShpC7bEveXmH
+    84JF01encK/ZYyq5RvunoT9BAwiSDMeYaz+8Jjlwpfyh6w5ZaZ47tkbNsPgBDrz9
+    gFN1WtmdkdKrB3ovWH5bPVUe8qwuY188lxVfLI3sB4G2LrsCUNn30AYMYZMLdaQf
+    AgMBAAE=
+    -----END PUBLIC KEY-----
+  private_key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEoQIBAAKCAQB3yYpH/nJ+yCATrmb2xI+1k6SzMez1OQ3aebkdnAKwsna51S6h
+    kLBtG7Qg9PIsmwCgvUVbwhmLarcY7J2tf5u2gyL5NdhtRp4OYsrQAZZwo+Ccmf3R
+    PGXc1+Y/2H2tRLWsbmvDWZ8tHxZfIY6A0p5ZF54LfwaDDsBFs0vGXNw3nWeqMMRP
+    0cP2NZV3CqveBDv5ebgNJbyoShpC7bEveXmH84JF01encK/ZYyq5RvunoT9BAwiS
+    DMeYaz+8Jjlwpfyh6w5ZaZ47tkbNsPgBDrz9gFN1WtmdkdKrB3ovWH5bPVUe8qwu
+    Y188lxVfLI3sB4G2LrsCUNn30AYMYZMLdaQfAgMBAAECggEAQEaWurbf/QOpoqXs
+    ffFPI6GLuNPLUHJC6r5yBF9YWjQI3QJ1OSCIaqN47k5BPIoXtiiZdPkb9+FVSjx9
+    B0H37eFD/PFVpp1D5nhAV4jijqKAvccrmQCNsAjxdcTW+whpa5L8pCAM94s81+ML
+    sjhR24B+v7BzcBOUPFJPEKt3RyekJhO7rOrkZlAZ/rC7dm6M0YS01gKH2NSHw94R
+    IGk1SCA7Em/Nn1Me/V0p71Tl8MK3am3PpaMK30uuPQjFDhom/vJHEZX73z/33KQF
+    RxYlJQ+CzhQQ1CNljgZyv2IvBqOGrD9TgqW50a0Mba+qI8YuMNjcDj/SeceOa4jr
+    iR1GIQKBgQDChxsdrwvo3+THTMcHV5952kwTWvPHLBpEOvdxV5SBaOIBbWjGss8B
+    s3nJ8xrNXpz9/X1TY11v+S6uStubsj70+vuhyW2RRgGW3o/i57zoXnIjR4rikt1V
+    j9ZKWjbwZ2Rt8Ua86i6IHuAIl3+QlVMUapYRYQovVn0w2CSOa7hahwKBgQCdpBUv
+    0U9nkCzXUThfW9m/3VQ88JKe4Aw/jjsjRipvVuwXV53M/acudSS2kdqq2Ck4Y4Ao
+    9rLVNb+1h8dRW7HX39MXVP8Nx9vqw8HdH8JYRjVebEfqDaE+RYRCAQkqEXjM+RFu
+    SKrMUThlWtBEwdiQXJgeCjFcVPzfOkVS4ZJXqQKBgEjpQuyZU6lxYdqhmGfUG94c
+    SC9pA74/dYjlYSGGZg8rNKq8S21OT/CfSKK9D+qx773zaSn8MGVrzGdff3iYEqjX
+    +cDmMr8ksivON7ggi9m8rKM0iYXq7jLHutYbgkQRPL9Ik+7zB4XVrLsLrbCPh5g7
+    awwQhzS/AiVwniMTlQG5AoGAdLTQdqlIVwy3FeVsjbSLfe8W+VLFyddnWforsA63
+    RdydRx63ldbIWa2iM4PB1q/XvIZ1kF4rwYtcVcGi/4maHY74UZK8jPBE0QaCVPm5
+    QO8hfbk+eHoEwPxoURFBPqLWwzE2BWbJBCCxVuAnxm+YrC/Q8pRrPMcyuvUB871K
+    QZkCgYBjjTbO3HRpGZatwrFvjso6ENVil23+caQ5LW7e9xXrrGZX9Hdrm3M5/zv/
+    +p75414SpSGJD9jKKo5CevDzt9o+Z8QH1G72uqtXkZlK+QeVTxY3sFrg5j5umtKj
+    RQJ9d861gX6Bj9WqC7qvi+L/Rb96BtlUsrk3JHvHCrIdBqJI8Q==
+    -----END RSA PRIVATE KEY-----
+
+aes:
+  key:
+  iv:
+  mode:
+signature:
+  status: true
+  salt: 'wx.VXdB7D46[u]$6'

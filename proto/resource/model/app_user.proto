@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb.resource.model;
+
+option go_package = "./pb_resource_model";
+
+service AppUser {
+  rpc AddAppUser(OneAppUserRequest) returns (OneAppUserResponse);
+}
+
+message OneAppUserRequest {
+  string name = 1;
+}
+
+message OneAppUserResponse {
+  string name = 1;
+}
+
+
+

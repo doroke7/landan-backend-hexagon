@@ -1,0 +1,79 @@
+package middleware_admin
+
+import (
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+
+	types "example/types"
+
+	bootstrap "example/bootstrap"
+
+	pkg "example/pkg"
+
+	utility "example/internal/utility"
+)
+
+type SignatureMiddleware struct {
+	*AbstractMiddleware
+}
+
+// go的嵌入式繼承（組合繼承） 比較特殊， Abstract 類別 需要注入到子類別，這個其他語言不需要這個動作
+
+// 2. 在結構體上定義一個「構造函數」
+func NewSignatureMiddleware(oAbstractMiddleware *AbstractMiddleware) *SignatureMiddleware {
+	return &SignatureMiddleware{
+		AbstractMiddleware: oAbstractMiddleware,
+	}
+}
+
+// 3. 定義一個方法，返回 gin.HandlerFunc
+func (oSelf *SignatureMiddleware) Handle() gin.HandlerFunc {
+	return func(oContext *gin.Context) {
+
+		sVer := oContext.GetHeader("Ver")
+		sVersion := oContext.GetHeader("Version")
+		sK := oContext.GetHeader("K")
+		sTime := oContext.GetHeader("Time")
+		sHeaderSignature := oContext.GetHeader("Signature")
+
+		// 故意不用 oContext.DefaultQuery/PostForm 讀這幾個「加密前」的原始值——那兩個
+		// 方法會觸發 gin 的 queryCache/formCache 快取，之後 DecryptionMiddleware 改寫
+		// RawQuery/PostForm 時就得反過來清快取。直接讀 c.Request.URL.Query()（每次都是
+		// 現剖析 RawQuery，不會被 gin 快取）就完全不會有這個問題。
+		sS := oContext.Request.URL.Query().Get("s")
+		sO := oContext.Request.URL.Query().Get("o")
+
+		var oRequestPayload types.RequestPayload
+
+		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
+		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
+		if err := oContext.ShouldBindBodyWith(&oRequestPayload, binding.JSON); err != nil {
+			oContext.Abort()
+			_ = oContext.Error(pkg.NewDefaultError("請求格式錯誤1", -1, 400))
+
+			return
+		}
+		sP := oRequestPayload.P
+
+		// NOTE: 不要把 未加密的 search, option, param, 都加下去簽名，多次一舉
+		aStrings := []string{sVer, sVersion, sK, sTime, sS, sO, sP, bootstrap.CONFIG.SERVICES.HTTP.ADMIN.SALT}
+
+		sStrings := strings.Join(aStrings, "|")
+
+		sMd5Signature := utility.Md5(sStrings)
+
+		if bootstrap.CONFIG.SERVICES.HTTP.ADMIN.SIGNATURE == true {
+			if sMd5Signature != sHeaderSignature {
+				oContext.Abort()
+				_ = oContext.Error(pkg.NewDefaultError("簽名失敗", -3, 406))
+
+				return
+			}
+		}
+
+		oContext.Next()
+
+	}
+}

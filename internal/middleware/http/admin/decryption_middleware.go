@@ -1,0 +1,110 @@
+package middleware_admin
+
+import (
+	"net/url"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+
+	bootstrap "example/bootstrap"
+	utility "example/internal/utility"
+	pkg "example/pkg"
+	types "example/types"
+)
+
+type DecryptionMiddleware struct {
+	*AbstractMiddleware
+}
+
+// go的嵌入式繼承（組合繼承） 比較特殊， Abstract 類別 需要注入到子類別，這個其他語言不需要這個動作
+
+// 2. 在結構體上定義一個「構造函數」
+func NewDecryptionMiddleware(oAbstractMiddleware *AbstractMiddleware) *DecryptionMiddleware {
+	return &DecryptionMiddleware{
+		AbstractMiddleware: oAbstractMiddleware,
+	}
+}
+
+// 3. 定義一個方法，返回 gin.HandlerFunc
+func (oSelf *DecryptionMiddleware) Handle() gin.HandlerFunc {
+	return func(oContext *gin.Context) {
+
+		// sHeaderKeys := oContext.GetHeader("Keys")
+		sHeaderK := oContext.GetHeader("K")
+		sHeaderA := oContext.GetHeader("A")
+
+		// 故意不用 oContext.DefaultQuery/PostForm 讀這幾個「加密前」的原始值，理由跟
+		// SignatureMiddleware 一樣：直接讀 c.Request.URL.Query() 才不會提前把 gin 的
+		// queryCache 卡死在加密前的值上，下面改寫 RawQuery 才不用反過來清快取。
+		sQueryS := oContext.Request.URL.Query().Get("s")
+		sQueryO := oContext.Request.URL.Query().Get("o")
+
+		var oRequestPayload types.RequestPayload
+
+		// 2. 關鍵：使用 c.ShouldBind 代替 c.ShouldBindJSON！
+		// Gin 會自動根據 Content-Type 去選用 JSON 解析器或 Form 解析器
+		if err := oContext.ShouldBindBodyWith(&oRequestPayload, binding.JSON); err != nil {
+
+			oContext.Abort()
+			_ = oContext.Error(pkg.NewDefaultError("請求格式錯誤2", -1, 400))
+
+			return
+		}
+		sP := oRequestPayload.P
+
+		sKeys, oErr := oSelf.rsaHelper.Decrypt(sHeaderK, bootstrap.CONFIG.SERVICES.HTTP.ADMIN.PRIVATE_KEY)
+		if oErr != nil {
+			oContext.Abort()
+			_ = oContext.Error(pkg.NewDefaultError("金鑰解密失敗", -1, 400))
+			return
+		}
+
+		// Go 的 encoding/json 只能反序列化到 exported（大写开头） 的字段。
+		// 小写字段是 unexported 的，json.Unmarshal 无法访问，
+		// 如果你写小写，直接跳过，解出来永远是空值。
+
+		oKeys, _ := utility.JsonDecode[struct {
+			Key string `json:"key"`
+			Iv  string `json:"iv"`
+		}](sKeys)
+
+		oContext.Set("key", oKeys.Key)
+		oContext.Set("iv", oKeys.Iv)
+
+		sOption := oSelf.aesHelper.Decrypt(sQueryO, oKeys.Key, oKeys.Iv)
+
+		sSearch := oSelf.aesHelper.Decrypt(sQueryS, oKeys.Key, oKeys.Iv)
+
+		sParam := oSelf.aesHelper.Decrypt(sP, oKeys.Key, oKeys.Iv)
+
+		sAuthorizaion := oSelf.aesHelper.Decrypt(sHeaderA, bootstrap.CONFIG.SERVICES.HTTP.ADMIN.JWT.KEY, bootstrap.CONFIG.SERVICES.HTTP.ADMIN.JWT.IV)
+		oContext.Set("Authrization", sAuthorizaion)
+
+		oOption, _ := utility.JsonDecode[struct {
+			Size  string `json:"size"`
+			Page  string `json:"page"`
+			AppId string `json:"app_id"`
+		}](sOption)
+
+		oSearch, _ := utility.JsonDecode[map[string]interface{}](sSearch)
+		oParam, _ := utility.JsonDecode[map[string]interface{}](sParam)
+
+		oUrlQuery := oContext.Request.URL.Query()
+
+		oSelf.Flatten(oUrlQuery, "search", oSearch)
+		oSelf.Flatten(oUrlQuery, "option", oOption)
+
+		// req.PostForm 只要不是 nil，net/http 的 req.ParseForm()（gin PostForm/
+		// initFormCache 內部會呼叫到）就會直接沿用這裡塞的值、不會再重新解析一次
+		// body 蓋掉它——不用像 queryCache 那樣特別去清 gin 的私有快取。
+		if oContext.Request.PostForm == nil {
+			oContext.Request.PostForm = url.Values{}
+		}
+		oSelf.Flatten(oContext.Request.PostForm, "param", oParam)
+
+		oContext.Request.URL.RawQuery = oUrlQuery.Encode()
+
+		oContext.Next()
+
+	}
+}

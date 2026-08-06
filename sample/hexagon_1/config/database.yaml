@@ -1,0 +1,13 @@
+user: "root"
+password: "mysql_pass_cli"
+name: "gogin"
+prefix: "gin-"
+charset: "utf8mb4"
+max_idle_connections: 12
+
+read:
+  hosts: ["127.0.0.1", "127.0.0.1"]
+  ports: ["3306","3306"]
+write:
+  hosts: ["127.0.0.1", "127.0.0.1"]
+  ports: ["3306","3306"]
