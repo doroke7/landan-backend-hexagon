@@ -137,6 +137,7 @@ func InitFacadeContainer(ctx context.Context) (*FacadeContainer, error) {
 	interceptor_facade_adminLoggerInterceptor := interceptor_facade_admin.NewLoggerInterceptor(interceptor_facade_adminAbstractInterceptor)
 	signatureInterceptor := interceptor_facade_admin.NewSignatureInterceptor(interceptor_facade_adminAbstractInterceptor)
 	decryptionInterceptor := interceptor_facade_admin.NewDecryptionInterceptor(interceptor_facade_adminAbstractInterceptor)
+	encryptionInterceptor := interceptor_facade_admin.NewEncryptionInterceptor(interceptor_facade_adminAbstractInterceptor)
 	facadeContainer := &FacadeContainer{
 		AbstractHelper:                         abstractHelper,
 		AesHelper:                              aesHelper,
@@ -156,6 +157,7 @@ func InitFacadeContainer(ctx context.Context) (*FacadeContainer, error) {
 		FacadeAdminLoggerInterceptor:           interceptor_facade_adminLoggerInterceptor,
 		FacadeAdminSignatureInterceptor:        signatureInterceptor,
 		FacadeAdminDecryptionInterceptor:       decryptionInterceptor,
+		FacadeAdminEncryptionInterceptor:       encryptionInterceptor,
 	}
 	return facadeContainer, nil
 }
@@ -489,6 +491,7 @@ type FacadeContainer struct {
 	FacadeAdminLoggerInterceptor        *interceptor_facade_admin.LoggerInterceptor
 	FacadeAdminSignatureInterceptor     *interceptor_facade_admin.SignatureInterceptor
 	FacadeAdminDecryptionInterceptor    *interceptor_facade_admin.DecryptionInterceptor
+	FacadeAdminEncryptionInterceptor    *interceptor_facade_admin.EncryptionInterceptor
 }
 
 type ResourceContainer struct {

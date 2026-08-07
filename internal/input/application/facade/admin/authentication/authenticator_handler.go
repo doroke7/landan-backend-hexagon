@@ -3,14 +3,11 @@ package authentication
 import (
 	"context"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	bootstrap "example/bootstrap"
 	inputApplicationFacade "example/internal/input/application/facade"
-	interceptorFacadeAdmin "example/internal/interceptor/facade/admin"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
 	pbFacadeAdminAuthentication "example/pb/facade/admin/authentication"
 	"example/pkg"
@@ -41,13 +38,7 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext context.Context, oRequest *pb
 		return nil, status.Error(codes.Internal, oErr.Error())
 	}
 
-	if oHolder, bOk := interceptorFacadeAdmin.AuthHolderFromContext(oContext); bOk {
-		oHolder.Authorization = sAuthorization
-	}
-
-	if oErr := grpc.SetHeader(oContext, metadata.Pairs("A", sAuthorization)); oErr != nil {
-		return nil, oErr
-	}
+	oContext = context.WithValue(oContext, "authorization", sAuthorization)
 
 	return &pbFacadeAdminAuthentication.OneResponse{}, nil
 }

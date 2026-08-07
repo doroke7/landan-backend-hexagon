@@ -29,6 +29,9 @@ func facadeInterceptors(oContainer *container.FacadeContainer) grpc.UnaryServerI
 		oContainer.FacadeAdminLoggerInterceptor.Handle(),
 		oContainer.FacadeAdminSignatureInterceptor.Handle(),
 		oContainer.FacadeAdminDecryptionInterceptor.Handle(),
+		// Encryption 自己管理 holder，不依賴其他攔截器的順序，放在請求階段的
+		// Signature/Decryption 之後只是邏輯上比較好懂（回應階段的事放最後）。
+		oContainer.FacadeAdminEncryptionInterceptor.Handle(),
 	}
 
 	oRouter := pkg.NewGrpcRouter()

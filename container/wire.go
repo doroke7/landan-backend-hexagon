@@ -195,6 +195,7 @@ type FacadeContainer struct {
 	FacadeAdminLoggerInterceptor        *interceptorFacadeAdmin.LoggerInterceptor
 	FacadeAdminSignatureInterceptor     *interceptorFacadeAdmin.SignatureInterceptor
 	FacadeAdminDecryptionInterceptor    *interceptorFacadeAdmin.DecryptionInterceptor
+	FacadeAdminEncryptionInterceptor    *interceptorFacadeAdmin.EncryptionInterceptor
 }
 
 func InitFacadeContainer(ctx context.Context) (*FacadeContainer, error) {
@@ -239,6 +240,7 @@ func InitFacadeContainer(ctx context.Context) (*FacadeContainer, error) {
 		interceptorFacadeAdmin.NewLoggerInterceptor,
 		interceptorFacadeAdmin.NewSignatureInterceptor,
 		interceptorFacadeAdmin.NewDecryptionInterceptor,
+		interceptorFacadeAdmin.NewEncryptionInterceptor,
 
 		wire.Struct(new(FacadeContainer), "*"),
 	)
