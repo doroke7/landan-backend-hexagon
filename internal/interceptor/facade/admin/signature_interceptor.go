@@ -32,6 +32,8 @@ func (oSelf *SignatureInterceptor) Handle() grpc.UnaryServerInterceptor {
 
 		oMd, _ := metadata.FromIncomingContext(oContext)
 
+		fmt.Println(oMd, "md..")
+
 		var sVer, sVersion, sK, sTime, sHeaderSignature string
 		if aValues := oMd.Get("ver"); len(aValues) > 0 {
 			sVer = aValues[0]

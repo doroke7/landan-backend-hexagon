@@ -27,8 +27,6 @@ func facadeInterceptors(oContainer *container.FacadeContainer) grpc.UnaryServerI
 		oContainer.FacadeAdminErrorInterceptor.Handle(),
 		oContainer.FacadeAdminStatusInterceptor.Handle(),
 		oContainer.FacadeAdminLoggerInterceptor.Handle(),
-		// Signature 要跑在 Decryption 之前：這時候加密欄位都還是密文，簽的才是
-		// client 端真正送出來的內容；如果先解密再簽，等於簽了偽造請求也能通過的明文。
 		oContainer.FacadeAdminSignatureInterceptor.Handle(),
 		oContainer.FacadeAdminDecryptionInterceptor.Handle(),
 	}

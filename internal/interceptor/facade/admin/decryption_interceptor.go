@@ -2,6 +2,7 @@ package interceptor_facade_admin
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -85,6 +86,10 @@ func (oSelf *DecryptionInterceptor) Handle() grpc.UnaryServerInterceptor {
 			// 變數，是個沒生效的 no-op，實際送出來的還是標準 base64（帶 +/）。這裡統一先轉成
 			// url-safe，AesHelper.Decrypt 固定用 RawURLEncoding 解，兩種格式都吃得下。
 			sNormalized := strings.NewReplacer("+", "-", "/", "_").Replace(sValue)
+
+			fmt.Println("oKeys 90", oKeys)
+			fmt.Println("sNormalized ", sNormalized)
+
 			sDecrypted := oSelf.AesHelper.Decrypt(sNormalized, oKeys.Key, oKeys.Iv)
 
 			oReflect.Set(oField, protoreflect.ValueOfString(sDecrypted))

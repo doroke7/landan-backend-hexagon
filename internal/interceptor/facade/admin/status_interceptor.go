@@ -19,22 +19,17 @@ func NewStatusInterceptor(oInterceptor *AbstractInterceptor) *StatusInterceptor 
 
 func (oSelf *StatusInterceptor) Handle() grpc.UnaryServerInterceptor {
 
-	return func(
-		oContext context.Context,
-		req any,
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (any, error) {
+	return func(oContext context.Context, oRequest any, oServerInfo *grpc.UnaryServerInfo, fnHandler grpc.UnaryHandler) (any, error) {
 
 		// before
 		fmt.Println("Before StatusInterceptor...")
 
-		oCtx, oReq := handler(oContext, req)
+		oResponse, oReq := fnHandler(oContext, oRequest)
 		fmt.Println("After StatusInterceptor...")
 
 		// after
 
-		return oCtx, oReq
+		return oResponse, oReq
 	}
 
 }

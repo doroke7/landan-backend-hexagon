@@ -10,6 +10,7 @@ import (
 
 	bootstrap "example/bootstrap"
 	inputApplicationFacade "example/internal/input/application/facade"
+	interceptorFacadeAdmin "example/internal/interceptor/facade/admin"
 	usecasePortAnyAdminAuthentication "example/internal/usecase/port/any/admin/authentication"
 	pbFacadeAdminAuthentication "example/pb/facade/admin/authentication"
 	"example/pkg"
@@ -38,6 +39,10 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext context.Context, oRequest *pb
 		}
 
 		return nil, status.Error(codes.Internal, oErr.Error())
+	}
+
+	if oHolder, bOk := interceptorFacadeAdmin.AuthHolderFromContext(oContext); bOk {
+		oHolder.Authorization = sAuthorization
 	}
 
 	if oErr := grpc.SetHeader(oContext, metadata.Pairs("A", sAuthorization)); oErr != nil {

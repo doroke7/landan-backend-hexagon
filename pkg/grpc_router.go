@@ -41,6 +41,7 @@ func NewGrpcRouter() *GrpcRouter {
 
 func ChainInterceptors(aInterceptors ...grpc.UnaryServerInterceptor) grpc.UnaryServerInterceptor {
 	return func(oContext context.Context, oRequest any, oServerInfo *grpc.UnaryServerInfo, fnHandler grpc.UnaryHandler) (any, error) {
+
 		fnNextHandler := fnHandler
 
 		for i := len(aInterceptors) - 1; i >= 0; i-- {

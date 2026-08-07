@@ -3,7 +3,10 @@ package interceptor_facade_admin
 import (
 	"context"
 	"fmt"
+
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ErrorInterceptor struct {
@@ -18,23 +21,26 @@ func NewErrorInterceptor(oInterceptor *AbstractInterceptor) *ErrorInterceptor {
 
 func (oSelf *ErrorInterceptor) Handle() grpc.UnaryServerInterceptor {
 
-	return func(
-		oContext context.Context,
-		req any,
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (any, error) {
+	return func(oContext context.Context, oReqeust any, oServerIno *grpc.UnaryServerInfo, fnHandler grpc.UnaryHandler) (oResponse any, oErr error) {
 
-		// before
+		oErr = nil
 
 		fmt.Println("Before ErrorInterceptor...")
 
-		oCtx, oReq := handler(oContext, req)
+		defer func() {
+
+			if oPanic := recover(); oPanic != nil {
+				oResponse = nil
+				oErr = status.Error(codes.Unavailable, "系統錯誤")
+			}
+		}()
+
+		oResponse, oErr = fnHandler(oContext, oReqeust)
 		fmt.Println("After ErrorInterceptor...")
 
 		// after
 
-		return oCtx, oReq
+		return oResponse, oErr
 	}
 
 }
