@@ -38,7 +38,9 @@ func (oSelf *AuthenticatorHandler) SignIn(oContext context.Context, oRequest *pb
 		return nil, status.Error(codes.Internal, oErr.Error())
 	}
 
-	oContext = context.WithValue(oContext, "authorization", sAuthorization)
+	if oHolder, bOk := oContext.Value("a").(*struct{ Authorization string }); bOk {
+		oHolder.Authorization = sAuthorization
+	}
 
 	return &pbFacadeAdminAuthentication.OneResponse{}, nil
 }
