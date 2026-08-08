@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"time"
 
@@ -38,30 +37,24 @@ func NewResource(oContext context.Context) *grpc.ClientConn {
 	oResolverBuilder.InitialState(resolver.State{Addresses: aAddrs})
 
 	// gRPC 本身支持 多路復用， 不建議做連結池
-	oConnection, err := grpc.NewClient(
-		oResolverBuilder.Scheme()+":///resource",
-		grpc.WithResolvers(oResolverBuilder),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithChainUnaryInterceptor(func(
-			ctx context.Context,
-			method string,
-			req, reply any,
-			cc *grpc.ClientConn,
-			invoker grpc.UnaryInvoker,
-			opts ...grpc.CallOption,
-		) error {
+	oConnection, err := grpc.NewClient(oResolverBuilder.Scheme()+":///resource", grpc.WithResolvers(oResolverBuilder), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithChainUnaryInterceptor(func(
+		ctx context.Context,
+		method string,
+		req, reply any,
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
 
-			sUser := CONFIG.CLIENTS.RESOURCE.USER
-			sPassword := CONFIG.CLIENTS.RESOURCE.PASSWORD
+		sUser := CONFIG.CLIENTS.RESOURCE.USER
+		sPassword := CONFIG.CLIENTS.RESOURCE.PASSWORD
 
-			fmt.Println("CONFIG.CLIENTS.RESOURCE=", CONFIG.CLIENTS.RESOURCE)
-			sAuthorization := "Basic " + utility.Base64Encode(
-				sUser+":"+sPassword,
-			)
-			ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", sAuthorization))
-			return invoker(ctx, method, req, reply, cc, opts...)
-		}),
+		sAuthorization := "Basic " + utility.Base64Encode(
+			sUser+":"+sPassword,
+		)
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", sAuthorization))
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}),
 		grpc.WithConnectParams(grpc.ConnectParams{
 			Backoff: backoff.Config{
 				BaseDelay:  1.0 * time.Second, // 第一次斷線後，等 1.0 秒再嘗試重連
