@@ -13,31 +13,38 @@ import (
 type Module string
 
 const (
-	Default                  Module = "default"
-	Cron                     Module = "cron"
-	Consumer                 Module = "consumer"
+	Default  Module = "default"
+	Cron     Module = "cron"
+	Consumer Module = "consumer"
+
+	HttpAdmin           Module = "http-admin"
+	HttpApp             Module = "http-app"
+	HttpThird           Module = "http-third"
+	HttpAdminMiddleware Module = "http-admin-middleware"
+	HttpAppMiddleware   Module = "http-app-middleware"
+	HttpThirdMiddleware Module = "http-third-middleware"
+
 	Websocket                Module = "websocket"
 	WebsocketMiddleware      Module = "websocket-middleware"
 	WebsocketAdminMiddleware Module = "websocket-admin-middleware"
 	WebsocketAppMiddleware   Module = "websocket-app-middleware"
 	WebsocketThirdMiddleware Module = "websocket-third-middleware"
-	HttpAdmin                Module = "http-admin"
-	HttpApp                  Module = "http-app"
-	HttpThird                Module = "http-third"
-	HttpAdminMiddleware      Module = "http-admin-middleware"
-	HttpAppMiddleware        Module = "http-app-middleware"
-	HttpThirdMiddleware      Module = "http-third-middleware"
-	Client                   Module = "client"
-	Deamon                   Module = "deamon"
-	DeamonWatcher            Module = "deamon-watcher"
-	FacadeGame               Module = "facade-game"
-	FacadeTable              Module = "facade-table"
-	FacadeRegister           Module = "facade-register"
-	ResourceLogic            Module = "resource-logic"
-	ResourceModel            Module = "resource-model"
-	Repository               Module = "repository"
-	Sdk                      Module = "sdk"
-	Publisher                Module = "publisher"
+
+	FacadeAdmin            Module = "facade-admin"
+	FacadeGame             Module = "facade-game"
+	FacadeTable            Module = "facade-table"
+	FacadeRegister         Module = "facade-register"
+	FacadeAdminInterceptor Module = "facade-admin-interceptor"
+
+	Client        Module = "client"
+	Deamon        Module = "deamon"
+	DeamonWatcher Module = "deamon-watcher"
+
+	ResourceLogic Module = "resource-logic"
+	ResourceModel Module = "resource-model"
+	Repository    Module = "repository"
+	Sdk           Module = "sdk"
+	Publisher     Module = "publisher"
 )
 
 var (

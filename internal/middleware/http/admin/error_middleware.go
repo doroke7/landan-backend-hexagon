@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	bootstrap "example/bootstrap"
 
@@ -44,17 +45,26 @@ func (oSelf *ErrorMiddleware) Handle() gin.HandlerFunc {
 			// 捕获 panic
 			if oError := recover(); oError != nil {
 				oByteStack := make([]byte, 4096)
+				iLen := runtime.Stack(oByteStack, false)
 
 				switch oErrorType := oError.(type) {
 				case *pkg.DefaultError: // 需要用 *指標， 因為 controller 是用 指標
-					fmt.Printf("[ERROR] %v", oErrorType)
-
+					pkg.Logger(pkg.HttpAdminMiddleware).Warn(
+						"業務警告",
+						zap.Any("error", oError),
+						zap.Any("headers", oByteStack[:iLen]),
+					)
 					oSelf.Response.Set(oContext, int(oErrorType.Status), int(oErrorType.Code), oErrorType.Message, struct{}{}, "")
 
 				default:
 					iLen := runtime.Stack(oByteStack, false)
-					fmt.Printf("[ERROR] %v\n%s\n", oError, oByteStack[:iLen])
+					// Logger.Fatal 會再觸發 panic
 
+					pkg.Logger(pkg.HttpAdminMiddleware).Fatal(
+						"系統錯誤",
+						zap.Any("error", oError),
+						zap.Any("headers", oByteStack[:iLen]),
+					)
 					oSelf.Response.Set(oContext, 200, -4, "系統錯誤", struct{}{}, "")
 
 				}
@@ -66,15 +76,28 @@ func (oSelf *ErrorMiddleware) Handle() gin.HandlerFunc {
 			if len(oContext.Errors) > 0 {
 				oLastErr := oContext.Errors.Last()
 
-				byStack := make([]byte, 4096)
-				iLen := runtime.Stack(byStack, false)
-				fmt.Printf("[ERROR] %s\n%s\n", oLastErr.Error(), byStack[:iLen])
+				aByteStack := make([]byte, 4096)
+				iLen := runtime.Stack(aByteStack, false)
+				fmt.Printf("[ERROR] %s\n%s\n", oLastErr.Error(), aByteStack[:iLen])
 
 				switch oErrorType := oLastErr.Err.(type) {
 				case *pkg.DefaultError:
+
+					pkg.Logger(pkg.HttpAdminMiddleware).Warn(
+						"DefaultError",
+						zap.String("error", oLastErr.Error()),
+						zap.Any("headers", aByteStack[:iLen]),
+					)
 					oSelf.Response.Set(oContext, int(oErrorType.Status), int(oErrorType.Code), oErrorType.Message, struct{}{}, "")
 
 				default:
+					// Logger.Fatal 會再觸發 panic
+
+					pkg.Logger(pkg.HttpAdminMiddleware).Fatal(
+						"系統錯誤",
+						zap.String("error", oLastErr.Error()),
+						zap.Any("headers", aByteStack[:iLen]),
+					)
 					oSelf.Response.Set(oContext, 200, -4, "系統錯誤", struct{}{}, "")
 
 				}

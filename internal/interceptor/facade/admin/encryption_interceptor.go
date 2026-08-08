@@ -2,11 +2,9 @@ package interceptor_facade_admin
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-
-	bootstrap "example/bootstrap"
 )
 
 type EncryptionInterceptor struct {
@@ -28,22 +26,23 @@ func (oSelf *EncryptionInterceptor) Handle() grpc.UnaryServerInterceptor {
 
 		sAuthorization := oContext.Value("authorization").(string)
 
+		fmt.Println(sAuthorization)
 		oResponse, oErr = fnHandler(oContext, oRequest)
-		if oErr != nil {
-			return oResponse, oErr
-		}
+		// if oErr != nil {
+		// 	return oResponse, oErr
+		// }
 
-		if sAuthorization != "" {
-			sA := oSelf.AesHelper.Encrypt(
-				sAuthorization,
-				bootstrap.CONFIG.SERVICES.FACADE.ADMIN.JWT.KEY,
-				bootstrap.CONFIG.SERVICES.FACADE.ADMIN.JWT.IV,
-			)
+		// if sAuthorization != "" {
+		// 	sA := oSelf.AesHelper.Encrypt(
+		// 		sAuthorization,
+		// 		bootstrap.CONFIG.SERVICES.FACADE.ADMIN.JWT.KEY,
+		// 		bootstrap.CONFIG.SERVICES.FACADE.ADMIN.JWT.IV,
+		// 	)
 
-			if oHeaderErr := grpc.SetHeader(oContext, metadata.Pairs("A", sA)); oHeaderErr != nil {
-				return nil, oHeaderErr
-			}
-		}
+		// 	if oHeaderErr := grpc.SetHeader(oContext, metadata.Pairs("A", sA)); oHeaderErr != nil {
+		// 		return nil, oHeaderErr
+		// 	}
+		// }
 
 		return oResponse, oErr
 	}

@@ -3,10 +3,14 @@ package interceptor_facade_admin
 import (
 	"context"
 	"fmt"
+	"runtime"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	pkg "example/pkg"
 )
 
 type ErrorInterceptor struct {
@@ -30,6 +34,18 @@ func (oSelf *ErrorInterceptor) Handle() grpc.UnaryServerInterceptor {
 		defer func() {
 
 			if oPanic := recover(); oPanic != nil {
+
+				oByteStack := make([]byte, 4096)
+				iLen := runtime.Stack(oByteStack, false)
+
+				// Logger.Fatal 會再觸發 panic
+				pkg.Logger(pkg.FacadeAdminInterceptor).Error(
+					"panic recovered",
+					zap.Any("panic", oPanic),
+					zap.String("method", oServerIno.FullMethod),
+					zap.String("stack", string(oByteStack[:iLen])),
+				)
+
 				oResponse = nil
 				oErr = status.Error(codes.Unavailable, "系統錯誤")
 			}
